@@ -1,0 +1,22 @@
+# Node / Next.js
+node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env.local
+
+# Python / FastAPI
+backend/__pycache__/
+backend/**/__pycache__/
+backend/.venv/
+backend/venv/
+backend/*.egg-info/
+backend/.env
+
+# Data (raw/unprocessed exports; keep the cleaned static GeoJSON in frontend/public/data)
+backend/data/raw/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

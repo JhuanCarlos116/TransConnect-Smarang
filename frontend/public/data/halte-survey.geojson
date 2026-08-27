@@ -1,0 +1,1097 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.47174530000001,
+          -7.051117
+        ]
+      },
+      "properties": {
+        "halte_id": "6a8a84480d6732db988bf684",
+        "nama_halte": "Halte Dadapan Semarang 1 ",
+        "kelurahan": "Meteseh",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "tidak",
+        "sidewalk_condition": "tidak",
+        "route_info_signage": "-",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/1b9d1584-e249-467d-9ad7-eaac157754cf_1787462723525.jpg",
+        "survey_date": "2026-08-23",
+        "catatan_lapangan": "Halte ini berada di pemukiman yang cukup kumuh daripada halte lain. Terdapat fasikutas seperti tangga dan kursi yang sudah berdebu. Vegetasi ada tetapi daun yang sangat berserakan. Pedestrian pun tidak ada. Halte ini sama sekali tidak mempunyai penerangan walaupun di pertengahan permukiman warga. #timGOPEK",
+        "condition_score": 25,
+        "condition_label": "red"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.46702909999999,
+          -7.0426148
+        ]
+      },
+      "properties": {
+        "halte_id": "6a8a82640d6732db988bf4ef",
+        "nama_halte": "Halte SLB Negeri Semarang I",
+        "kelurahan": "Mangunharjo",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "-",
+        "sidewalk_condition": "tidak",
+        "route_info_signage": "tidak",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/b8011dc9-9ee6-4f71-8246-2ae1af4e1ab9_1787462239812.jpg",
+        "survey_date": "2026-08-23",
+        "catatan_lapangan": "Halte ini memiliki area yang cukup luas dibanding hakte seberangannya. Halte ini terlihat seperti sepi dan kurang terfasilitasi tempat duduk dengan baik. Layanan seperti pedestrian dan papan informasi pun tidak ada. Walaupun begitu, halte ini memiliki kanopi yany cukup panjang sehingga memiliki suasana yang cukup adem. #timGOPEK",
+        "condition_score": 28,
+        "condition_label": "red"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.46708130000002,
+          -7.0425984
+        ]
+      },
+      "properties": {
+        "halte_id": "6a8a81ac52d86e03b51911fe",
+        "nama_halte": "Halte SLB Negeri Semarang II",
+        "kelurahan": "Sendangmulyo",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "-",
+        "sidewalk_condition": "tidak",
+        "route_info_signage": "-",
+        "canopy": "-",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/d33aac40-5460-44cf-b60d-45de16a7154d_1787462056037.jpg",
+        "survey_date": "2026-08-23",
+        "catatan_lapangan": "Halte ini tampak agak kurang terfasilitasi dengan baik. Tampak tangga dan tempat duduk yang cukup usang dan rusak dibandingkan dengan halte seberangannya. Halte ini tidak memiliki pedestrian yang baik. Halte ini berhadapan langsung dengan jalan raya sehingga kenyamanan pengunjung belum terjamin aman dan nyaman. #timGOPEK",
+        "condition_score": 30,
+        "condition_label": "red"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.46817069999997,
+          -7.0398003
+        ]
+      },
+      "properties": {
+        "halte_id": "6a8a805e0d6732db988bf2ca",
+        "nama_halte": "Halte Harmoni Residence II",
+        "kelurahan": "Mangunharjo",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "-",
+        "sidewalk_condition": "ada",
+        "route_info_signage": "tidak",
+        "canopy": "-",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/a21801fd-e157-45b2-9e0a-2d0c7ff11e12_1787461721575.jpg",
+        "survey_date": "2026-08-23",
+        "catatan_lapangan": "Halte ini mempunyai tempat duduk yang sangat kecil dan agak meleyot. Seperti halte di sebelahnya, halte ini mempunyai pedestrian yang cukup memperihatinkan. Suasana yang cukup panas membuat pengunjung terasa lebih sepi saat kami menyusuri halte ini. Halte ini banyak ditempeli spanduk-spanduk bersifat promosi daripada informasi rute Bus Trans Semarang. #timGOPEK",
+        "condition_score": 62,
+        "condition_label": "yellow"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.46816360000003,
+          -7.0398247
+        ]
+      },
+      "properties": {
+        "halte_id": "6a8a7f7d52d86e03b5190f8b",
+        "nama_halte": "Halte Harmoni Residence I",
+        "kelurahan": "Mangunharjo",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "ada",
+        "sidewalk_condition": "tidak",
+        "route_info_signage": "-",
+        "canopy": "-",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/627b9db0-9f77-43ce-b2cc-a31ee705c0e8_1787461497020.jpg",
+        "survey_date": "2026-08-23",
+        "catatan_lapangan": "Halte ini cukuo sepi darioada halte lain. Pedestrian seperti trotoar dan guiding block pun tidak ada. Penerangan hanya mengandalkan lampu jalan. Tempat duduk dan tangga yang agak meleyot menjadi situasi yang riskan bagi pengunjung. #timGOPEK",
+        "condition_score": 40,
+        "condition_label": "yellow"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.46749679999999,
+          -7.0330392
+        ]
+      },
+      "properties": {
+        "halte_id": "6a8a7cf052d86e03b5190d55",
+        "nama_halte": "Halte RSWN Semarang I",
+        "kelurahan": "Sendangmulyo",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "ada",
+        "sidewalk_condition": "ada",
+        "route_info_signage": "ada",
+        "canopy": "-",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/b5ac51ad-a522-45ca-b35b-542a40007822_1787460843620.jpg",
+        "survey_date": "2026-08-23",
+        "catatan_lapangan": "Menyusuri wilayah Sendangmulyo, tampak halte dengan fasilitas yang cukup lengkap. Fasilitas tersebut di antaranya adalah trotoar, tempat duduk, charger, keramik, dinding tembok, papan informasi, bahkan halte ini sudah mempunyai penerangannya mandiri dibuktikan dengan adanya tempat token listrik. Saat kita suvey, kami melihat banyak sekali pengunjung yang mengunjungi halte di sini. #timGOPEK",
+        "condition_score": 88,
+        "condition_label": "green"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4675775,
+          -7.0328062
+        ]
+      },
+      "properties": {
+        "halte_id": "6a8a7b3352d86e03b5190c07",
+        "nama_halte": "Halte RSWN Semarang II",
+        "kelurahan": "Sendangmulyo",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "-",
+        "sidewalk_condition": "tidak",
+        "route_info_signage": "-",
+        "canopy": "-",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/ff84d8e3-2340-4038-b4fa-967e00796c72_1787460398816.jpg",
+        "survey_date": "2026-08-23",
+        "catatan_lapangan": "Terlihat halte ini cukup adem dikala teriknya panas matahari. Area halte yang sempit tak menjadi masalah bagi pengunjung yang turun pada pukul 11.45 WIB pada Minggu, 23 Agustus 2026. Halte ini tidak mempunyai trotoar dan guiding block tetapi aksesbilitas jalan bagi pengunjung sudah cukup terlayani dengan baik. Lain dari halte lain, halte ini menggunakan bangunan berupa semen tembok dan lantai keramik dengan kursi besi yang cukup kokoh. #timGOPEK",
+        "condition_score": 30,
+        "condition_label": "red"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.46497369999997,
+          -7.0238647
+        ]
+      },
+      "properties": {
+        "halte_id": "6a8a771052d86e03b519075c",
+        "nama_halte": "Halte Kini Jaya I",
+        "kelurahan": "Sambiroto",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "ada",
+        "sidewalk_condition": "ada",
+        "route_info_signage": "-",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/ed9f6702-5195-4766-bae3-02c5bdcd10b5_1787459339455.jpg",
+        "survey_date": "2026-08-23",
+        "catatan_lapangan": "Halte satu ini memiliki area yang sangat luas. Jika dibandingkan dengan halte lain, penempatan halte ini lumayan adem karena kanopi yang panjang. Halte ini pun ada pengawas yang mengawasi sehingga apabila ada pengunjung yang memerlukan bantuan cukup terlayani. Penerangan yang minim. Trotoar dan guiding block yang terhalang oleh benda benda lain. Jalanan di depan halte tersebut ada dua lubang yang membuat keselamatan pengunjung cukup diperhatikan. #timGOPEK",
+        "condition_score": 85,
+        "condition_label": "green"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4650236,
+          -7.0238449
+        ]
+      },
+      "properties": {
+        "halte_id": "6a8a73ef52d86e03b519044f",
+        "nama_halte": "Halte Kini Jaya II",
+        "kelurahan": "Kedungmundu",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "tidak",
+        "sidewalk_condition": "ada",
+        "route_info_signage": "-",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/51641314-2b1a-467a-996f-7bf7d8211e1b_1787458539010.jpg",
+        "survey_date": "2026-08-23",
+        "catatan_lapangan": "Suasana panas pada tanggal 23 Agustus 2026 menyelimuti halte ini, tetapi untung saja ada kanopi yang cukup bagus lain daripada halte lain yang menghalanginya. Walaupun halte ini memiliki trotoar yang cukup rapih tetapi tidak memiliki guiding block dan biasanya digunakan oleh pedagang untuk berjualan. Halte ini tidak mempunyai peberangan khusus untuk meneranginya terutama di malam hari. Terlihat cukup ramai walaupun keadaan halte lumayan sempit. #timGOPEK",
+        "condition_score": 65,
+        "condition_label": "yellow"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.46380060000001,
+          -7.023062
+        ]
+      },
+      "properties": {
+        "halte_id": "6a8a71230d6732db988be3a2",
+        "nama_halte": "Halte Depan SMAN 15 Semarang (barat)",
+        "kelurahan": "Kedungmundu",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "-",
+        "sidewalk_condition": "ada",
+        "route_info_signage": "-",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/4dce5f85-346c-4a5e-89ee-4d6a1de6d8fe_1787457822976.jpg",
+        "survey_date": "2026-08-23",
+        "catatan_lapangan": "Tepat pukul 11.00 menjelang siang hari yang sangat panas, berada di area halte yang biasa digunakan oleh anak-anak sekolah terutama siswa SMAN 15 Semarang. Halte ini tampak kecil. Halte ini mempunyai kanopi, tangga, dan kursi bangunan yang kokoh. Halte ini berbatasan langsung dengan drainase yang cukup dalam. Pedestrian yang cukup kurang karena berpotensi menjadi wilaya pedagang. #timGOPEK",
+        "condition_score": 75,
+        "condition_label": "green"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.46323359999997,
+          -7.0227841
+        ]
+      },
+      "properties": {
+        "halte_id": "6a8a6e2c52d86e03b5190000",
+        "nama_halte": "Halte Depan SMAN 15 Semarang (timur)",
+        "kelurahan": "Sambiroto",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "-",
+        "sidewalk_condition": "tidak",
+        "route_info_signage": "-",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/cc91c683-5b62-4d03-ab10-9551c36bbc41_1787457064382.jpg",
+        "survey_date": "2026-08-23",
+        "catatan_lapangan": "Tampak sekali halte ini diselimuti kanopi yang panjang. Walaupun adem, halte ini tidak mempunyai trotoar dan guiding block, hal ini dikarenakan wilayah sekitarnya malahan dijadikan sebagai selokan. Tempat duduk dan penopang halte pun agak riskan dikarenakab kurang kokohnya besi bangunan halte tersebut. #timGOPEK",
+        "condition_score": 35,
+        "condition_label": "red"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.46143890000002,
+          -7.0245036
+        ]
+      },
+      "properties": {
+        "halte_id": "6a8a6c450d6732db988be029",
+        "nama_halte": "Bus Stop Kelurahan Kedungmundu I (timur)",
+        "kelurahan": "Kedungmundu",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "-",
+        "sidewalk_condition": "ada",
+        "route_info_signage": "-",
+        "canopy": "-",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/47141686-3c96-41f3-b54c-5429e1b5fa8a_1787456577296.jpg",
+        "survey_date": "2026-08-23",
+        "catatan_lapangan": "Halte (bus stop) hanya berupa plang yang sudah hampir jatuh (miring) dan ditempatkan di belakang drainase tanpa penutup sehingga keselamatan pedestrian sangat kurang. #timGOPEK",
+        "condition_score": 70,
+        "condition_label": "green"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.46140509999998,
+          -7.0245201
+        ]
+      },
+      "properties": {
+        "halte_id": "6a8a6b2f0d6732db988bdf53",
+        "nama_halte": "Halte Kelurahan Kedungmundu II (barat)",
+        "kelurahan": "Kedungmundu",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "-",
+        "sidewalk_condition": "tidak",
+        "route_info_signage": "-",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/4b646646-b9e0-4072-b0c7-703b3ba24cff_1787456291934.jpg",
+        "survey_date": "2026-08-23",
+        "catatan_lapangan": "Suasana yang panas menyelimuti halte ini, tepat pada Minggu, 23 Agustus 2026 pukul 10.35 saya melihat halte ini sedang sepi tidak ada pengunjung. Halte ini mempunyai kanopi, tangga, dan kursi fasilitas yang kokoh. Halte ini tidak mempunyai trotoar dan guiding block. Area sekitarnya dimanfaatkan untuk keperluan bangunan toko. Walaupun terdapat kanopi, halte ini cenderung panas dikarenakan terletak di tengah tengah jalan raya dan tidak ada vegetasi di sekitarnya. #timGOPEK",
+        "condition_score": 35,
+        "condition_label": "red"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4533649,
+          -7.0154414
+        ]
+      },
+      "properties": {
+        "halte_id": "6a8a66cd52d86e03b518fbb6",
+        "nama_halte": "Halte PDAM Kedungmundu I",
+        "kelurahan": "Kedungmundu",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "ada",
+        "sidewalk_condition": "ada",
+        "route_info_signage": "-",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/8f07073d-99a0-42c9-8403-0706c8bcb1ad_1787455177197.jpg",
+        "survey_date": "2026-08-23",
+        "catatan_lapangan": "Tepat pada Minggu, 23 Agustus 2026 pukul 10.15 saya berada pada halte di sekitar area yang cukup ramai. Halte ini tampak memiliki kursi, tangga, dan kanopi. Peletakkan halte yang kurang cocok dikarenakan terletak di atas trotoar sehingga orang yang ingin mengunjungi halte tersebut kurang terfasilitasi. Maka dari itu, keselamatan para pengunjung Trans Semarang tidak terlayani dengan baik. Halte ini hanya memanfaatkan penerangan di sekitar jalanan saja sehingga jika pengunjung berada di halte ini malam hari akan terasa gelap sebagian. #timGOPEK ",
+        "condition_score": 85,
+        "condition_label": "green"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.46981169999998,
+          -7.0602017
+        ]
+      },
+      "properties": {
+        "halte_id": "6a892840478dc3b356b72e15",
+        "nama_halte": "Halte BRT Dinar Elok I",
+        "kelurahan": "Meteseh",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "ada",
+        "sidewalk_condition": "tidak",
+        "route_info_signage": "-",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/8191fe8a-6ce6-429e-8a90-fc7cc56e4dba_1787373623278.jpg",
+        "survey_date": "2026-08-22",
+        "catatan_lapangan": "Pada pukul 11.07, kami mendatangi Halte BRT Dinar Elok I. Halte ini berbentuk bangunan semipermanen dengan kursi, tangga, dan atap. Halte ini cukup layak karena memiliki vegetasi (pohon) di sampingnya sehingga memberikan rasa teduh bagi pengguna maupun penulis. Halte ini sudah memiliki penerangan yang baik karena berdekatan dengan lampu jalan. Kekurangan dari halte ini adalah tidak adanya jalur pejalan kaki yang layak karena langsung berbatasan dengan jalan. Sebagai tambahan, pada saat penulis menulis ulasan ini, seorang bapak bapak yang sepertinya ditugaskan oleh instansi terkait Trans Semarang datang dan membersihkan halte tersebut. #timGOPEK",
+        "condition_score": 45,
+        "condition_label": "yellow"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.47155729999997,
+          -7.056096
+        ]
+      },
+      "properties": {
+        "halte_id": "6a8926d9478dc3b356b72d43",
+        "nama_halte": "Halte BRT Pasar Meteseh I",
+        "kelurahan": "Meteseh",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "tidak",
+        "sidewalk_condition": "ada",
+        "route_info_signage": "-",
+        "canopy": "tidak",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/a3fd4257-25d4-4388-ba5d-a12ed4af43d8_1787373253104.jpg",
+        "survey_date": "2026-08-22",
+        "catatan_lapangan": "Pada pukul 11.21 kami mendatangi Halte BRT Pasar Meteseh I, halte ini berupa bangunan semipermanen dengan tangga, kursi, dan atap. Saat berada di halte ini, penulis merasa sangat panas karena tidak adanya vegetasi (pohon) di sekitar. Aksesibilitas bagi pejalan kaki juga tidak layak karena adanya  sampah sampah , batuan, dan pasir yang beterbangan. Selain itu, penulis juga tidak melihat adanya tiang lampu atau lampu penerangan di halte ini. #timGOPEK",
+        "condition_score": 55,
+        "condition_label": "yellow"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.46114979999999,
+          -7.0630248
+        ]
+      },
+      "properties": {
+        "halte_id": "6a89239252d86e03b51832bf",
+        "nama_halte": "Bus Stop Bukit Kencana Jaya (arah utara)",
+        "kelurahan": "Meteseh",
+        "kecamatan": "Tembalang",
+        "cctv": "tidak",
+        "lighting": "ada",
+        "sidewalk_condition": "-",
+        "route_info_signage": "tidak",
+        "canopy": "tidak",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/6db6e813-3467-4b9f-8f4c-6c07ad3ea566_1787372425551.jpg",
+        "survey_date": "2026-08-22",
+        "catatan_lapangan": "pada tanggal 22 Agustus 2026, pukul 11.16. Saya sedang berada di Bus Stop Bukit Kencana Jaya arah utara,  suasana lalu lintas tidak begitu ramai dan cuaca sedang panas terik. Untuk bus stop sendiri terletak di dekat bundaran toko risol, warung, alfamart, dan perumahan warga sekitar. Untuk bus stop sendiri tidak tertutup dengan pohon ataupun kanopi sehingga panas terik dapat langsung mengenai penumpang yang sedang menunggu bus. Selain itu bus stop ini tidak menyediakan tempat duduk dan informasi mengenai rute perjalanan bus. Penerangan bersumber dari lampu jalan di sebelah kanan dan tidak tersedia cctv. #timGOPEK",
+        "condition_score": 40,
+        "condition_label": "yellow"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.46131880000002,
+          -7.0640755
+        ]
+      },
+      "properties": {
+        "halte_id": "6a89202352d86e03b5182e7e",
+        "nama_halte": "Bus Stop Bukit Kencana Jaya (arah selatan)",
+        "kelurahan": "Meteseh",
+        "kecamatan": "Tembalang",
+        "cctv": "tidak",
+        "lighting": "ada",
+        "sidewalk_condition": "-",
+        "route_info_signage": "tidak",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/9f4071d7-b527-4c46-b60a-34f9e6c0de76_1787371549180.jpg",
+        "survey_date": "2026-08-22",
+        "catatan_lapangan": "pada tanggal 22 Agustus 2026, pukul 11.06. Saya sedang berada di Bus Stop Bukit Kencaba Jaya arah selatan, suasana lalu lintas tidak begitu ramai dan cuaca sedang panas terik. Untuk bus stop sendiri terletak di dekat bangunan ruko, lahan kosong, toko kuliner, dan perumahan warga setempat. Untuk bus stop sendiri tidak menyediakan informasi rute perjalanan bus, mengandalkan tanaman dan pohon sekitar sebagai kanopi menangkal panas matahari. Tidak tersedia  tempat duduk bagi penumpang yang menungu bus. Sumber penerangan berasal dari lampu jalan dan tidak tersedia cctv. Penumpang yang menunggu juga harus berhati-hati karena ada kabel listrik menggantung cukup dekat dengan kepala orang dewasa. #timGOPEK",
+        "condition_score": 50,
+        "condition_label": "yellow"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.46969469999999,
+          -7.0602133
+        ]
+      },
+      "properties": {
+        "halte_id": "6a89201052d86e03b5182e77",
+        "nama_halte": "Halte BRT Dinar Elok II",
+        "kelurahan": "Meteseh",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "ada",
+        "sidewalk_condition": "tidak",
+        "route_info_signage": "-",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/37d3dd4e-fac2-4c10-b896-6c8260517fbd_1787371525827.jpg",
+        "survey_date": "2026-08-22",
+        "catatan_lapangan": "Pada pukul 11.07, kami mendatangi Halte BRT Dinar Elok II. Halte ini berbentuk bangunan semipermanen dengan kursi, tangga, dan atap. Halte ini cukup layak karena memiliki vegetasi (pohon) di sampingnya sehingga memberikan rasa teduh bagi pengguna maupun penulis. Halte ini sudah memiliki penerangan yang baik karena berdekatan dengan lampu jalan. Kekurangan dari halte ini adalah tidak adanya jalur pejalan kaki yang layak karena langsung berbatasan dengan jalan. Sebagai tambahan, pada saat penulis menulis ulasan ini, seorang bapak bapak yang sepertinya ditugaskan oleh instansi terkait Trans Semarang datang dan membersihkan halte tersebut. #timGOPEK",
+        "condition_score": 45,
+        "condition_label": "yellow"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.46803,
+          -7.06057
+        ]
+      },
+      "properties": {
+        "halte_id": "6a891f2852d86e03b5182ce3",
+        "nama_halte": "Halte BRT Dinar Asri I",
+        "kelurahan": "Meteseh",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "ada",
+        "sidewalk_condition": "-",
+        "route_info_signage": "-",
+        "canopy": "tidak",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/4232aa15-5bea-47f1-b098-b1d286afdc43_1787371302002.jpg",
+        "survey_date": "2026-08-22",
+        "catatan_lapangan": "Pada pukul 10.58, kami mendatangi Halte Inar Asri I. Halte ini berupa bangunan semipermanen dengan atap, tangga, dan kursi bagi penumpang dan pengguna BRT Trans Semarang yang menunggu. Halte ini terlihat sudah cukup lama dan tua dan nampaknya belum ada revitalisasi. Di sekitar halte ini tidak ada vegetasi sehingga saat berada halte sangat panas. Namun, penerangan sudah ada karena bersebelahan dengan tiang lampu jalan. #timGOPEK",
+        "condition_score": 55,
+        "condition_label": "yellow"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4617394,
+          -7.0628181
+        ]
+      },
+      "properties": {
+        "halte_id": "6a891ea7478dc3b356b72322",
+        "nama_halte": "Bus stop Victoria Residence II (arah barat)",
+        "kelurahan": "Meteseh",
+        "kecamatan": "Tembalang",
+        "cctv": "tidak",
+        "lighting": "ada",
+        "sidewalk_condition": "-",
+        "route_info_signage": "tidak",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/c4332658-db29-4ee4-9cb6-6521f76f4909_1787371165884.jpg",
+        "survey_date": "2026-08-22",
+        "catatan_lapangan": "pada tanggal 22 Agustus 2026, pukul 10.53. Saya sedang berada di bus stop Victoria Residence II arah barat, suasana lalu lintas tidak begitu ramai dan cuaca sedang panas terik. Untuk bus stop sendiri terletak di dekat bundaran Victoria Residence II, rumah makan padang, dan toko kuliner lain. Untuk bus stop sendiri sudah ditutupi tenda berwarna biru sehingga tertutup dari panas matahari. Sudah tersedia juga tempat duduk bagi penumpang yang menungu bus namun masih tidak ada informasi mengenai rute perjalanan bus. Sumber penerangan berasal dari lampu bundaran dan tidak tersedia cctv. #timGOPEK",
+        "condition_score": 50,
+        "condition_label": "yellow"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.46443999999997,
+          -7.06295
+        ]
+      },
+      "properties": {
+        "halte_id": "6a891d13478dc3b356b7219e",
+        "nama_halte": "Halte BRT Dinas Mas II",
+        "kelurahan": "Meteseh",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "-",
+        "sidewalk_condition": "tidak",
+        "route_info_signage": "-",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/30c93134-140f-4604-99b2-25c34d633715_1787370768666.jpg",
+        "survey_date": "2026-08-22",
+        "catatan_lapangan": "Pada pukul 10.49 kami mendatangi halte ..... . Halte ini berada di dalam kawasan dan jalan perumahan. Halte ini hanya berupa plang penanda naik/turun. Akses pejalan kali sudah ada, tetapi belum cukup karna tidak ada trotoar atau bahkan guiding block. Vegetasi di sekitar halte ini sedikit, kurang dari 3 pohon dalam 100m di ruas jalan ini. Namun, ada pohon yang cukup rindang di samping plang tersebut sehingga pengguna trans Semarang yang menunggu bisa berteduh.#timGOPEK",
+        "condition_score": 35,
+        "condition_label": "red"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4632767,
+          -7.0588477
+        ]
+      },
+      "properties": {
+        "halte_id": "6a891c0d478dc3b356b71fda",
+        "nama_halte": "Bus stop Emerald Garden (arah utara)",
+        "kelurahan": "Meteseh",
+        "kecamatan": "Tembalang",
+        "cctv": "tidak",
+        "lighting": "ada",
+        "sidewalk_condition": "ada",
+        "route_info_signage": "tidak",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/eb8f2bcb-6d02-4097-b4ea-b576f09a69c7_1787370502229.jpg",
+        "survey_date": "2026-08-22",
+        "catatan_lapangan": "Tepat pada tanggal 22 Agustus 2026, pukul 10.41. Saya sedang berada di bus stop Emerald Garden arah utara, suasana lalu lintas tidak begitu ramai dan cuaca sedang panas terik. Untuk bus stop sendiri terletak di dekat perumahan emerald green dan ruko-ruko sekitar. Kondisi area pejalan kaki menggunakan tanah dan sudah tertutupi daun daun kering. Tidak tersedia informasi mengenai rute perjalanan bus. Bus stop ini bergantung pada tanaman sekitar sebagai kanopi yang cukup untuk menangkal panas matahari. Terdapat platform besi yang ditopang dengan batu bata yang digunakan sebagai tempat duduk penumpang yang menunggu bus. Sumber penerangan berumber dari lampu jalan di samping rambu dan lampu dari ruko-ruko sekitar. Untuk cctv belum tersedia. #timGOPEK",
+        "condition_score": 70,
+        "condition_label": "green"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.46281550000003,
+          -7.0580335
+        ]
+      },
+      "properties": {
+        "halte_id": "6a8918bc52d86e03b5182170",
+        "nama_halte": "Bus Stop SDN Meteseh (arah utara)",
+        "kelurahan": "Meteseh",
+        "kecamatan": "Tembalang",
+        "cctv": "tidak",
+        "lighting": "ada",
+        "sidewalk_condition": "ada",
+        "route_info_signage": "tidak",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/51aafe4a-f821-4751-b767-f4bda0395f1c_1787369655405.jpg",
+        "survey_date": "2026-08-22",
+        "catatan_lapangan": "Tepat pada tanggal 22 Agustus 2026, pukul 10.30 Saya sedang berada di bus stop SDN Meteseh arah utara, suasana lalu lintas tidak begitu ramai dan cuaca sedang cerah. Untuk bus stop sendiri terletak di dekat SDN Meteseh, indomaret, dan tempat tinggal warga Meteseh. Kondisi trotoar tidak cukup layak, melihat banyak area tempat tunggu banyak ditumbuhi rumput dan serpihan batu, selain itu terletak cukup dekat dengan jalan kendaraan. Tidak tersedia informasi mengenai rute perjalanan bus. Bus stop ini bergantung pada satu pohon di dekat sebuah bangunan sebagai kanopi untuk menangkal panas matahari. Tidak ada sumber penerangan pasti dari lampu jalan (bersumber dari indomaret dan lampu rumah warga sekitar). Untuk cctv belum tersedia. #timGOPEK",
+        "condition_score": 70,
+        "condition_label": "green"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.43952360000003,
+          -7.0598259
+        ]
+      },
+      "properties": {
+        "halte_id": "6a8916b952d86e03b5181f0b",
+        "nama_halte": "Halte BRT Kantor Pos Tembalang 1",
+        "kelurahan": "Tembalang",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "-",
+        "sidewalk_condition": "tidak",
+        "route_info_signage": "-",
+        "canopy": "tidak",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/8cd2fcc7-5d18-473a-a562-f16b13be476c_1787369143782.jpg",
+        "survey_date": "2026-08-22",
+        "catatan_lapangan": "Pada pukul 10.19 kami mendatangi halte POS Tembalang. Halte ini hanya berupa plang penanda naik atau turun BRT Trans semarang saja. Cukup mudah ditemukan, tetapi aksesibilitas pejalan kaki kurang baik karena pedestrian way-nya tidak ada, langsung bersinggungan dengan jalan raya. Selain itu, plang ini berada di bawah tiang kabel listrik yang berisiko terhadap keselamatan penunggu BRT Trans Semarang. Halte ini juga panas karena tidak ada vegetasi (pohon) yang meneduhi halte tersebut. #timGOPEK",
+        "condition_score": 25,
+        "condition_label": "red"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.46278139999998,
+          -7.0581449
+        ]
+      },
+      "properties": {
+        "halte_id": "6a89167452d86e03b5181eb5",
+        "nama_halte": "Bus stop SDN Meteseh (arah selatan)",
+        "kelurahan": "Meteseh",
+        "kecamatan": "Tembalang",
+        "cctv": "tidak",
+        "lighting": "ada",
+        "sidewalk_condition": "ada",
+        "route_info_signage": "tidak",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/67b6c569-9ffe-4270-b98b-73f31ff4e68c_1787369071395.jpg",
+        "survey_date": "2026-08-22",
+        "catatan_lapangan": "Tepat pada tanggal 22 Agustus 2026, pukul 10.17. Saya sedang berada di bus stop SDN Meteseh arah selatan, suasana lalu lintas tidak begitu ramai dan cuaca sedang cerah. Untuk bus stop sendiri terletak di dekat SDN Meteseh, toko bubur ayam, dan tempat tinggal warga Meteseh. Kondisi trotoar tidak cukup layak, melihat banyak area tempat tunggu banyak ditumbuhi rumput dan serpihan batu, selain itu terletak cukup dekat dengan jalan kendaraan. Tidak tersedia informasi mengenai rute perjalanan bus. Bus stop ini bergantung pada tanaman sekitar sebagai kanopi namun tidak cukup tinggi untuk menangkal panas matahari. Sumber penerangan berumber dari lampu jalan di seberang jalan yang sepertinya sudah rusak. Untuk cctv belum tersedia. #timGOPEK",
+        "condition_score": 70,
+        "condition_label": "green"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4480886,
+          -7.0605751
+        ]
+      },
+      "properties": {
+        "halte_id": "6a8912c059146ea8941f9883",
+        "nama_halte": "Bus stop Jl. Imam Soeparto (arah barat)",
+        "kelurahan": "Bulusan",
+        "kecamatan": "Tembalang",
+        "cctv": "tidak",
+        "lighting": "ada",
+        "sidewalk_condition": "ada",
+        "route_info_signage": "tidak",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/a32b9f90-6ef3-46e5-8b66-9715d7ff5d9f_1787368122595.jpg",
+        "survey_date": "2026-08-22",
+        "catatan_lapangan": "Tepat pada tanggal 22 Agustus 2026, pukul 10.00. Saya sedang berada di bus stop Jl. Imam Soeparto, suasana lalu lintas tidak begitu ramai dan cuaca sedang cerah. Untuk bus stop sendiri terletak di seberang ruko-ruko, dan area pembangunan, dan jauh dari tempat tinggal warga dan mahasiswa. Kondisi area pejalan kaki tidak begitu aman, melihat posisinya begitu dekat dengan jalan kendaraan sehingga penumpang yang menunggu bus dan pejalan kaki yang berlalu lalang harus waspada akan kendaraan sekitar. Tidak tersedia juga informasi mengenai rute perjalanan bus bagi penumpang yang menunggu. Bus stop ini bergantung pada pepohonan sekitar sebagai kanopi untuk menangkal panas matahari. Sumber penerangan hanya bersumber dari lampu jalan di sebelah kanan. Untuk cctv belum tersedia. #timGOPEK",
+        "condition_score": 70,
+        "condition_label": "green"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4474439,
+          -7.0604956
+        ]
+      },
+      "properties": {
+        "halte_id": "6a890f9652d86e03b518171a",
+        "nama_halte": "Bus Stop Kantor Kecamatan Tembalang (arah timur)",
+        "kelurahan": "Tembalang",
+        "kecamatan": "Tembalang",
+        "cctv": "tidak",
+        "lighting": "ada",
+        "sidewalk_condition": "ada",
+        "route_info_signage": "tidak",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/4e164f6b-8998-46e7-936e-eb071ebeb6b7_1787367313735.jpg",
+        "survey_date": "2026-08-22",
+        "catatan_lapangan": "Tepat pada tanggal 22 Agustus 2026, pukul 09.44. Saya sedang berada di bus stop kantor kecamatan tembalang, suasana lalu lintas cukup ramai dan cuaca sedang cerah. Untuk bus stop sendiri terletak di dekat kantor kecamatan tembalang, Alfamart, dan caffe, namun cukup jauh dari tempat tinggal warga sekitar. Rambu bus stop sendiri tertutupi oleh beberapa bendera dan area pejalan kaki sudah menyentuh jalan kendaraan sehingga penumpang yang menunggu bus harus lebih waspada ketika sedang berdiri disini. Tidak tersedia informasi rute perjalanan bus. Bus stop ini bergantung pada pepohonan sekitar sebagai kanopi untuk menangkal panas matahari. Sumber penerangan berumber dari lampu cafee dan lampu dari atah alfamart. Untuk cctv belum tersedia. #timGOPEK",
+        "condition_score": 70,
+        "condition_label": "green"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4352404,
+          -7.0583219
+        ]
+      },
+      "properties": {
+        "halte_id": "6a890ed252d86e03b5181514",
+        "nama_halte": "Halte BRT Simpang UNPAND",
+        "kelurahan": "Tembalang",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "ada",
+        "sidewalk_condition": "ada",
+        "route_info_signage": "-",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/874d91d7-db19-48e5-a067-b23bafa11e4e_1787367120777.jpg",
+        "survey_date": "2026-08-22",
+        "catatan_lapangan": "Pada pukul 09.47 kami mendatangi halte Masjid Al Hidayah. Halte ini hanya berupa plang penanda naik/turun BRT Trans Semarang. Terdapat pedestrian way namun kurang layak karena terlalu bersinggungan dengan jalan dan tidak ada guiding block. Vegetasi tidak banyak (cukup panas). Namun, penerangan terpantau baik karena berada di sekitar kawasan komersial dan juga terdapat lampu penerangan. \n#timGOPEK",
+        "condition_score": 85,
+        "condition_label": "green"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.43478779999998,
+          -7.0582536
+        ]
+      },
+      "properties": {
+        "halte_id": "6a890cea59146ea8941f9085",
+        "nama_halte": "Halte BRT SD Pedalangan 02",
+        "kelurahan": "Tembalang",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "ada",
+        "sidewalk_condition": "ada",
+        "route_info_signage": "-",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/cc4a53be-ae48-4774-9d2e-edeb4c5cfdba_1787366633120.jpg",
+        "survey_date": "2026-08-22",
+        "catatan_lapangan": "Pada pukul 09.38 kami mendatangi halte SDN Tembalang. Halte ini hanya berupa plang penanda naik atau berhentinya bus. Plang yang adapun terpantau sidah miring dari posisi aslinya sehingga bisa berisiko menimpa penunggu BRT Trans Semarang atau pejalan kaki. Selain itu Pedestrian waynya pun tidak layak, banyak bebatuan dan terlalu sempit sehingga keselamatan pengguna brt yang menunggu dan aksesibilitas pengguna BRT kurang tercover dengan baik. Namun, kelebihannya ada pada penerangan berupa lampu dan vegetasi pohon yang rimbun sehingga memberi suasana teduh. #timGOPEK",
+        "condition_score": 85,
+        "condition_label": "green"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.44545149999999,
+          -7.0607922
+        ]
+      },
+      "properties": {
+        "halte_id": "6a890b8652d86e03b51810f0",
+        "nama_halte": "Bus Stop J&T Bulusan (arah barat)",
+        "kelurahan": "Bulusan",
+        "kecamatan": "Tembalang",
+        "cctv": "tidak",
+        "lighting": "ada",
+        "sidewalk_condition": "tidak",
+        "route_info_signage": "tidak",
+        "canopy": "tidak",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/10781dbc-e886-4c5b-b1a4-211b4c9c1a63_1787366274475.jpg",
+        "survey_date": "2026-08-22",
+        "catatan_lapangan": "Tepat pada tanggal 22 Agustus 2026, Pukul 09.30, saya sedang berada di bus stop J&T Bulusan, kondisi lalu lintas cukup ramai dengan kondisi cuaca cerah. Bus stop ini terletak di dekat kantor layabab ekpedisi J&T, toko elektronik, dan tempat tinggal warga dan mahasiswa. Kondisi bus stop ini sendiri hanya menyediakan rambu naik turun saja, tidak tersedia trotoar hanya jalanan yang terbuat dari semen, terlihat juga serpihan serpihan batu memenuhu area pejalan kaki. Tidak ada pohon maupun kanopi yang tersedia sebagai penangkal panas matahari. Tidak tersedia juga rute perjalanan bus bagi penumpang yang menunggu. Sumber pencahayaan bersumber dari satu lampu jalan dan lampu banner toko sekitar. Tidak tersedia cctv sebagai pemantau keadaan sekitar. #timGOPEK",
+        "condition_score": 20,
+        "condition_label": "red"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.43238170000001,
+          -7.0547695
+        ]
+      },
+      "properties": {
+        "halte_id": "6a890b1259146ea8941f9008",
+        "nama_halte": "Halte BRT SPBU UNDIP",
+        "kelurahan": "Tembalang",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "ada",
+        "sidewalk_condition": "ada",
+        "route_info_signage": "-",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/01be9f53-ab94-45d2-8407-633676e6a106_1787366160879.jpg",
+        "survey_date": "2026-08-22",
+        "catatan_lapangan": "Pada pukul 09.30 kami mendatangi halte BRT Trans Semarang SPBU UNDIP. Yang ada di sini adalah sebuah plang penanda bus berhenti/naik. Jalan pedestrian ada, namun kurang layak karena masih tertup oleh pohon. Ada penerangan di dekat halte berupa lampu vegetasi berupa pohon di samping plang halte tersebut sehingga cukup memberi sensasi teduh bagi pengguna yang menunggu BRT saat dalam cuaca panas. Namun, tidak adanya bangunan dengan atap membuat pengguna BRT sulit untuk menunggu saat hujan datang. #timGOPEK",
+        "condition_score": 85,
+        "condition_label": "green"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.44546379999997,
+          -7.0607064
+        ]
+      },
+      "properties": {
+        "halte_id": "6a89085159146ea8941f8ec3",
+        "nama_halte": "Bus Stop Puskesmas Bulusan (arah timur)",
+        "kelurahan": "Bulusan",
+        "kecamatan": "Tembalang",
+        "cctv": "tidak",
+        "lighting": "ada",
+        "sidewalk_condition": "ada",
+        "route_info_signage": "-",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/61012c27-e5af-4c3a-8a50-180717d8b24e_1787365449721.jpg",
+        "survey_date": "2026-08-22",
+        "catatan_lapangan": "Tepat pada tanggal 22 Agustus 2026, pukul 09.16. Saya sedang berada di bus stop bulusan arah timur, suasana lalu lintas cukup ramai dan cuaca sedang cerah. Untuk bus stop sendiri terletak di dekat toko-toko penjual makanan, Puskesmas bulusan, dan tempat tinggal warga dan mahasiswa. Kondisi trotoar tidak cukup layak, melihat banyak pecahan batu yang tercampur dengan tanah menutupi area pejalan kaki. Bus stop ini bergantubg pada pepohonan sekitar sebagai kanopi untuk menangkal panas matahari. Sumber penerangan berumber dari lampu puskesma dan lampu spanduk di seberang jalan. Untuk cctv belum tersedia. #timGOPEK",
+        "condition_score": 78,
+        "condition_label": "green"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.43827169999997,
+          -7.05595
+        ]
+      },
+      "properties": {
+        "halte_id": "6a89081652d86e03b5180f83",
+        "nama_halte": "Halte BRT Bulusari",
+        "kelurahan": "Tembalang",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "ada",
+        "sidewalk_condition": "ada",
+        "route_info_signage": "-",
+        "canopy": "-",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/c9fd0b47-5a06-492e-9620-f94cfdc86648_1787365396582.jpg",
+        "survey_date": "2026-08-22",
+        "catatan_lapangan": "Pada pukul 09.21, kami mendatangi Halte BRT Trans Semarang Bulusari. Yang terlihat di halte ini hanyalah sebuah plang yang menandakan tempat naik/turun BRT Trans Semarang. Tidak ada bangunan. Kelebihan halte ini ialah terdapat pedestiran way berupa trotoar dan penerangan yang cukup karena berada dekat dengan permukiman warga. #timGOPEK",
+        "condition_score": 80,
+        "condition_label": "green"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4425665,
+          -7.0603448
+        ]
+      },
+      "properties": {
+        "halte_id": "6a89037059146ea8941f8c67",
+        "nama_halte": "Bus Stop Bulusan 1B (arah barat)",
+        "kelurahan": "Bulusan",
+        "kecamatan": "Tembalang",
+        "cctv": "tidak",
+        "lighting": "ada",
+        "sidewalk_condition": "tidak",
+        "route_info_signage": "tidak",
+        "canopy": "tidak",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/6504374d-620b-4e84-9e5e-db6ed9634935_1787364201377.jpg",
+        "survey_date": "2026-08-22",
+        "catatan_lapangan": "Tepat pada tanggal 22 Agustus 2026, pukul 08.57, suasana lalu lintas ramai. Terlihat bustop hanya terapat plang naik turun, tidak tersedia kanopi untuk berteduh, tidak tersedia informasi rute perjalan bus, dan tidak tersedia juga trotoar yang layak. Untuk keamanan seperti penerangan hanya mengandalkan sinar lampu dari toko dan bangunan terdekat, tidak tersedia juga kamera cctv sebagai alat pemantau keadaan. Meskipun begitu, bus stop ini terletak di dekat area tempat tinggal mahasiswa dan warga sekitar, juga toko-toko makanan, sehingga penumpang yang menunggu bus bisa berteduh di toko-toko tersebut. #timGOPEK",
+        "condition_score": 20,
+        "condition_label": "red"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.46213990000001,
+          -7.0626414
+        ]
+      },
+      "properties": {
+        "halte_id": "6a8807babcfea993a88b3b7f",
+        "nama_halte": "Halte Victoria Residence II (arah timur)",
+        "kelurahan": "Meteseh",
+        "kecamatan": "Tembalang",
+        "cctv": "tidak",
+        "lighting": "ada",
+        "sidewalk_condition": "tidak",
+        "route_info_signage": "-",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/898acece-9237-4921-a890-706a3b114891_1787299766942.jpg",
+        "survey_date": "2026-08-21",
+        "catatan_lapangan": "Pada pukul 15.05, kami mendatangi Halte Victoria Residence II arah timur . Halte tersebut sudah memadai mempunyai penerangan yang baik dan kanopi yang bisa manangkal panas sinar matahari di halte tersebut juga tersedia staf penjaga halte , untuk kekurangan di sekitar halte adalah trotoar yang belum tersedia dan juga keamanan seperti CCTV.#timGOPEK",
+        "condition_score": 38,
+        "condition_label": "red"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4360767,
+          -7.0686417
+        ]
+      },
+      "properties": {
+        "halte_id": "6a880454d57440d48a1f1c70",
+        "nama_halte": "Halte BRT Depan Kel. Kramas",
+        "kelurahan": "Kramas",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "tidak",
+        "sidewalk_condition": "ada",
+        "route_info_signage": "-",
+        "canopy": "-",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/b92e372d-4eb1-4e7e-86a1-787629623341_1787298897355.jpg",
+        "survey_date": "2026-08-21",
+        "catatan_lapangan": "Pada pukul 14.51, kami mendatangi Halte BRT Kelurahan Kramas. Yang terlihat di halte ini hanyalah sebuah plang yang menandakan tempat naik/turun BRT Trans Semarang. Tidak ada bangunan, tidak ada tanda-tanda penerangan yang layak. Jalan pedestrian pun tampak tidak layak. Bahkan, plang tersebut diletakkan tepad dengan zebra cross tempat penyebrangan. #timGOPEK",
+        "condition_score": 60,
+        "condition_label": "yellow"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.463435,
+          -7.0588936
+        ]
+      },
+      "properties": {
+        "halte_id": "6a880334bcfea993a88b3510",
+        "nama_halte": "BUS STOP EMERALD GARDEN (arah selatan)",
+        "kelurahan": "Meteseh",
+        "kecamatan": "Tembalang",
+        "cctv": "ada",
+        "lighting": "ada",
+        "sidewalk_condition": "-",
+        "route_info_signage": "tidak",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/7cda58e2-1134-4d89-a501-74c5a86aa848_1787298609401.jpg",
+        "survey_date": "2026-08-21",
+        "catatan_lapangan": "Pada pukul 14.44, kami mendatangi Bus stop emerald garden arah selatan. Bus stop berfungsi dengan baik dan sudah dilengkapi dengan tempat duduk serta penerangan yang cukup dari lampu jalan terdapat beberapa pohon untuk manangkal panas matahari dan untuk keamanan tersedia cctv ,Hal yang perlu dievaluasi selanjutnya adalah rute perjalanan bus yang belum tersedia. #timGOPEK",
+        "condition_score": 65,
+        "condition_label": "yellow"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.44279570000003,
+          -7.060288
+        ]
+      },
+      "properties": {
+        "halte_id": "6a87fc9bd57440d48a1f15f4",
+        "nama_halte": "Bus Stop Bulusan 1A (arah timur)",
+        "kelurahan": "Bulusan",
+        "kecamatan": "Tembalang",
+        "cctv": "tidak",
+        "lighting": "ada",
+        "sidewalk_condition": "tidak",
+        "route_info_signage": "tidak",
+        "canopy": "-",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/517836e0-296d-4940-b1b0-709a6cf0096c_1787296920377.jpg",
+        "survey_date": "2026-08-21",
+        "catatan_lapangan": "Tepat pada Jumat, 21 Agustus 2026 pukul 14.15 saya melihat bus stop di area kelurahan Bulusan 1A arah timur. Bus stop ini biasanya dipakai oleh masyarakat setempat dan mahasiswa UNDIP. Bus stop ini diapit oleh beberapa toko bangunan di sekitarnya. Lain hal dari halte pada umumnya, tempat ini tidak mempunyai tempat duduk bagi pengunjung, tidak ada trotoar dan guiding block, cctv tidak ada, serta penerangan hanya mengandalkan penerangan beberapa toko di sekitarnya saja. Bus stop ini belum mempunyai spanduk yang berisikan rute Bus Trans Semarang. #timGOPEK",
+        "condition_score": 25,
+        "condition_label": "red"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.44408199999998,
+          -7.0543307
+        ]
+      },
+      "properties": {
+        "halte_id": "6a87f7febcfea993a88b28ed",
+        "nama_halte": "HALTE BRT RUSUNAWA UNDIP",
+        "kelurahan": "Tembalang",
+        "kecamatan": "Tembalang",
+        "cctv": "tidak",
+        "lighting": "ada",
+        "sidewalk_condition": "ada",
+        "route_info_signage": "ada",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/b35599d2-70f8-4207-84c6-8ccdb4a71433_1787295735811.jpg",
+        "survey_date": "2026-08-21",
+        "catatan_lapangan": "Suasana Halte BRT RUSUNAWA UNDIP pukul 13.54 tanggal 21 Agustus 2026, Cuaca sedang panas terik, lalu lintas tidak terlalu ramai. Untuk haltenya sendiri terletak di dekat RUSUNAWA UNDIP dan dekat dengan tempat tinggal Mahasiswa Undip . Bangunan halte sudah terpasang kanopi dan tersedia informasi mengenai rute perjalanan BRT, sudah tersedianya trotoar dan rambu stop, terdapat banyak pohon baik dari sisi depan maupun belakang halte . Kekurangannya, bangunan halte yang kurang kokoh dan juga kanopi pada halte tidak cukup lebar untuk menangkal panas yang masuk dan trotoar tidak mempunyai guiding block serta beberapa paving block terlapas keluar dari trotoar. Untuk sumber penerangan cukup  yaitu bersumber dari lampu jalan di samping halte dan dari arah rusunawa undip. Selain itu CCTV sebagai sumber pengawasan masih belum tersedia. #timGOPEK",
+        "condition_score": 85,
+        "condition_label": "green"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.43269670000001,
+          -7.052355
+        ]
+      },
+      "properties": {
+        "halte_id": "6a87f797d57440d48a1f0e0c",
+        "nama_halte": "Halte Muladi Dome UNDIP",
+        "kelurahan": "Tembalang",
+        "kecamatan": "Tembalang",
+        "cctv": "-",
+        "lighting": "tidak",
+        "sidewalk_condition": "tidak",
+        "route_info_signage": "ada",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/163057a9-86dc-4426-87a5-cc353173fb44_1787295634444.jpg",
+        "survey_date": "2026-08-21",
+        "catatan_lapangan": "Suasana halte BRT Muladi Dome Undip pada pukul 13.55 terpantau cukup sepi, tetapi banyak kendaraan roda 4 yang parkir di sekitar halte. Kelebihan halte ini adalah ia berdiri di ruas jalan yang kecil namun tetap menyediakan atap sebagai peneduh bagi pengguna BRT yang sedang menunggu dan terdapat spanduk yang merupakan map dari rute BRT terkait. Namun, tidak terdapat penerangan di sekitar halte dan akses pedestrian kurang aman dan nyaman (tidak ada trotoar karena dipakai naruh halte). #timGOPEK",
+        "condition_score": 32,
+        "condition_label": "red"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.44434769999998,
+          -7.0506017
+        ]
+      },
+      "properties": {
+        "halte_id": "6a87f44ed57440d48a1f0aa8",
+        "nama_halte": "Halte BRT Fakultas Kedokteran UNDIP",
+        "kelurahan": "Tembalang",
+        "kecamatan": "Tembalang",
+        "cctv": "tidak",
+        "lighting": "ada",
+        "sidewalk_condition": "ada",
+        "route_info_signage": "ada",
+        "canopy": "ada",
+        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/c13b6352-3e90-46aa-b392-bbc0bd297ac3_1787294783507.jpg",
+        "survey_date": "2026-08-21",
+        "catatan_lapangan": "Suasana Halte BRT Fakultas Kedoktetan UNDIP pukul 13.38 tanggal 21 Agustus 2026, Cuaca sedang panas terik, lalu lintas tidak terlalu ramai. Untuk haltenya sendiri terletak di dekat fakultas kedokteran dan dekat dengan tempat tinggal warga sekitar. Bangunan halte sudah terpasang kanopi dan tersedia informasi mengenai rute perjalanan BRT, trotoar di sekitarnya sudah ada guidingblock dan trotarnya masih mulus. Kekurangannya, bangunan halte yang kurang kokoh dan juga kanopi pada halte tidak cukup lebar untuk menangkal panas yang masuk. Untuk sumber penerangan cukup minim yaitu hanya bersumber dari lampu jalan di samping halte. Selain itu CCTV sebagai sumber pengawasan masih belum tersedia. #timGOPEK",
+        "condition_score": 85,
+        "condition_label": "green"
+      }
+    }
+  ]
+}
