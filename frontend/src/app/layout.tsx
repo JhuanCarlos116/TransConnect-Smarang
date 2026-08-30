@@ -24,6 +24,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <head>
+        {/* eslint-disable-next-line @next/next/no-page-custom-font -- the rule
+            targets the pages/ router, where a font link outside _document.js
+            loads for one page only. This is the App Router root layout, so it
+            already applies to every page. Not routed through next/font because
+            Material Symbols is a variable icon font whose axes (wght, FILL) we
+            set from CSS. */}
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
           rel="stylesheet"

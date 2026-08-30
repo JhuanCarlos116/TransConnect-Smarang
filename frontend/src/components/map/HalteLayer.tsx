@@ -24,9 +24,7 @@ export default function HalteLayer({ map, visible }: HalteLayerProps) {
     loadedRef.current = true;
 
     fetchHalteData().then((data: HalteFeatureCollection) => {
-      console.log(`Halte survey points loaded: ${data.features.length}`);
-
-      map.addSource(SOURCE_ID, { type: "geojson", data });
+            map.addSource(SOURCE_ID, { type: "geojson", data });
 
       map.addLayer({
         id: LAYER_ID,
