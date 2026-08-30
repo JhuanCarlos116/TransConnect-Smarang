@@ -20,3 +20,6 @@ backend/data/raw/
 Thumbs.db
 .vscode/
 .idea/
+
+# osmnx HTTP cache (raw Overpass responses, re-downloadable)
+backend/cache/
