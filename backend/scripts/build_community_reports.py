@@ -71,7 +71,7 @@ def main() -> None:
 
     for out_path in (PROCESSED_OUT, FRONTEND_OUT):
         out_path.parent.mkdir(parents=True, exist_ok=True)
-        out_path.write_text(json.dumps(report_fc, indent=2, ensure_ascii=False))
+        out_path.write_text(json.dumps(report_fc, indent=2, ensure_ascii=False), encoding="utf-8")
         print(f"Wrote {len(report_fc['features'])} community report(s) to {out_path}")
 
 
