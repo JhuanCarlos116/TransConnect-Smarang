@@ -22,13 +22,20 @@ interface IsochroneLayerProps {
 // darkest/most-covered core.
 export default function IsochroneLayer({ map, visible }: IsochroneLayerProps) {
   const loadedRef = useRef(false);
+  // The layer is added once, asynchronously, after its data arrives. `visible`
+  // can flip while that fetch is still in flight, and the sync effect below
+  // bails out whenever the layer does not exist yet -- so a value captured on
+  // the first render would get baked in and the toggle would silently
+  // disagree with the map. The sync effect keeps this ref current instead, and
+  // the add-layer callback reads it when the data finally lands.
+  const visibleRef = useRef(visible);
 
   useEffect(() => {
     if (loadedRef.current) return;
     loadedRef.current = true;
 
     fetchIsochrones().then((data: IsochroneFeatureCollection) => {
-      const initialVisibility = visible ? "visible" : "none";
+      const initialVisibility = visibleRef.current ? "visible" : "none";
       const beforeId = map.getStyle().layers?.find((l) => l.type === "symbol")?.id;
 
       map.addSource(SOURCE_ID, { type: "geojson", data: data as never });
@@ -89,6 +96,7 @@ export default function IsochroneLayer({ map, visible }: IsochroneLayerProps) {
   }, [map]);
 
   useEffect(() => {
+    visibleRef.current = visible;
     if (!map.getLayer(FILL_LAYER_ID)) return;
     const visibility = visible ? "visible" : "none";
     map.setLayoutProperty(FILL_LAYER_ID, "visibility", visibility);

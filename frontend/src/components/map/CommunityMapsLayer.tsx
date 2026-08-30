@@ -21,15 +21,20 @@ interface CommunityMapsLayerProps {
 
 export default function CommunityMapsLayer({ map, visible }: CommunityMapsLayerProps) {
   const loadedRef = useRef(false);
+  // The layer is added once, asynchronously, after its data arrives. `visible`
+  // can flip while that fetch is still in flight, and the sync effect below
+  // bails out whenever the layer does not exist yet -- so a value captured on
+  // the first render would get baked in and the toggle would silently
+  // disagree with the map. The sync effect keeps this ref current instead, and
+  // the add-layer callback reads it when the data finally lands.
+  const visibleRef = useRef(visible);
 
   useEffect(() => {
     if (loadedRef.current) return;
     loadedRef.current = true;
 
     fetchCommunityReports().then((data: CommunityReportFeatureCollection) => {
-      console.log(`Community reports (contoh laporan warga) loaded: ${data.features.length}`);
-
-      map.addSource(SOURCE_ID, {
+            map.addSource(SOURCE_ID, {
         type: "geojson",
         data,
         cluster: true,
@@ -37,7 +42,7 @@ export default function CommunityMapsLayer({ map, visible }: CommunityMapsLayerP
         clusterRadius: 50,
       });
 
-      const initialVisibility = visible ? "visible" : "none";
+      const initialVisibility = visibleRef.current ? "visible" : "none";
 
       map.addLayer({
         id: CLUSTER_LAYER_ID,
@@ -123,6 +128,7 @@ export default function CommunityMapsLayer({ map, visible }: CommunityMapsLayerP
   }, [map]);
 
   useEffect(() => {
+    visibleRef.current = visible;
     if (!map.getLayer(POINT_LAYER_ID)) return;
     for (const id of ALL_LAYER_IDS) {
       map.setLayoutProperty(id, "visibility", visible ? "visible" : "none");

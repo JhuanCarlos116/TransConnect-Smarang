@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function PublicHeader() {
   return (
     <header className="z-50 flex h-16 w-full shrink-0 items-center justify-between border-b border-border-low bg-surface px-gutter">
@@ -10,18 +12,18 @@ export default function PublicHeader() {
         </div>
 
         <nav className="hidden h-full items-end gap-6 md:flex">
-          <a
+          <Link
             href="/"
             className="flex h-full items-end border-b-2 border-transport-blue pb-4 font-bold text-transport-blue"
           >
             Peta Publik
-          </a>
-          <a
+          </Link>
+          <Link
             href="/dashboard"
             className="flex h-full items-end px-2 pb-4 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-transport-blue"
           >
             Dashboard DISHUB
-          </a>
+          </Link>
         </nav>
       </div>
 
