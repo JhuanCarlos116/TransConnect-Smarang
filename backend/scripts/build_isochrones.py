@@ -10,7 +10,7 @@ use to recommend where new stops are needed.
 Methodology (documented here since there's no isochrone spec in the PRD):
 - Catchment is measured from each existing halte outward along the real
   street network (not straight-line/"as the crow flies" circles like the
-  mockup's placeholder SVG) — a 15-min isochrone can be a very different
+  mockup's placeholder SVG) — a 10-min isochrone can be a very different
   shape than a circle wherever the network is sparse or blocked (river,
   toll road).
 - Thresholds: 3 / 5 / 10 minutes, as specified by the PRD (Tabel 5 and the
