@@ -6,9 +6,14 @@ interface LayerToggleProps {
 
 export default function LayerToggle({ label, visible, onChange }: LayerToggleProps) {
   return (
-    <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-      <input type="checkbox" checked={visible} onChange={(e) => onChange(e.target.checked)} />
-      {label}
+    <label className="flex cursor-pointer items-center gap-2">
+      <input
+        type="checkbox"
+        checked={visible}
+        onChange={(e) => onChange(e.target.checked)}
+        className="rounded border-outline text-transport-blue focus:ring-transport-blue"
+      />
+      <span className="text-label-md text-on-surface">{label}</span>
     </label>
   );
 }

@@ -5,16 +5,30 @@ import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { DEFAULT_CENTER, DEFAULT_ZOOM, MAPID_API_KEY, mapStyleUrl } from "@/lib/maplibre";
+import { fetchHalteData } from "@/lib/fetchHalteData";
+import { fetchCommunityReports } from "@/lib/fetchCommunityReports";
 import HalteLayer from "@/components/map/HalteLayer";
 import CommunityMapsLayer from "@/components/map/CommunityMapsLayer";
 import ConditionLegend from "@/components/map/ConditionLegend";
-import LayerPanel from "@/components/map/LayerPanel";
+import PublicHeader from "@/components/map/PublicHeader";
+import PublicSidePanel from "@/components/map/PublicSidePanel";
+import type { HalteFeature } from "@/types/halte";
 
 export default function MapView() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [map, setMap] = useState<maplibregl.Map | null>(null);
   const [halteVisible, setHalteVisible] = useState(true);
   const [communityVisible, setCommunityVisible] = useState(false);
+
+  const [halteFeatures, setHalteFeatures] = useState<HalteFeature[]>([]);
+  const [verifiedCount, setVerifiedCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetchHalteData().then((data) => setHalteFeatures(data.features));
+    fetchCommunityReports().then((data) =>
+      setVerifiedCount(data.features.filter((f) => f.properties.verification_status === "verified").length),
+    );
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current || !MAPID_API_KEY) return;
@@ -31,7 +45,7 @@ export default function MapView() {
       center: DEFAULT_CENTER,
       zoom: DEFAULT_ZOOM,
     });
-    instance.addControl(new maplibregl.NavigationControl(), "top-left");
+    instance.addControl(new maplibregl.NavigationControl(), "top-right");
     instance.on("load", () => setMap(instance));
 
     return () => {
@@ -41,59 +55,38 @@ export default function MapView() {
   }, []);
 
   return (
-    <div style={{ position: "relative", width: "100%", height: "100vh" }}>
-      <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
-      {map && (
-        <>
-          <HalteLayer map={map} visible={halteVisible} />
-          <CommunityMapsLayer map={map} visible={communityVisible} />
-          <ConditionLegend />
-          <LayerPanel
-            halteVisible={halteVisible}
-            onHalteChange={setHalteVisible}
-            communityVisible={communityVisible}
-            onCommunityChange={setCommunityVisible}
-          />
-          <a
-            href="/dashboard"
-            style={{
-              position: "absolute",
-              top: 100,
-              left: 12,
-              zIndex: 1,
-              background: "#fff",
-              borderRadius: 8,
-              padding: "8px 14px",
-              boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
-              fontSize: 13,
-              fontFamily: "system-ui, sans-serif",
-              fontWeight: 600,
-              color: "#1d4ed8",
-              textDecoration: "none",
-            }}
-          >
-            Dashboard DISHUB →
-          </a>
-        </>
-      )}
-      {!MAPID_API_KEY && (
-        <div
-          style={{
-            position: "absolute",
-            top: 12,
-            left: 12,
-            zIndex: 2,
-            background: "#fef2f2",
-            color: "#991b1b",
-            padding: "8px 12px",
-            borderRadius: 6,
-            fontSize: 13,
-            fontFamily: "system-ui, sans-serif",
-          }}
-        >
-          NEXT_PUBLIC_MAPID_API_KEY belum diisi di frontend/.env.local
-        </div>
-      )}
+    <div className="flex h-screen flex-col overflow-hidden font-sans">
+      <PublicHeader />
+
+      <div className="relative flex flex-1 overflow-hidden">
+        <PublicSidePanel
+          features={halteFeatures}
+          verifiedReportCount={verifiedCount}
+          halteVisible={halteVisible}
+          onHalteChange={setHalteVisible}
+          communityVisible={communityVisible}
+          onCommunityChange={setCommunityVisible}
+        />
+
+        <main className="relative flex-1">
+          <div ref={containerRef} className="h-full w-full" />
+          {map && (
+            <>
+              <HalteLayer map={map} visible={halteVisible} />
+              <CommunityMapsLayer map={map} visible={communityVisible} />
+            </>
+          )}
+          {!MAPID_API_KEY && (
+            <div className="absolute left-margin-page top-margin-page z-20 rounded-lg bg-error-container px-stack-md py-stack-sm text-label-md text-on-error-container">
+              NEXT_PUBLIC_MAPID_API_KEY belum diisi di frontend/.env.local
+            </div>
+          )}
+
+          <div className="absolute bottom-margin-page right-margin-page z-20">
+            <ConditionLegend />
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

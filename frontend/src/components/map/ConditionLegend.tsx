@@ -5,33 +5,12 @@ const LABELS: ConditionLabel[] = ["green", "yellow", "red"];
 
 export default function ConditionLegend() {
   return (
-    <div
-      style={{
-        position: "absolute",
-        bottom: 24,
-        left: 12,
-        zIndex: 1,
-        background: "#fff",
-        borderRadius: 8,
-        padding: "10px 14px",
-        boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
-        fontSize: 13,
-        fontFamily: "system-ui, sans-serif",
-      }}
-    >
-      <div style={{ fontWeight: 600, marginBottom: 6 }}>Skor Kondisi</div>
+    <div className="w-48 rounded-lg border border-border-low bg-surface/95 p-3 shadow-sm backdrop-blur-sm">
+      <h4 className="mb-2 text-label-sm font-bold text-on-surface">Skor Kondisi Halte</h4>
       {LABELS.map((label) => (
-        <div key={label} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
-          <span
-            style={{
-              width: 10,
-              height: 10,
-              borderRadius: "50%",
-              backgroundColor: conditionColor(label),
-              display: "inline-block",
-            }}
-          />
-          <span>{conditionLabelText(label)}</span>
+        <div key={label} className="mb-1 flex items-center gap-2">
+          <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: conditionColor(label) }} />
+          <span className="text-label-sm text-on-surface-variant">{conditionLabelText(label)}</span>
         </div>
       ))}
     </div>
