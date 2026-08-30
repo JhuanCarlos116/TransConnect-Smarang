@@ -1,61 +1,78 @@
-"use client";
-
 interface VerificationSummaryProps {
-  halteCount?: number;
-  verifiedReportCount?: number | null;
-  onOpenModelDetail?: () => void;
+  halteCount: number;
+  verifiedReportCount: number | null;
 }
 
-export default function VerificationSummary({
-  onOpenModelDetail,
-}: VerificationSummaryProps) {
+interface StatCardProps {
+  icon: string;
+  label: string;
+  value: string;
+  badge: string;
+  badgeIcon: string;
+  badgeClass: string;
+  barClass: string;
+}
+
+function StatCard({ icon, label, value, badge, badgeIcon, badgeClass, barClass }: StatCardProps) {
   return (
-    <div className="p-gutter border-t border-border-low bg-surface-subtle shrink-0">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="font-label-md text-label-md font-bold text-on-surface flex items-center gap-2">
-          <span className="material-symbols-outlined text-transport-blue text-[18px]">memory</span>
-          YOLOv8 Detection Summary
-        </h3>
-        {onOpenModelDetail && (
-          <button
-            onClick={onOpenModelDetail}
-            className="text-[11px] font-label-sm text-transport-blue hover:underline cursor-pointer"
-          >
-            Detail Metrik
-          </button>
-        )}
+    <div className="rounded border border-border-low bg-surface p-3 shadow-sm">
+      <div className="mb-1 flex items-center justify-between">
+        <span className="material-symbols-outlined text-[18px] text-outline">{icon}</span>
+        <span className={`flex items-center gap-1 font-label-sm text-label-sm font-bold ${badgeClass}`}>
+          <span className="material-symbols-outlined text-[14px]">{badgeIcon}</span>
+          {badge}
+        </span>
       </div>
+      <div className="font-label-sm text-label-sm text-on-surface-variant">{label}</div>
+      <div className="mt-1 font-headline-md text-headline-md font-bold text-on-surface">{value}</div>
+      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-container-high">
+        <div className={`h-full w-full ${barClass}`} />
+      </div>
+    </div>
+  );
+}
 
+/**
+ * Occupies the slot the mockup gave to "YOLOv8 Detection Summary", in the
+ * same two-card layout.
+ *
+ * An earlier pass filled it with invented figures — 1,204 sidewalks at 84%
+ * valid, 4,392 streetlights at 22% QC required — while receiving the real
+ * `halteCount` / `verifiedReportCount` props and never reading them.
+ * YOLOv8 is still being trained, not wired into this app yet, so the cards
+ * report what the pipeline has actually produced so far: the 42 surveyed
+ * halte (QA'd by hand) and the community-report demo count, and the heading
+ * says plainly that these are manual counts, not model output.
+ */
+export default function VerificationSummary({ halteCount, verifiedReportCount }: VerificationSummaryProps) {
+  return (
+    <div className="border-t border-border-low bg-surface-subtle p-gutter">
+      <h3 className="mb-2 flex items-center gap-2 font-label-md text-label-md font-bold text-on-surface">
+        <span className="material-symbols-outlined text-[18px] text-transport-blue">memory</span>
+        Status Verifikasi
+      </h3>
+      <p className="mb-3 font-label-sm text-label-sm leading-relaxed text-on-surface-variant">
+        YOLOv8 belum terintegrasi — angka di bawah hasil QA manual tim, bukan deteksi AI otomatis.
+      </p>
       <div className="grid grid-cols-2 gap-3">
-        {/* Sidewalks Summary */}
-        <div className="bg-surface border border-border-low p-3 rounded shadow-sm">
-          <div className="flex items-center justify-between mb-1">
-            <span className="material-symbols-outlined text-outline text-[18px]">directions_walk</span>
-            <span className="text-safety-green font-label-sm text-[11px] font-bold flex items-center gap-0.5">
-              <span className="material-symbols-outlined text-[13px]">check_circle</span> 84% Valid
-            </span>
-          </div>
-          <div className="font-label-sm text-[11px] text-on-surface-variant">Sidewalks</div>
-          <div className="font-headline-md text-headline-md font-bold text-on-surface mt-0.5">1,204</div>
-          <div className="w-full bg-surface-container-high h-1.5 rounded-full mt-2 overflow-hidden">
-            <div className="bg-safety-green h-full w-[84%]"></div>
-          </div>
-        </div>
-
-        {/* Streetlights Summary */}
-        <div className="bg-surface border border-border-low p-3 rounded shadow-sm">
-          <div className="flex items-center justify-between mb-1">
-            <span className="material-symbols-outlined text-outline text-[18px]">lightbulb</span>
-            <span className="text-caution-yellow font-label-sm text-[11px] font-bold flex items-center gap-0.5">
-              <span className="material-symbols-outlined text-[13px]">error</span> 22% QC Req
-            </span>
-          </div>
-          <div className="font-label-sm text-[11px] text-on-surface-variant">Streetlights</div>
-          <div className="font-headline-md text-headline-md font-bold text-on-surface mt-0.5">4,392</div>
-          <div className="w-full bg-surface-container-high h-1.5 rounded-full mt-2 overflow-hidden">
-            <div className="bg-transport-blue h-full w-[78%]"></div>
-          </div>
-        </div>
+        <StatCard
+          icon="directions_walk"
+          label="Titik Survei"
+          value={String(halteCount)}
+          badge="QA manual"
+          badgeIcon="check_circle"
+          badgeClass="text-safety-green"
+          barClass="bg-safety-green"
+        />
+        <StatCard
+          icon="campaign"
+          label="Laporan Warga"
+          value={verifiedReportCount === null ? "…" : String(verifiedReportCount)}
+          badge="data contoh"
+          badgeIcon="check_circle"
+          badgeClass="text-transport-blue"
+          barClass="bg-transport-blue"
+        />
       </div>
     </div>
   );
