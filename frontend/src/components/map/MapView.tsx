@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
@@ -54,9 +54,16 @@ export default function MapView() {
     };
   }, []);
 
+  const flyToHalte = useCallback(
+    (feature: HalteFeature) => {
+      map?.flyTo({ center: feature.geometry.coordinates, zoom: 16 });
+    },
+    [map],
+  );
+
   return (
     <div className="flex h-screen flex-col overflow-hidden font-sans">
-      <AppHeader active="public" />
+      <AppHeader active="public" searchFeatures={halteFeatures} onSearchSelect={flyToHalte} />
 
       <div className="relative flex flex-1 overflow-hidden">
         <PublicSidePanel
