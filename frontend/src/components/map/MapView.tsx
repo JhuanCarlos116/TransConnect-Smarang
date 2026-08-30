@@ -10,7 +10,7 @@ import { fetchCommunityReports } from "@/lib/fetchCommunityReports";
 import HalteLayer from "@/components/map/HalteLayer";
 import CommunityMapsLayer from "@/components/map/CommunityMapsLayer";
 import ConditionLegend from "@/components/map/ConditionLegend";
-import PublicHeader from "@/components/map/PublicHeader";
+import AppHeader from "@/components/ui/AppHeader";
 import PublicSidePanel from "@/components/map/PublicSidePanel";
 import type { HalteFeature } from "@/types/halte";
 
@@ -56,7 +56,7 @@ export default function MapView() {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden font-sans">
-      <PublicHeader />
+      <AppHeader active="public" />
 
       <div className="relative flex flex-1 overflow-hidden">
         <PublicSidePanel

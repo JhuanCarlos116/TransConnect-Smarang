@@ -1,32 +1,23 @@
 interface LayerToggleRowProps {
   label: string;
+  hint?: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
 }
 
-function LayerToggleRow({ label, checked, onChange }: LayerToggleRowProps) {
+function LayerToggleRow({ label, hint, checked, onChange }: LayerToggleRowProps) {
   return (
-    <label className="flex cursor-pointer items-center gap-2">
+    <label className="flex cursor-pointer items-start gap-2">
       <input
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="rounded border-outline text-transport-blue focus:ring-transport-blue"
+        className="mt-0.5 rounded border-outline text-transport-blue focus:ring-transport-blue"
       />
-      <span className="text-label-sm text-on-surface">{label}</span>
-    </label>
-  );
-}
-
-function StaticToggleRow({ label, defaultChecked }: { label: string; defaultChecked?: boolean }) {
-  return (
-    <label className="flex cursor-pointer items-center gap-2">
-      <input
-        type="checkbox"
-        defaultChecked={defaultChecked}
-        className="rounded border-outline text-transport-blue focus:ring-transport-blue"
-      />
-      <span className="text-label-sm text-on-surface">{label}</span>
+      <span>
+        <span className="block text-label-sm text-on-surface">{label}</span>
+        {hint && <span className="block text-[11px] leading-tight text-on-surface-variant">{hint}</span>}
+      </span>
     </label>
   );
 }
@@ -42,6 +33,13 @@ interface DashboardFilterPanelProps {
   onIsochroneChange: (v: boolean) => void;
 }
 
+/**
+ * Only layers that have data behind them. The mockup also listed Blank Spot,
+ * LST / Thermal Comfort and Slope -- rendered as pre-checked boxes, which read
+ * as "this layer is currently drawn on the map" when nothing of the sort
+ * existed. A checkbox that changes nothing when toggled undermines every other
+ * control next to it, so they are gone until their data is built.
+ */
 export default function DashboardFilterPanel({
   densityVisible,
   onDensityChange,
@@ -53,16 +51,33 @@ export default function DashboardFilterPanel({
   onIsochroneChange,
 }: DashboardFilterPanelProps) {
   return (
-    <div className="w-64 rounded-lg border border-border-low bg-surface/95 p-stack-md shadow-[0_4px_16px_rgba(0,0,0,0.12)] backdrop-blur-sm">
-      <h3 className="mb-stack-sm text-label-md font-bold text-on-surface">Spatial Filters</h3>
-      <div className="flex flex-col gap-3">
-        <LayerToggleRow label="Kepadatan Penduduk" checked={densityVisible} onChange={onDensityChange} />
-        <LayerToggleRow label="Titik Survei Halte" checked={halteVisible} onChange={onHalteChange} />
-        <LayerToggleRow label="Laporan Warga Terverifikasi" checked={reportsVisible} onChange={onReportsChange} />
-        <LayerToggleRow label="Jangkauan Jalan Kaki (Isochrone)" checked={isochroneVisible} onChange={onIsochroneChange} />
-        <StaticToggleRow label="Blank Spot" />
-        <StaticToggleRow label="LST / Thermal Comfort" />
-        <StaticToggleRow label="Slope" />
+    <div className="w-72 rounded-lg border border-border-low bg-surface/95 p-stack-md shadow-[0_4px_16px_rgba(0,0,0,0.12)] backdrop-blur-sm">
+      <h3 className="mb-stack-sm text-label-md font-bold text-on-surface">Layer Peta</h3>
+      <div className="flex flex-col gap-stack-sm">
+        <LayerToggleRow
+          label="Titik Survei Halte"
+          hint="42 titik, diwarnai menurut skor kondisi"
+          checked={halteVisible}
+          onChange={onHalteChange}
+        />
+        <LayerToggleRow
+          label="Kepadatan Penduduk"
+          hint="9 kelurahan, sumber BPS"
+          checked={densityVisible}
+          onChange={onDensityChange}
+        />
+        <LayerToggleRow
+          label="Jangkauan Jalan Kaki"
+          hint="Isochrone 3/5/10 menit dari halte eksisting"
+          checked={isochroneVisible}
+          onChange={onIsochroneChange}
+        />
+        <LayerToggleRow
+          label="Laporan Warga"
+          hint="Data contoh, bukan laporan asli"
+          checked={reportsVisible}
+          onChange={onReportsChange}
+        />
       </div>
     </div>
   );

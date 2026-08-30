@@ -43,7 +43,9 @@ export default function PopulationLayer({ map, visible }: PopulationLayerProps) 
           layout: { visibility: initialVisibility },
           paint: {
             "fill-color": densityFillExpression() as never,
-            "fill-opacity": 0.55,
+            // Context layer, kept deliberately light: at 0.55 it drowned out the
+            // halte points drawn above it.
+            "fill-opacity": 0.3,
           },
         },
         map.getStyle().layers?.find((l) => l.type === "symbol")?.id,
