@@ -11,8 +11,8 @@ import HalteLayer from "@/components/map/HalteLayer";
 import CommunityMapsLayer from "@/components/map/CommunityMapsLayer";
 import PopulationLayer from "@/components/dashboard/PopulationLayer";
 import IsochroneLayer from "@/components/dashboard/IsochroneLayer";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import DashboardSideNav from "@/components/dashboard/DashboardSideNav";
+import AppHeader from "@/components/ui/AppHeader";
+import DashboardGuide from "@/components/dashboard/DashboardGuide";
 import DashboardFilterPanel from "@/components/dashboard/DashboardFilterPanel";
 import DashboardLegend from "@/components/dashboard/DashboardLegend";
 import PriorityList from "@/components/dashboard/PriorityList";
@@ -64,10 +64,10 @@ export default function DashboardPage() {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden font-sans">
-      <DashboardHeader />
+      <AppHeader active="dashboard" />
 
       <div className="relative flex flex-1 overflow-hidden">
-        <DashboardSideNav />
+        <DashboardGuide />
 
         <main className="relative flex flex-1 flex-col bg-surface-subtle md:flex-row">
           {/* Map Canvas */}

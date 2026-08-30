@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { conditionColor, conditionLabelText } from "@/lib/conditionScore";
 import LayerToggle from "@/components/map/LayerToggle";
 import type { ConditionLabel, HalteFeature } from "@/types/halte";
@@ -31,6 +33,12 @@ export default function PublicSidePanel({
         <h1 className="mb-2 text-headline-lg text-on-surface">Peta Kondisi Halte</h1>
         <p className="text-body-md text-on-surface-variant">
           Kondisi {total} titik halte hasil survei lapangan Tim GOPEK di Kecamatan Tembalang, 22–23 Agustus 2026.
+        </p>
+        <p className="mt-stack-sm flex items-start gap-2 rounded-lg bg-surface-subtle p-3 text-label-sm leading-relaxed text-on-surface-variant">
+          <span className="material-symbols-outlined text-[18px] text-transport-blue">touch_app</span>
+          <span>
+            Klik titik berwarna di peta untuk melihat foto survei, kondisi trotoar, dan penerangan di halte tersebut.
+          </span>
         </p>
       </div>
 
@@ -78,13 +86,13 @@ export default function PublicSidePanel({
       </div>
 
       <div className="p-margin-page">
-        <a
+        <Link
           href="/dashboard"
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-transport-blue py-3 text-body-md font-bold text-on-primary transition-colors hover:bg-primary"
         >
           Buka Dashboard DISHUB
           <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
-        </a>
+        </Link>
       </div>
     </aside>
   );

@@ -63,14 +63,6 @@ export default function PriorityList({ features, onSelect }: PriorityListProps) 
             </div>
             <ScoreBadge feature={first} />
           </div>
-          <div className="mt-3 flex items-center gap-4">
-            <button className="flex-1 rounded bg-transport-blue py-1.5 text-label-sm font-bold text-on-primary transition-colors hover:bg-primary">
-              Tugaskan Tim
-            </button>
-            <button className="rounded border border-border-low p-1.5 text-on-surface-variant transition-colors hover:bg-surface-container">
-              <span className="material-symbols-outlined text-[18px]">more_horiz</span>
-            </button>
-          </div>
         </div>
       </div>
 
