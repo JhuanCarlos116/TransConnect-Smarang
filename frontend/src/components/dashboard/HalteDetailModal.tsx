@@ -6,7 +6,6 @@ import type { HalteFeature, HalteProperties } from "@/types/halte";
 interface HalteDetailModalProps {
   feature: HalteFeature | null;
   onClose: () => void;
-  onDispatch?: (feature: HalteFeature) => void;
   onFlyTo?: (feature: HalteFeature) => void;
 }
 
@@ -27,7 +26,6 @@ function formatState(value: string): { text: string; colorClass: string } {
 export default function HalteDetailModal({
   feature,
   onClose,
-  onDispatch,
   onFlyTo,
 }: HalteDetailModalProps) {
   if (!feature) return null;
@@ -140,7 +138,10 @@ export default function HalteDetailModal({
             </div>
           )}
 
-          {/* Actions */}
+          {/* Actions. A "Dispatch Tim Perbaikan" button used to sit here,
+              submitting to a modal that only ran a setTimeout and reported a
+              fabricated success -- there is no real dispatch system behind
+              it, so it is gone until there is. */}
           <div className="flex items-center justify-end gap-3 pt-3 border-t border-border-low">
             <button
               onClick={() => {
@@ -151,16 +152,6 @@ export default function HalteDetailModal({
             >
               <span className="material-symbols-outlined text-[18px]">my_location</span>
               Lihat di Peta
-            </button>
-            <button
-              onClick={() => {
-                onClose();
-                onDispatch?.(feature);
-              }}
-              className="px-5 py-2 rounded-lg bg-transport-blue text-white font-label-md text-[13px] font-bold hover:bg-primary transition-colors cursor-pointer flex items-center gap-1.5"
-            >
-              <span className="material-symbols-outlined text-[18px]">send</span>
-              Dispatch Tim Perbaikan
             </button>
           </div>
         </div>
