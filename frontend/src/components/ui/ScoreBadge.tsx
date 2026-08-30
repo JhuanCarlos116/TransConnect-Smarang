@@ -9,17 +9,8 @@ interface ScoreBadgeProps {
 export default function ScoreBadge({ score, label }: ScoreBadgeProps) {
   return (
     <span
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 6,
-        padding: "2px 10px",
-        borderRadius: 999,
-        fontSize: 13,
-        fontWeight: 600,
-        color: "#fff",
-        backgroundColor: conditionColor(label),
-      }}
+      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-label-sm font-bold text-on-primary"
+      style={{ backgroundColor: conditionColor(label) }}
     >
       {conditionLabelText(label)} ({score})
     </span>

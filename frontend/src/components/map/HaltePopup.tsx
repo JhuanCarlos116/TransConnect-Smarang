@@ -22,46 +22,33 @@ interface HaltePopupProps {
 
 export default function HaltePopup({ properties }: HaltePopupProps) {
   return (
-    <div style={{ minWidth: 220, maxWidth: 260, fontFamily: "system-ui, sans-serif" }}>
+    <div className="min-w-[220px] max-w-[260px] font-sans">
       {properties.photo_url ? (
         // eslint-disable-next-line @next/next/no-img-element -- popup is rendered into a Mapbox GL DOM node, outside Next's page tree
         <img
           src={properties.photo_url}
           alt={properties.nama_halte}
-          style={{ width: "100%", height: 120, objectFit: "cover", borderRadius: 6, marginBottom: 8 }}
+          className="mb-2 h-[120px] w-full rounded-md object-cover"
         />
       ) : (
-        <div
-          style={{
-            width: "100%",
-            height: 120,
-            borderRadius: 6,
-            marginBottom: 8,
-            backgroundColor: "#e5e7eb",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "#6b7280",
-            fontSize: 13,
-          }}
-        >
+        <div className="mb-2 flex h-[120px] w-full items-center justify-center rounded-md bg-surface-container text-label-sm text-on-surface-variant">
           Tidak ada foto
         </div>
       )}
 
-      <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 2 }}>{properties.nama_halte}</div>
-      <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 8 }}>
+      <div className="mb-0.5 text-body-md font-bold text-on-surface">{properties.nama_halte}</div>
+      <div className="mb-2 text-label-sm text-on-surface-variant">
         {properties.kelurahan}, {properties.kecamatan}
       </div>
 
       <ScoreBadge score={properties.condition_score} label={properties.condition_label} />
 
-      <table style={{ width: "100%", marginTop: 10, fontSize: 13, borderCollapse: "collapse" }}>
+      <table className="mt-2.5 w-full border-collapse text-label-md">
         <tbody>
           {ATTRIBUTE_ROWS.map(({ key, label }) => (
             <tr key={key}>
-              <td style={{ padding: "3px 0", color: "#6b7280" }}>{label}</td>
-              <td style={{ padding: "3px 0", textAlign: "right", fontWeight: 500 }}>
+              <td className="py-0.5 text-on-surface-variant">{label}</td>
+              <td className="py-0.5 text-right font-semibold text-on-surface">
                 {formatState(properties[key] as string)}
               </td>
             </tr>
@@ -70,8 +57,8 @@ export default function HaltePopup({ properties }: HaltePopupProps) {
       </table>
 
       {properties.catatan_lapangan && (
-        <div style={{ marginTop: 10, fontSize: 12, color: "#4b5563", lineHeight: 1.4 }}>
-          <div style={{ fontWeight: 600, color: "#374151", marginBottom: 2 }}>Catatan Lapangan</div>
+        <div className="mt-2.5 text-label-sm leading-relaxed text-on-surface-variant">
+          <div className="mb-0.5 font-bold text-on-surface">Catatan Lapangan</div>
           {properties.catatan_lapangan}
         </div>
       )}
