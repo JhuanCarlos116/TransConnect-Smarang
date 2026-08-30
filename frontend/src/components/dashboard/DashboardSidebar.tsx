@@ -1,101 +1,140 @@
+"use client";
+
 import Link from "next/link";
 
-const STEPS = [
-  {
-    n: 1,
-    title: "Pilih layer",
-    body: "Centang di kotak Layer Peta (kiri bawah). Nyalakan satu per satu — semuanya sekaligus membuat peta sulit dibaca.",
-  },
-  {
-    n: 2,
-    title: "Klik objek di peta",
-    body: "Titik halte membuka foto survei dan skor kondisinya. Area isochrone menampilkan luas jangkauan dan jumlah halte yang melayaninya.",
-  },
-  {
-    n: 3,
-    title: "Telusuri daftar prioritas",
-    body: "Klik salah satu halte di panel kanan untuk memindahkan peta ke lokasinya.",
-  },
-];
-
 interface DashboardSidebarProps {
-  onResetView: () => void;
+  activeTab?: string;
+  onTabChange?: (tab: string) => void;
+  onRunSpatialAnalysis: () => void;
+  isAnalyzing?: boolean;
+  onOpenSupport?: () => void;
+  onSignOut?: () => void;
 }
 
-/**
- * Left column, styled after the mockup's SideNavBar.
- *
- * The mockup listed Infrastructure AI, Safe Transit, Analytics, Reports,
- * Support and Sign Out — six destinations that do not exist — so the nav here
- * carries only the two pages that do, in the same visual language. The space
- * the dead links occupied goes to the thing the dashboard actually lacked: an
- * explanation of where to start. The mockup's "Run Spatial Analysis" button
- * keeps its prominent slot but does something real, since the spatial analysis
- * itself is precomputed and there is nothing to kick off.
- */
-export default function DashboardSidebar({ onResetView }: DashboardSidebarProps) {
+export default function DashboardSidebar({
+  activeTab = "map",
+  onTabChange,
+  onRunSpatialAnalysis,
+  isAnalyzing = false,
+  onOpenSupport,
+  onSignOut,
+}: DashboardSidebarProps) {
   return (
-    <nav className="z-40 hidden h-full w-panel-width shrink-0 flex-col overflow-y-auto border-r border-border-low bg-surface md:flex">
-      <div className="flex items-center gap-4 border-b border-border-low p-gutter">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded bg-surface-container">
-          <span className="material-symbols-outlined text-[24px] text-transport-blue">shield</span>
+    <nav className="bg-surface dark:bg-surface-dim docked left-0 h-full w-panel-width shrink-0 border-r border-border-low dark:border-outline-variant hidden md:flex flex-col z-40 overflow-y-auto">
+      {/* Header */}
+      <div className="p-gutter border-b border-border-low flex items-center gap-4">
+        <div className="h-12 w-12 rounded bg-surface-container flex items-center justify-center shrink-0">
+          <span className="material-symbols-outlined text-transport-blue text-[24px]">shield</span>
         </div>
         <div>
-          <h2 className="font-headline-md text-headline-md font-bold leading-tight text-on-surface">DSS Dashboard</h2>
-          <p className="font-label-sm text-label-sm text-on-surface-variant">Mobilitas Urban Semarang</p>
+          <h2 className="font-headline-md text-headline-md font-bold text-on-surface leading-tight">DSS Dashboard</h2>
+          <p className="font-label-sm text-label-sm text-on-surface-variant">Semarang Urban Mobility</p>
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 px-3 py-4">
-        <span className="flex items-center gap-3 rounded-lg bg-primary-fixed px-4 py-3 font-label-md text-label-md font-bold text-on-primary-fixed-variant">
-          <span className="material-symbols-outlined">map</span>
-          Map View (DISHUB)
-        </span>
+      {/* Main Nav Links */}
+      <div className="flex-1 py-4 flex flex-col gap-2 px-3">
+        {/* Map View (Primary) */}
+        <button
+          onClick={() => onTabChange?.("map")}
+          className={`flex items-center gap-3 px-4 py-3 rounded-lg font-bold transition-all text-left w-full cursor-pointer ${
+            activeTab === "map"
+              ? "bg-primary-fixed text-on-primary-fixed-variant"
+              : "text-on-surface-variant hover:text-transport-blue hover:bg-surface-container-high"
+          }`}
+        >
+          <span className="material-symbols-outlined" data-weight={activeTab === "map" ? "fill" : "regular"}>
+            map
+          </span>
+          <span className="font-body-md text-body-md">Map View</span>
+        </button>
+
+        {/* Infrastructure AI */}
+        <button
+          onClick={() => onTabChange?.("infrastructure-ai")}
+          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-left w-full cursor-pointer ${
+            activeTab === "infrastructure-ai"
+              ? "bg-primary-fixed text-on-primary-fixed-variant font-bold"
+              : "text-on-surface-variant dark:text-outline hover:text-transport-blue hover:bg-surface-container-high"
+          }`}
+        >
+          <span className="material-symbols-outlined">analytics</span>
+          <span className="font-body-md text-body-md">Infrastructure AI</span>
+        </button>
+
+        {/* Safe Transit (Links to Public Route Planner) */}
         <Link
           href="/"
-          className="flex items-center gap-3 rounded-lg px-4 py-3 font-label-md text-label-md text-on-surface-variant transition-all hover:bg-surface-container-high hover:text-transport-blue"
+          className="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline hover:text-transport-blue hover:bg-surface-container-high rounded-lg transition-all"
         >
-          <span className="material-symbols-outlined">public</span>
-          Peta Publik
+          <span className="material-symbols-outlined">security</span>
+          <span className="font-body-md text-body-md">Safe Transit</span>
         </Link>
-      </div>
 
-      <div className="border-t border-border-low px-gutter py-4">
-        <h3 className="mb-stack-md font-label-md text-label-md font-bold uppercase tracking-wider text-on-surface-variant">
-          Cara pakai
-        </h3>
-        <ol className="flex flex-col gap-stack-md">
-          {STEPS.map((step) => (
-            <li key={step.n} className="flex gap-3">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary-fixed font-label-sm text-label-sm font-bold text-on-primary-fixed-variant">
-                {step.n}
-              </span>
-              <div>
-                <h4 className="font-label-md text-label-md font-bold text-on-surface">{step.title}</h4>
-                <p className="mt-0.5 font-label-sm text-label-sm leading-relaxed text-on-surface-variant">
-                  {step.body}
-                </p>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </div>
-
-      <div className="p-gutter">
+        {/* Analytics */}
         <button
-          onClick={onResetView}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-transport-blue py-3 font-label-md text-label-md font-bold text-on-primary transition-colors hover:bg-primary active:scale-95"
+          onClick={() => onTabChange?.("analytics")}
+          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-left w-full cursor-pointer ${
+            activeTab === "analytics"
+              ? "bg-primary-fixed text-on-primary-fixed-variant font-bold"
+              : "text-on-surface-variant dark:text-outline hover:text-transport-blue hover:bg-surface-container-high"
+          }`}
         >
-          <span className="material-symbols-outlined">restart_alt</span>
-          Atur Ulang Peta
+          <span className="material-symbols-outlined">bar_chart</span>
+          <span className="font-body-md text-body-md">Analytics</span>
+        </button>
+
+        {/* Reports */}
+        <button
+          onClick={() => onTabChange?.("reports")}
+          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-left w-full cursor-pointer ${
+            activeTab === "reports"
+              ? "bg-primary-fixed text-on-primary-fixed-variant font-bold"
+              : "text-on-surface-variant dark:text-outline hover:text-transport-blue hover:bg-surface-container-high"
+          }`}
+        >
+          <span className="material-symbols-outlined">description</span>
+          <span className="font-body-md text-body-md">Reports</span>
         </button>
       </div>
 
-      <div className="mt-auto border-t border-border-low p-gutter">
-        <p className="font-label-sm text-label-sm leading-relaxed text-on-surface-variant">
-          Layer LST, Slope, dan Blank Spot belum tersedia — datanya belum dibangun, jadi sengaja tidak ditampilkan
-          sebagai pilihan.
-        </p>
+      {/* Big Action Button */}
+      <div className="p-gutter">
+        <button
+          onClick={onRunSpatialAnalysis}
+          disabled={isAnalyzing}
+          className="w-full bg-transport-blue text-on-primary font-bold py-3 rounded-lg flex justify-center items-center gap-2 hover:bg-primary transition-colors active:scale-95 text-white shadow-md cursor-pointer disabled:opacity-75"
+        >
+          {isAnalyzing ? (
+            <>
+              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+              <span className="font-label-md text-label-md">Menghitung Spasial...</span>
+            </>
+          ) : (
+            <>
+              <span className="material-symbols-outlined">play_arrow</span>
+              <span className="font-label-md text-label-md">Run Spatial Analysis</span>
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Footer Support & Sign Out */}
+      <div className="border-t border-border-low p-4 flex flex-col gap-1">
+        <button
+          onClick={onOpenSupport}
+          className="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-transport-blue rounded-lg transition-all text-left w-full cursor-pointer hover:bg-surface-container"
+        >
+          <span className="material-symbols-outlined text-[20px]">contact_support</span>
+          <span className="font-label-md text-label-md">Support</span>
+        </button>
+        <button
+          onClick={onSignOut}
+          className="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-alert-red rounded-lg transition-all text-left w-full cursor-pointer hover:bg-surface-container"
+        >
+          <span className="material-symbols-outlined text-[20px]">logout</span>
+          <span className="font-label-md text-label-md">Sign Out</span>
+        </button>
       </div>
     </nav>
   );

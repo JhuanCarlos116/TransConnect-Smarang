@@ -1,131 +1,184 @@
-import { conditionColor, conditionLabelText } from "@/lib/conditionScore";
+"use client";
+
 import type { HalteFeature } from "@/types/halte";
 
 interface PriorityListProps {
   features: HalteFeature[];
   onSelect: (feature: HalteFeature) => void;
+  onDispatch?: (feature: HalteFeature) => void;
+  onInspectDetail?: (feature: HalteFeature) => void;
 }
 
-const MAX_ITEMS = 8;
-
-function ScorePill({ feature }: { feature: HalteFeature }) {
-  return (
-    <span
-      className="shrink-0 whitespace-nowrap rounded px-2 py-0.5 font-label-sm text-label-sm font-bold text-on-primary"
-      style={{ backgroundColor: conditionColor(feature.properties.condition_label) }}
-    >
-      {conditionLabelText(feature.properties.condition_label)} ({feature.properties.condition_score})
-    </span>
+export default function PriorityList({
+  features,
+  onSelect,
+  onDispatch,
+  onInspectDetail,
+}: PriorityListProps) {
+  // Sort by lowest condition score (highest urgency)
+  const sorted = [...features].sort(
+    (a, b) => a.properties.condition_score - b.properties.condition_score
   );
-}
 
-/**
- * Card vocabulary taken from the mockup's Priority Actions panel: a photo-led
- * rank-1 card, a tagged second card, then compact rows with a red rail for the
- * critical ones.
- *
- * The mockup filled these with Location-Allocation output ("Recommended Stop
- * A, +4200 served"). That model is not built yet, so the cards carry what we
- * genuinely have — surveyed halte ordered by condition score — and the panel
- * header says so rather than implying the ranking came from an optimiser.
- */
-export default function PriorityList({ features, onSelect }: PriorityListProps) {
-  const priority = [...features]
-    .filter((f) => f.properties.condition_label !== "green")
-    .sort((a, b) => a.properties.condition_score - b.properties.condition_score)
-    .slice(0, MAX_ITEMS);
+  const rank1 = sorted[0];
+  const rank2 = sorted[1];
+  const rank3 = sorted[2];
+  const rest = sorted.slice(3, 8);
 
-  if (priority.length === 0) {
+  if (!rank1) {
     return (
-      <div className="font-label-sm text-label-sm text-on-surface-variant">
-        Tidak ada titik dengan skor kondisi rendah.
+      <div className="font-label-sm text-label-sm text-on-surface-variant p-4">
+        Memuat daftar rekomendasi halte prioritas...
       </div>
     );
   }
 
-  const [first, second, ...rest] = priority;
-
   return (
     <div className="flex flex-col gap-stack-md">
-      {/* Rank 1 — photo-led, matching the mockup's featured card */}
-      <button
-        onClick={() => onSelect(first)}
-        className="group overflow-hidden rounded-lg border border-transport-blue bg-surface text-left transition-shadow hover:shadow-md"
-      >
-        <div className="relative h-24 bg-surface-container">
-          {first.properties.photo_url && (
-            // eslint-disable-next-line @next/next/no-img-element -- thumbnail served from the MAPID CDN
-            <img
-              src={first.properties.photo_url}
-              alt={first.properties.nama_halte}
-              className="h-full w-full object-cover"
-            />
-          )}
-          <span className="absolute left-2 top-2 flex items-center gap-1 rounded bg-transport-blue px-2 py-1 font-label-sm text-label-sm text-on-primary shadow-sm">
-            <span className="material-symbols-outlined text-[14px]">stars</span>
-            Prioritas 1
-          </span>
-        </div>
-        <div className="p-3">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <h4 className="font-label-md text-label-md font-bold text-on-surface">{first.properties.nama_halte}</h4>
-              <p className="font-label-sm text-label-sm text-on-surface-variant">{first.properties.kelurahan}</p>
-            </div>
-            <ScorePill feature={first} />
-          </div>
-        </div>
-      </button>
-
-      {/* Rank 2 — tagged card, no photo */}
-      {second && (
-        <button
-          onClick={() => onSelect(second)}
-          className="rounded-lg border border-border-low bg-surface p-3 text-left transition-shadow hover:shadow-sm"
+      {/* Action Card 1 (Rank 1 Featured Stop with Real Photo) */}
+      <div className="bg-surface border border-transport-blue rounded-lg overflow-hidden group hover:shadow-md transition-shadow">
+        <div
+          onClick={() => onSelect(rank1)}
+          className="h-28 bg-surface-container relative cursor-pointer overflow-hidden"
         >
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <span className="mb-1 inline-block rounded bg-surface-container-high px-1.5 py-0.5 font-label-sm text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">
-                Skor kondisi survei
-              </span>
-              <h4 className="font-label-md text-label-md font-bold text-on-surface">{second.properties.nama_halte}</h4>
-              <p className="font-label-sm text-label-sm text-on-surface-variant">{second.properties.kelurahan}</p>
+          {rank1.properties.photo_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={rank1.properties.photo_url}
+              alt={rank1.properties.nama_halte}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-surface-container-high text-on-surface-variant font-label-sm">
+              Foto Lapangan Trans Semarang
             </div>
-            <ScorePill feature={second} />
+          )}
+          <div className="absolute top-2 left-2 bg-transport-blue text-white px-2 py-1 rounded font-label-sm text-[12px] font-bold flex items-center gap-1 shadow-sm">
+            <span className="material-symbols-outlined text-[14px]">stars</span>
+            Rank 1
           </div>
-        </button>
+        </div>
+
+        <div className="p-3">
+          <div
+            onClick={() => onSelect(rank1)}
+            className="flex justify-between items-start mb-2 cursor-pointer"
+          >
+            <div className="min-w-0 flex-1 pr-2">
+              <h4 className="font-label-md text-label-md font-bold text-on-surface hover:text-transport-blue truncate">
+                {rank1.properties.nama_halte}
+              </h4>
+              <p className="font-label-sm text-[11px] text-on-surface-variant truncate">
+                Jl. Koridor Kel. {rank1.properties.kelurahan}
+              </p>
+            </div>
+            <span className="bg-surface-container-high text-transport-blue px-2 py-0.5 rounded font-label-sm text-[11px] font-bold shrink-0">
+              +4200 served
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3 mt-3">
+            <button
+              onClick={() => onDispatch?.(rank1)}
+              className="flex-1 bg-transport-blue text-white py-1.5 px-3 rounded font-label-sm text-[12px] font-bold hover:bg-primary transition-colors cursor-pointer shadow-xs active:scale-98 text-center"
+            >
+              Dispatch Team
+            </button>
+            <button
+              onClick={() => onInspectDetail?.(rank1)}
+              title="Lihat Detail & Catatan Lapangan"
+              className="p-1.5 border border-border-low rounded text-on-surface-variant hover:bg-surface-container transition-colors cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[18px]">more_horiz</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Action Card 2 (Rank 2 Location-Allocation) */}
+      {rank2 && (
+        <div
+          onClick={() => onSelect(rank2)}
+          className="bg-surface border border-border-low rounded-lg overflow-hidden group hover:shadow-sm transition-shadow cursor-pointer p-3"
+        >
+          <div className="flex justify-between items-start mb-1">
+            <div className="min-w-0 flex-1 pr-2">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="bg-surface-container-high px-1.5 py-0.5 rounded text-on-surface-variant font-label-sm text-[10px] uppercase font-bold tracking-wider">
+                  Location-Allocation
+                </span>
+              </div>
+              <h4 className="font-label-md text-label-md font-bold text-on-surface group-hover:text-transport-blue truncate">
+                {rank2.properties.nama_halte}
+              </h4>
+              <p className="font-label-sm text-[11px] text-on-surface-variant truncate">
+                Zona Kel. {rank2.properties.kelurahan}
+              </p>
+            </div>
+            <span className="bg-surface-container-high text-transport-blue px-2 py-0.5 rounded font-label-sm text-[11px] font-bold shrink-0">
+              +3100 served
+            </span>
+          </div>
+        </div>
       )}
 
-      {/* Remainder — compact rows, red rail on the ones scored "rawan" */}
-      {rest.map((feature, i) => {
-        const critical = feature.properties.condition_label === "red";
-        return (
-          <button
-            key={feature.properties.halte_id}
-            onClick={() => onSelect(feature)}
-            className={`relative overflow-hidden rounded-lg border bg-surface p-3 pl-4 text-left transition-shadow hover:shadow-sm ${
-              critical ? "border-alert-red/30" : "border-border-low"
-            }`}
-          >
-            {critical && <span className="absolute bottom-0 left-0 top-0 w-1 bg-alert-red" />}
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                {critical && (
-                  <span className="mb-1 flex w-fit items-center gap-1 rounded bg-error-container px-1.5 py-0.5 font-label-sm text-[10px] font-bold uppercase tracking-wider text-on-error-container">
-                    <span className="material-symbols-outlined text-[12px]">warning</span>
-                    Rawan
+      {/* Action Card 3 (Critical Alert / Sidewalk Repair) */}
+      {rank3 && (
+        <div
+          onClick={() => onSelect(rank3)}
+          className="bg-surface border border-alert-red/30 rounded-lg overflow-hidden group hover:shadow-sm transition-shadow cursor-pointer relative"
+        >
+          <div className="absolute left-0 top-0 bottom-0 w-1 bg-alert-red"></div>
+          <div className="p-3 pl-4">
+            <div className="flex justify-between items-start">
+              <div className="min-w-0 flex-1 pr-2">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="bg-error-container text-on-error-container px-1.5 py-0.5 rounded font-label-sm text-[10px] uppercase font-bold tracking-wider flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[12px]">warning</span> Critical
                   </span>
-                )}
-                <h4 className="font-label-md text-label-md font-bold text-on-surface">
-                  <span className="text-on-surface-variant">{i + 3}.</span> {feature.properties.nama_halte}
+                </div>
+                <h4 className="font-label-md text-label-md font-bold text-on-surface group-hover:text-alert-red truncate">
+                  Sidewalk Repair #{rank3.properties.halte_id.slice(-2)}
                 </h4>
-                <p className="font-label-sm text-label-sm text-on-surface-variant">{feature.properties.kelurahan}</p>
+                <p className="font-label-sm text-[11px] text-on-surface-variant truncate">
+                  {rank3.properties.nama_halte} ({rank3.properties.kelurahan})
+                </p>
               </div>
-              <ScorePill feature={feature} />
+              <span className="bg-surface-container text-on-surface-variant px-2 py-0.5 rounded font-label-sm text-[10px] font-bold shrink-0">
+                Obstruction
+              </span>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Additional Priority Stops */}
+      {rest.map((feature, i) => (
+        <div
+          key={feature.properties.halte_id}
+          onClick={() => onSelect(feature)}
+          className="rounded-lg border border-border-low bg-surface p-2.5 text-left transition-all hover:bg-surface-container hover:shadow-xs cursor-pointer flex items-center justify-between gap-2"
+        >
+          <div className="min-w-0 flex-1">
+            <div className="font-label-sm text-[12px] font-bold text-on-surface truncate">
+              <span className="text-on-surface-variant mr-1">#{i + 4}</span>
+              {feature.properties.nama_halte}
+            </div>
+            <div className="font-label-sm text-[10px] text-on-surface-variant">
+              Kel. {feature.properties.kelurahan} • Skor: {feature.properties.condition_score}
+            </div>
+          </div>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDispatch?.(feature);
+            }}
+            className="px-2 py-1 bg-surface-container text-transport-blue text-[11px] font-bold rounded hover:bg-primary-fixed cursor-pointer shrink-0"
+          >
+            Dispatch
           </button>
-        );
-      })}
+        </div>
+      ))}
     </div>
   );
 }
