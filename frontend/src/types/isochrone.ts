@@ -1,5 +1,5 @@
 export interface IsochroneBandProperties {
-  minutes: 5 | 10 | 15;
+  minutes: 3 | 5 | 10;
   halte_count: number;
   area_km2: number;
 }

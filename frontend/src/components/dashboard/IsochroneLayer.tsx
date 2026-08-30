@@ -16,9 +16,9 @@ interface IsochroneLayerProps {
 }
 
 // Bands are cumulative ("reachable within <= N min", see build_isochrones.py)
-// and the source data is pre-sorted largest-first (15, 10, 5), so a single
+// and the source data is pre-sorted largest-first (10, 5, 3), so a single
 // layer with a data-driven match on `minutes` stacks correctly: later
-// features in the array (the 5min band) draw on top and read as the
+// features in the array (the 3min band) draw on top and read as the
 // darkest/most-covered core.
 export default function IsochroneLayer({ map, visible }: IsochroneLayerProps) {
   const loadedRef = useRef(false);
@@ -41,7 +41,7 @@ export default function IsochroneLayer({ map, visible }: IsochroneLayerProps) {
           layout: { visibility: initialVisibility },
           paint: {
             "fill-color": "#00529b",
-            "fill-opacity": ["match", ["get", "minutes"], 5, 0.28, 10, 0.18, 15, 0.1, 0.1] as never,
+            "fill-opacity": ["match", ["get", "minutes"], 3, 0.28, 5, 0.18, 10, 0.1, 0.1] as never,
           },
         },
         beforeId,

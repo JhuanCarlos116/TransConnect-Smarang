@@ -2,8 +2,8 @@
 
 Computes walking-time catchment areas ("isochrones") around the 42 surveyed
 halte, using the routable pedestrian graph built by build_pedestrian_network.py.
-Output answers: "which parts of the 9 surveyed kelurahan are within a 5 / 10 /
-15-minute walk of an EXISTING halte?" — the gap between this and the
+Output answers: "which parts of the 9 surveyed kelurahan are within a 3 / 5 /
+10-minute walk of an EXISTING halte?" — the gap between this and the
 population layer is what the next roadmap module (Location Allocation) will
 use to recommend where new stops are needed.
 
@@ -13,9 +13,10 @@ Methodology (documented here since there's no isochrone spec in the PRD):
   mockup's placeholder SVG) — a 15-min isochrone can be a very different
   shape than a circle wherever the network is sparse or blocked (river,
   toll road).
-- Thresholds: 5 / 10 / 15 minutes, the standard walkability planning bands
-  (roughly 400m / 800m / 1200m at an average adult walking pace). Converted
-  to a network-distance budget using WALK_SPEED_M_PER_MIN below.
+- Thresholds: 3 / 5 / 10 minutes, as specified by the PRD (Tabel 5 and the
+  "Modul Network Isochrone Analysis" acceptance criteria). That works out to
+  roughly 250m / 415m / 830m of network distance at an average adult walking
+  pace. Converted to a budget using WALK_SPEED_M_PER_MIN below.
 - Cost = pure walking distance/time on the network. NOT safety-weighted
   (e.g. penalizing unlit segments) — our condition data (CCTV/lighting/
   sidewalk) is recorded per-halte-point from the survey, not per road
@@ -23,8 +24,8 @@ Methodology (documented here since there's no isochrone spec in the PRD):
   produces segment-level attributes this can become a weighted cost; until
   then, a fake safety weight would be worse than an honest distance-only one.
 - Each band is CUMULATIVE ("reachable within <= N min"), not an exclusive
-  ring (5-10min, 10-15min) — simpler to compute and to render (draw 15min
-  first, 10min on top, 5min on top of that), and is the standard way
+  ring (3-5min, 5-10min) — simpler to compute and to render (draw 10min
+  first, 5min on top, 3min on top of that), and is the standard way
   isochrones are visualized. Bands are the union across all 42 halte, so a
   resident only needs to be near *any* one halte to be counted covered.
 
@@ -51,7 +52,7 @@ OUT_PATHS = [
 
 PROJECTED_CRS = "EPSG:32749"  # UTM 49S — matches build_population_layer.py, accurate meters for Semarang
 WALK_SPEED_M_PER_MIN = 83.3  # ~5 km/h, standard pedestrian-accessibility assumption
-THRESHOLDS_MIN = [5, 10, 15]
+THRESHOLDS_MIN = [3, 5, 10]  # per PRD Tabel 5 — keep in sync with the PRD if changed
 CORRIDOR_HALF_WIDTH_M = 20  # buffers each reachable street to a ~40m-wide walkable corridor
 
 
@@ -126,7 +127,7 @@ def main() -> None:
         )
 
     # Largest band first so the frontend can add-layer in this order and get
-    # correct z-stacking (15min underneath, 5min on top) without re-sorting.
+    # correct z-stacking (10min underneath, 3min on top) without re-sorting.
     features.sort(key=lambda f: -f["properties"]["minutes"])
     collection = {"type": "FeatureCollection", "features": features}
 

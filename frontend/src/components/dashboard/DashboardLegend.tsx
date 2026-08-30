@@ -25,15 +25,15 @@ export default function DashboardLegend() {
       <h4 className="mb-1 mt-3 text-label-sm font-bold text-on-surface">Jangkauan Jalan Kaki</h4>
       <div className="flex items-center gap-2">
         <span className="inline-block h-2.5 w-2.5 rounded-full bg-transport-blue" style={{ opacity: 0.28 }} />
-        <span className="text-label-sm text-on-surface-variant">5 menit</span>
+        <span className="text-label-sm text-on-surface-variant">3 menit</span>
       </div>
       <div className="flex items-center gap-2">
         <span className="inline-block h-2.5 w-2.5 rounded-full bg-transport-blue" style={{ opacity: 0.18 }} />
-        <span className="text-label-sm text-on-surface-variant">10 menit</span>
+        <span className="text-label-sm text-on-surface-variant">5 menit</span>
       </div>
       <div className="flex items-center gap-2">
         <span className="inline-block h-2.5 w-2.5 rounded-full bg-transport-blue" style={{ opacity: 0.1 }} />
-        <span className="text-label-sm text-on-surface-variant">15 menit</span>
+        <span className="text-label-sm text-on-surface-variant">10 menit</span>
       </div>
     </div>
   );
