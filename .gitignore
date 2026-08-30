@@ -21,5 +21,6 @@ Thumbs.db
 .vscode/
 .idea/
 
-# osmnx HTTP cache (raw Overpass responses, re-downloadable)
-backend/cache/
+# osmnx HTTP cache (raw Overpass responses, re-downloadable). Not anchored to
+# backend/ because osmnx writes it relative to the cwd the script is run from.
+cache/
