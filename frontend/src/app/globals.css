@@ -71,11 +71,26 @@
   --color-thermal-cool: #00bcd4;
   --color-thermal-hot: #ff5722;
 
-  /* Typography — Inter for UI/reading, JetBrains Mono for metadata/coords/
-     AI-detected attribute labels (apply font-mono alongside these text-*
-     utilities, since Tailwind's --text-* tokens don't carry font-family). */
+  /* Typography. Tailwind's --text-* tokens carry size/leading/weight but not
+     family, so the design system pairs each one with a matching --font-* token
+     and components apply both (`font-label-sm text-label-sm`), exactly as the
+     source mockup does.
+
+     The split matters more than it looks: every SMALL label — layer names,
+     legend text, badges, counts, coordinates — is monospace, and that is what
+     gives the dashboard its instrument-panel character. Headlines and prose
+     stay in Inter so they remain comfortable to read. */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
+
+  --font-headline-xl: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-headline-lg: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-headline-lg-mobile: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-headline-md: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-body-lg: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-body-md: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-label-md: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
+  --font-label-sm: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
 
   --text-headline-xl: 40px;
   --text-headline-xl--line-height: 48px;
@@ -111,12 +126,20 @@
   --text-label-sm--line-height: 16px;
   --text-label-sm--font-weight: 500;
 
-  /* Shapes */
+  /* Shapes. Deliberately tight — the design reads as technical rather than
+     friendly, and softer corners were the single biggest reason our build did
+     not look like the mockup. Values mirror the mockup's Tailwind config
+     (DEFAULT .125 / lg .25 / xl .5 / full .75rem).
+
+     `--radius-full` being 12px rather than 9999px is not a mistake: CSS clamps
+     a corner radius to half the box, so anything up to 24px — legend dots,
+     progress bars, pills — still renders fully round, while larger surfaces
+     keep the squared-off look. */
   --radius-sm: 0.125rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
-  --radius-full: 9999px;
+  --radius-md: 0.1875rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.5rem;
+  --radius-full: 0.75rem;
 
   /* Layout rhythm */
   --spacing-panel-width: 380px;

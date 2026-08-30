@@ -3,45 +3,77 @@ interface VerificationSummaryProps {
   verifiedReportCount: number | null;
 }
 
+interface StatCardProps {
+  icon: string;
+  label: string;
+  value: string;
+  badge: string;
+  badgeIcon: string;
+  badgeClass: string;
+  barClass: string;
+  barWidth: string;
+}
+
+function StatCard({ icon, label, value, badge, badgeIcon, badgeClass, barClass, barWidth }: StatCardProps) {
+  return (
+    <div className="rounded border border-border-low bg-surface p-3 shadow-sm">
+      <div className="mb-1 flex items-center justify-between">
+        <span className="material-symbols-outlined text-[18px] text-outline">{icon}</span>
+        <span className={`flex items-center gap-1 font-label-sm text-label-sm font-bold ${badgeClass}`}>
+          <span className="material-symbols-outlined text-[14px]">{badgeIcon}</span>
+          {badge}
+        </span>
+      </div>
+      <div className="font-label-sm text-label-sm text-on-surface-variant">{label}</div>
+      <div className="mt-1 font-headline-md text-headline-md font-bold text-on-surface">{value}</div>
+      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-container-high">
+        <div className={`h-full ${barClass}`} style={{ width: barWidth }} />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Occupies the slot the mockup gave to "YOLOv8 Detection Summary", in the same
+ * two-card layout.
+ *
+ * The mockup's figures — 1,204 sidewalks at 84% valid, 4,392 streetlights at
+ * 22% QC required — are invented, and YOLOv8 is not wired up yet. Publishing
+ * them would put fabricated detection results in front of the judges, so the
+ * cards report what the pipeline has really produced and the heading states
+ * where the numbers came from.
+ */
 export default function VerificationSummary({ halteCount, verifiedReportCount }: VerificationSummaryProps) {
   return (
     <div className="border-t border-border-low bg-surface-subtle p-gutter">
-      <h3 className="mb-3 flex items-center gap-2 text-label-md font-bold text-on-surface">
+      <h3 className="mb-2 flex items-center gap-2 font-label-md text-label-md font-bold text-on-surface">
         <span className="material-symbols-outlined text-[18px] text-transport-blue">memory</span>
         Status Verifikasi
       </h3>
-      <p className="mb-3 text-label-sm text-on-surface-variant">
-        YOLOv8 belum terintegrasi — angka di bawah ini hasil QA manual tim, bukan deteksi AI otomatis.
+      <p className="mb-3 font-label-sm text-label-sm leading-relaxed text-on-surface-variant">
+        YOLOv8 belum terintegrasi — angka di bawah hasil QA manual tim, bukan deteksi AI otomatis.
       </p>
       <div className="grid grid-cols-2 gap-3">
-        <div className="rounded border border-border-low bg-surface p-3 shadow-sm">
-          <div className="mb-1 flex items-center justify-between">
-            <span className="material-symbols-outlined text-[18px] text-outline">directions_walk</span>
-            <span className="flex items-center gap-1 text-label-sm font-bold text-safety-green">
-              <span className="material-symbols-outlined text-[14px]">check_circle</span>
-              QA manual
-            </span>
-          </div>
-          <div className="text-label-sm text-on-surface-variant">Titik Survei</div>
-          <div className="mt-1 text-headline-md font-bold text-on-surface">{halteCount}</div>
-          <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-container-high">
-            <div className="h-full w-full bg-safety-green" />
-          </div>
-        </div>
-        <div className="rounded border border-border-low bg-surface p-3 shadow-sm">
-          <div className="mb-1 flex items-center justify-between">
-            <span className="material-symbols-outlined text-[18px] text-outline">campaign</span>
-            <span className="flex items-center gap-1 text-label-sm font-bold text-transport-blue">
-              <span className="material-symbols-outlined text-[14px]">check_circle</span>
-              data contoh
-            </span>
-          </div>
-          <div className="text-label-sm text-on-surface-variant">Laporan Warga</div>
-          <div className="mt-1 text-headline-md font-bold text-on-surface">{verifiedReportCount ?? "…"}</div>
-          <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-container-high">
-            <div className="h-full w-full bg-transport-blue" />
-          </div>
-        </div>
+        <StatCard
+          icon="directions_walk"
+          label="Titik Survei"
+          value={String(halteCount)}
+          badge="QA manual"
+          badgeIcon="check_circle"
+          badgeClass="text-safety-green"
+          barClass="bg-safety-green"
+          barWidth="100%"
+        />
+        <StatCard
+          icon="campaign"
+          label="Laporan Warga"
+          value={verifiedReportCount === null ? "…" : String(verifiedReportCount)}
+          badge="data contoh"
+          badgeIcon="check_circle"
+          badgeClass="text-transport-blue"
+          barClass="bg-transport-blue"
+          barWidth="100%"
+        />
       </div>
     </div>
   );
