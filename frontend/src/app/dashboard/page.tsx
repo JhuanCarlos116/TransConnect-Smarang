@@ -6,7 +6,6 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 import { DEFAULT_CENTER, DEFAULT_ZOOM, mapStyleUrl } from "@/lib/maplibre";
 import { fetchHalteData } from "@/lib/fetchHalteData";
-import { fetchCommunityReports } from "@/lib/fetchCommunityReports";
 import HalteLayer from "@/components/map/HalteLayer";
 import CommunityMapsLayer from "@/components/map/CommunityMapsLayer";
 import PopulationLayer from "@/components/dashboard/PopulationLayer";
@@ -17,7 +16,6 @@ import DashboardFilterPanel from "@/components/dashboard/DashboardFilterPanel";
 import DashboardLegend from "@/components/dashboard/DashboardLegend";
 import MapControls from "@/components/dashboard/MapControls";
 import PriorityList from "@/components/dashboard/PriorityList";
-import VerificationSummary from "@/components/dashboard/VerificationSummary";
 import HalteDetailModal from "@/components/dashboard/HalteDetailModal";
 import type { HalteFeature } from "@/types/halte";
 
@@ -32,14 +30,10 @@ export default function DashboardPage() {
   const [filterPanelOpen, setFilterPanelOpen] = useState(true);
 
   const [halteFeatures, setHalteFeatures] = useState<HalteFeature[]>([]);
-  const [verifiedCount, setVerifiedCount] = useState<number | null>(null);
   const [detailTarget, setDetailTarget] = useState<HalteFeature | null>(null);
 
   useEffect(() => {
     fetchHalteData().then((data) => setHalteFeatures(data.features));
-    fetchCommunityReports().then((data) =>
-      setVerifiedCount(data.features.filter((f) => f.properties.verification_status === "verified").length),
-    );
   }, []);
 
   useEffect(() => {
@@ -136,8 +130,6 @@ export default function DashboardPage() {
             <div className="flex-1 overflow-y-auto p-gutter">
               <PriorityList features={halteFeatures} onSelect={flyToHalte} />
             </div>
-
-            <VerificationSummary halteCount={halteFeatures.length} verifiedReportCount={verifiedCount} />
           </div>
         </main>
       </div>
