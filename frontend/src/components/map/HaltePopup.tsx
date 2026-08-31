@@ -21,12 +21,14 @@ interface HaltePopupProps {
 }
 
 export default function HaltePopup({ properties }: HaltePopupProps) {
+  const firstPhoto = properties.media.find((m) => m.type === "photo")?.url;
+
   return (
     <div className="min-w-[220px] max-w-[260px] font-sans">
-      {properties.photo_urls[0] ? (
+      {firstPhoto ? (
         // eslint-disable-next-line @next/next/no-img-element -- popup is rendered into a Mapbox GL DOM node, outside Next's page tree
         <img
-          src={properties.photo_urls[0]}
+          src={firstPhoto}
           alt={properties.nama_halte}
           className="mb-2 h-[120px] w-full rounded-md object-cover"
         />

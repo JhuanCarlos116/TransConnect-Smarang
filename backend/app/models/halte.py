@@ -1,6 +1,6 @@
 from geoalchemy2 import Geometry
 from sqlalchemy import Date, String
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -20,10 +20,11 @@ class HalteSurvey(Base):
     route_info_signage: Mapped[str] = mapped_column(String)  # "ada" | "tidak" | "-"
     canopy: Mapped[str] = mapped_column(String)  # "ada" | "tidak" | "-"
 
-    # Every survey point has 2-5 field photos in the raw MAPID export, not
-    # one -- a single-column photo_url used to keep only the first and
-    # silently drop the rest.
-    photo_urls: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
+    # Every point has 2-5 field photos, and 18 of the 42 have one video, in
+    # original upload order -- [{"url": ..., "type": "photo" | "video"}].
+    # JSONB rather than ARRAY(String) since each item carries a type tag,
+    # not just a bare URL.
+    media: Mapped[list[dict]] = mapped_column(JSONB, default=list)
     survey_date: Mapped[str | None] = mapped_column(Date, nullable=True)
     catatan_lapangan: Mapped[str | None] = mapped_column(String, nullable=True)
 

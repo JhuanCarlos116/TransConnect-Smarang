@@ -3,12 +3,11 @@
 import { useState } from "react";
 
 import { conditionColor, conditionLabelText } from "@/lib/conditionScore";
-import type { HalteFeature, HalteProperties } from "@/types/halte";
+import type { HalteFeature, HalteMediaItem, HalteProperties } from "@/types/halte";
 
 interface HalteDetailModalProps {
   feature: HalteFeature | null;
   onClose: () => void;
-  onFlyTo?: (feature: HalteFeature) => void;
 }
 
 const ATTRIBUTE_ROWS: Array<{ key: keyof HalteProperties; label: string; icon: string }> = [
@@ -25,24 +24,91 @@ function formatState(value: string): { text: string; colorClass: string } {
   return { text: "Tidak Disebutkan", colorClass: "text-on-surface-variant bg-surface-container" };
 }
 
-interface PhotoCarouselProps {
-  photoUrls: string[];
+interface LightboxProps {
+  media: HalteMediaItem[];
+  index: number;
+  onIndexChange: (i: number) => void;
+  onClose: () => void;
+  alt: string;
+}
+
+/** Full-view overlay for a single photo, stacked above the detail modal itself (z-[60] > z-50). */
+function Lightbox({ media, index, onIndexChange, onClose, alt }: LightboxProps) {
+  const item = media[index];
+  const hasMultiple = media.length > 1;
+
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-4"
+      onClick={onClose}
+    >
+      <button
+        onClick={onClose}
+        aria-label="Tutup"
+        className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70"
+      >
+        <span className="material-symbols-outlined text-[22px]">close</span>
+      </button>
+
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={item.url}
+        alt={alt}
+        className="max-h-full max-w-full object-contain"
+        onClick={(e) => e.stopPropagation()}
+      />
+
+      {hasMultiple && (
+        <>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onIndexChange((index - 1 + media.length) % media.length);
+            }}
+            aria-label="Sebelumnya"
+            className="absolute left-4 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70"
+          >
+            <span className="material-symbols-outlined text-[24px]">chevron_left</span>
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onIndexChange((index + 1) % media.length);
+            }}
+            aria-label="Berikutnya"
+            className="absolute right-4 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70"
+          >
+            <span className="material-symbols-outlined text-[24px]">chevron_right</span>
+          </button>
+          <span className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1 font-label-sm text-[12px] text-white">
+            {index + 1}/{media.length}
+          </span>
+        </>
+      )}
+    </div>
+  );
+}
+
+interface MediaCarouselProps {
+  media: HalteMediaItem[];
   alt: string;
 }
 
 /**
- * Every survey point has 2-5 field photos (see clean_survey_export.py's
- * pick_photo_urls), not one -- an earlier version of the pipeline kept only
- * the first and silently dropped the rest.
+ * Every survey point has 2-5 field photos and 18 of 42 have one video, in
+ * original upload order (see clean_survey_export.py's pick_media) -- an
+ * earlier version of this pipeline kept only the first photo and dropped
+ * every video outright.
  *
  * Rendered with `key={halte_id}` by the parent, so switching to a different
  * halte remounts this fresh (index back to 0) instead of needing an effect
  * to reset state in response to a prop change.
  */
-function PhotoCarousel({ photoUrls, alt }: PhotoCarouselProps) {
+function MediaCarousel({ media, alt }: MediaCarouselProps) {
   const [index, setIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
-  if (photoUrls.length === 0) {
+  if (media.length === 0) {
     return (
       <div className="flex h-full w-full items-center justify-center text-label-sm text-on-surface-variant">
         Foto survei tidak tersedia
@@ -50,53 +116,72 @@ function PhotoCarousel({ photoUrls, alt }: PhotoCarouselProps) {
     );
   }
 
-  const hasMultiple = photoUrls.length > 1;
+  const item = media[index];
+  const hasMultiple = media.length > 1;
 
   return (
     <>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={photoUrls[index]} alt={alt} className="h-full w-full object-cover" />
+      {item.type === "video" ? (
+        <video src={item.url} controls className="h-full w-full bg-black object-contain" />
+      ) : (
+        <button
+          onClick={() => setLightboxOpen(true)}
+          className="group relative block h-full w-full cursor-zoom-in"
+          aria-label="Lihat foto penuh"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={item.url} alt={alt} className="h-full w-full object-cover" />
+          <span className="absolute bottom-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100">
+            <span className="material-symbols-outlined text-[16px]">open_in_full</span>
+          </span>
+        </button>
+      )}
 
       {hasMultiple && (
         <>
           <button
-            onClick={() => setIndex((i) => (i - 1 + photoUrls.length) % photoUrls.length)}
-            aria-label="Foto sebelumnya"
+            onClick={() => setIndex((i) => (i - 1 + media.length) % media.length)}
+            aria-label="Sebelumnya"
             className="absolute left-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/70"
           >
             <span className="material-symbols-outlined text-[20px]">chevron_left</span>
           </button>
           <button
-            onClick={() => setIndex((i) => (i + 1) % photoUrls.length)}
-            aria-label="Foto berikutnya"
+            onClick={() => setIndex((i) => (i + 1) % media.length)}
+            aria-label="Berikutnya"
             className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/70"
           >
             <span className="material-symbols-outlined text-[20px]">chevron_right</span>
           </button>
 
           <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
-            {photoUrls.map((url, i) => (
+            {media.map((m, i) => (
               <button
-                key={url}
+                key={m.url}
                 onClick={() => setIndex(i)}
-                aria-label={`Foto ${i + 1} dari ${photoUrls.length}`}
-                className={`h-1.5 w-1.5 rounded-full transition-all ${
-                  i === index ? "w-4 bg-white" : "bg-white/60"
+                aria-label={`Media ${i + 1} dari ${media.length}`}
+                className={`h-1.5 rounded-full transition-all ${
+                  i === index ? "w-4 bg-white" : "w-1.5 bg-white/60"
                 }`}
               />
             ))}
           </div>
 
-          <span className="absolute right-3 top-3 rounded-full bg-black/60 px-2 py-0.5 font-label-sm text-[11px] text-white">
-            {index + 1}/{photoUrls.length}
+          <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 font-label-sm text-[11px] text-white">
+            {item.type === "video" && <span className="material-symbols-outlined text-[13px]">videocam</span>}
+            {index + 1}/{media.length}
           </span>
         </>
+      )}
+
+      {lightboxOpen && (
+        <Lightbox media={media} index={index} onIndexChange={setIndex} onClose={() => setLightboxOpen(false)} alt={alt} />
       )}
     </>
   );
 }
 
-export default function HalteDetailModal({ feature, onClose, onFlyTo }: HalteDetailModalProps) {
+export default function HalteDetailModal({ feature, onClose }: HalteDetailModalProps) {
   if (!feature) return null;
   const p = feature.properties;
 
@@ -126,10 +211,10 @@ export default function HalteDetailModal({ feature, onClose, onFlyTo }: HalteDet
 
         {/* Body Content */}
         <div className="mt-4 flex flex-col gap-4">
-          {/* Photo carousel & score banner */}
+          {/* Media carousel & score banner */}
           <div className="relative h-56 w-full rounded-lg overflow-hidden bg-surface-container border border-border-low">
-            <PhotoCarousel key={p.halte_id} photoUrls={p.photo_urls} alt={p.nama_halte} />
-            <div className="absolute top-3 left-3 bg-surface/90 backdrop-blur-sm px-3 py-1 rounded-lg border border-border-low shadow-sm flex items-center gap-2">
+            <MediaCarousel key={p.halte_id} media={p.media} alt={p.nama_halte} />
+            <div className="pointer-events-none absolute top-3 left-3 bg-surface/90 backdrop-blur-sm px-3 py-1 rounded-lg border border-border-low shadow-sm flex items-center gap-2">
               <span
                 className="h-3 w-3 rounded-full"
                 style={{ backgroundColor: conditionColor(p.condition_label) }}
@@ -139,7 +224,7 @@ export default function HalteDetailModal({ feature, onClose, onFlyTo }: HalteDet
               </span>
             </div>
             {p.survey_date && (
-              <div className="absolute bottom-3 right-3 bg-black/70 text-white font-label-sm text-[11px] px-2.5 py-1 rounded-md">
+              <div className="pointer-events-none absolute bottom-3 right-3 bg-black/70 text-white font-label-sm text-[11px] px-2.5 py-1 rounded-md">
                 Survei: {p.survey_date}
               </div>
             )}
@@ -199,23 +284,6 @@ export default function HalteDetailModal({ feature, onClose, onFlyTo }: HalteDet
               </p>
             </div>
           )}
-
-          {/* Actions. A "Dispatch Tim Perbaikan" button used to sit here,
-              submitting to a modal that only ran a setTimeout and reported a
-              fabricated success -- there is no real dispatch system behind
-              it, so it is gone until there is. */}
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-border-low">
-            <button
-              onClick={() => {
-                onFlyTo?.(feature);
-                onClose();
-              }}
-              className="px-4 py-2 rounded-lg border border-transport-blue text-transport-blue hover:bg-primary-fixed/30 font-label-md text-[13px] font-bold cursor-pointer flex items-center gap-1.5"
-            >
-              <span className="material-symbols-outlined text-[18px]">my_location</span>
-              Lihat di Peta
-            </button>
-          </div>
         </div>
       </div>
     </div>
