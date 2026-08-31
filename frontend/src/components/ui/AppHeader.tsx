@@ -25,6 +25,12 @@ const TABS = [
  * (Admin)" status with no auth system behind it. Neither was real, and both
  * looked like they were. Add them back only once there is something genuine
  * — a real alert feed, a real login — behind the icon.
+ *
+ * On the dashboard, the tab switcher collapses to a plain label rather than
+ * offering "Peta Publik" as a destination: this is DISHUB's internal tool,
+ * not a page a staff workflow should be routing back out of the public map
+ * from. The public page keeps both tabs -- that direction (public -> staff
+ * dashboard) isn't the one in question here.
  */
 export default function AppHeader({ active, searchFeatures, onSearchSelect }: AppHeaderProps) {
   const showSearch = Boolean(searchFeatures && onSearchSelect);
@@ -38,22 +44,28 @@ export default function AppHeader({ active, searchFeatures, onSearchSelect }: Ap
         <span className="font-headline-md text-headline-md font-bold text-transport-blue">TransConnect</span>
       </Link>
 
-      <nav className="flex h-full items-stretch">
-        {TABS.map((tab) => (
-          <Link
-            key={tab.key}
-            href={tab.href}
-            aria-current={active === tab.key ? "page" : undefined}
-            className={
-              active === tab.key
-                ? "flex items-center whitespace-nowrap border-b-2 border-transport-blue px-3 font-label-md text-label-md font-bold text-transport-blue"
-                : "flex items-center whitespace-nowrap border-b-2 border-transparent px-3 font-label-md text-label-md text-on-surface-variant transition-colors hover:text-transport-blue"
-            }
-          >
-            {tab.label}
-          </Link>
-        ))}
-      </nav>
+      {active === "dashboard" ? (
+        <span className="flex h-full items-center whitespace-nowrap border-b-2 border-transport-blue px-3 font-label-md text-label-md font-bold text-transport-blue">
+          Dashboard DISHUB
+        </span>
+      ) : (
+        <nav className="flex h-full items-stretch">
+          {TABS.map((tab) => (
+            <Link
+              key={tab.key}
+              href={tab.href}
+              aria-current={active === tab.key ? "page" : undefined}
+              className={
+                active === tab.key
+                  ? "flex items-center whitespace-nowrap border-b-2 border-transport-blue px-3 font-label-md text-label-md font-bold text-transport-blue"
+                  : "flex items-center whitespace-nowrap border-b-2 border-transparent px-3 font-label-md text-label-md text-on-surface-variant transition-colors hover:text-transport-blue"
+              }
+            >
+              {tab.label}
+            </Link>
+          ))}
+        </nav>
+      )}
 
       {showSearch && (
         <div className="mx-4 hidden max-w-md flex-1 md:block">
