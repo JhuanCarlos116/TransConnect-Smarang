@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import HalteSearch from "@/components/ui/HalteSearch";
@@ -37,10 +38,8 @@ export default function AppHeader({ active, searchFeatures, onSearchSelect }: Ap
 
   return (
     <header className="z-50 flex h-16 w-full shrink-0 items-center gap-6 border-b border-border-low bg-surface px-gutter">
-      <Link href="/" className="flex shrink-0 items-center gap-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded bg-transport-blue text-on-primary">
-          <span className="material-symbols-outlined text-[18px]">shield</span>
-        </div>
+      <Link href="/" className="flex shrink-0 items-center gap-2">
+        <Image src="/logo-icon.png" alt="" width={128} height={128} className="h-9 w-9" priority />
         <span className="font-headline-md text-headline-md font-bold text-transport-blue">TransConnect</span>
       </Link>
 
