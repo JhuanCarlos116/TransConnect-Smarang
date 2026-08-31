@@ -55,13 +55,6 @@ export default function DashboardSidebar({ onResetView }: DashboardSidebarProps)
           Atur Ulang Peta
         </button>
       </div>
-
-      <div className="mt-auto border-t border-border-low p-gutter">
-        <p className="font-label-sm text-label-sm leading-relaxed text-on-surface-variant">
-          Layer LST, Slope, dan Blank Spot belum tersedia — datanya belum dibangun, jadi sengaja tidak ditampilkan
-          sebagai pilihan.
-        </p>
-      </div>
     </nav>
   );
 }
