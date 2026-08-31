@@ -48,6 +48,15 @@ function buildPanel(layerId: string, properties: Record<string, unknown>): Panel
   return null;
 }
 
+// Same treatment as HalteDetailModal's close button (border-alert-red,
+// hover:bg-alert-red) -- MapLibre's own default close button is a plain gray
+// "x" with no relation to the rest of the UI's styling.
+const CLOSE_BUTTON_HTML =
+  `<button data-close aria-label="Tutup" ` +
+  `class="text-alert-red hover:text-on-error border border-alert-red rounded-lg p-1 hover:bg-alert-red transition-colors cursor-pointer" ` +
+  `style="display:flex;align-items:center">` +
+  `<span class="material-symbols-outlined" style="font-size:16px">close</span></button>`;
+
 function panelHtml(panel: Panel, index: number, total: number): string {
   const nav =
     total > 1
@@ -70,7 +79,8 @@ function panelHtml(panel: Panel, index: number, total: number): string {
   return (
     `<div style="font-family:system-ui,sans-serif;font-size:13px;min-width:180px;color:var(--color-on-surface)">` +
     `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px">` +
-    `<div style="font-weight:700;font-size:15px;color:var(--color-on-surface)">${panel.title}</div>${nav}</div>` +
+    `<div style="font-weight:700;font-size:15px;color:var(--color-on-surface)">${panel.title}</div>` +
+    `<div style="display:flex;align-items:center;gap:6px">${nav}${CLOSE_BUTTON_HTML}</div></div>` +
     rows +
     `</div>`
   );
@@ -119,6 +129,7 @@ export default function MapInfoPopup({ map }: MapInfoPopupProps) {
       }
       if (panels.length === 0) return;
 
+      const popupRef: { current?: maplibregl.Popup } = {};
       const container = document.createElement("div");
       const render = (index: number) => {
         container.innerHTML = panelHtml(panels[index], index, panels.length);
@@ -126,10 +137,16 @@ export default function MapInfoPopup({ map }: MapInfoPopupProps) {
           .querySelector("[data-prev]")
           ?.addEventListener("click", () => render((index - 1 + panels.length) % panels.length));
         container.querySelector("[data-next]")?.addEventListener("click", () => render((index + 1) % panels.length));
+        container.querySelector("[data-close]")?.addEventListener("click", () => popupRef.current?.remove());
       };
       render(0);
 
-      new maplibregl.Popup({ offset: 8 }).setLngLat(e.lngLat).setDOMContent(container).addTo(map);
+      // closeButton: false -- MapLibre's default "x" is replaced by the
+      // styled one baked into panelHtml above, matching HalteDetailModal.
+      popupRef.current = new maplibregl.Popup({ offset: 8, closeButton: false })
+        .setLngLat(e.lngLat)
+        .setDOMContent(container)
+        .addTo(map);
     };
 
     map.on("click", handleClick);
