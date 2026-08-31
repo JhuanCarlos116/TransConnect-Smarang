@@ -162,6 +162,33 @@
   }
 }
 
+/* Material Symbols is loaded as a webfont in layout.tsx (a <link> to
+   fonts.googleapis.com, family "Material Symbols Outlined"), but that link
+   only supplies @font-face rules -- Google's own usage docs require the
+   consuming project to define this class itself. It was never added here,
+   so every icon in the app (12 call sites across 6 components) was rendering
+   as literal fallback text -- "search", "restart_alt", "map" -- in whatever
+   font-family it inherited, not as a glyph. Most read as plausible at a
+   glance since short icon names (map, close) resemble icon-sized text, but
+   it's why the header search icon visibly overlapped the placeholder text:
+   "search" as six literal characters is far wider than pl-10 budgeted for
+   a compact icon. */
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+}
+
 html {
   height: 100%;
 }
