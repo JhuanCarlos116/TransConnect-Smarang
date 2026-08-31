@@ -24,3 +24,5 @@ Thumbs.db
 # osmnx HTTP cache (raw Overpass responses, re-downloadable). Not anchored to
 # backend/ because osmnx writes it relative to the cwd the script is run from.
 cache/
+.vercel
+.env*
