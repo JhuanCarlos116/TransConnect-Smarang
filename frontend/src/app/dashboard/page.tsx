@@ -12,8 +12,6 @@ import PopulationLayer from "@/components/dashboard/PopulationLayer";
 import IsochroneLayer from "@/components/dashboard/IsochroneLayer";
 import AppHeader from "@/components/ui/AppHeader";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
-import DashboardFilterPanel from "@/components/dashboard/DashboardFilterPanel";
-import DashboardLegend from "@/components/dashboard/DashboardLegend";
 import MapControls from "@/components/dashboard/MapControls";
 import HalteDetailModal from "@/components/dashboard/HalteDetailModal";
 import type { HalteFeature } from "@/types/halte";
@@ -26,7 +24,6 @@ export default function DashboardPage() {
   const [halteVisible, setHalteVisible] = useState(true);
   const [reportsVisible, setReportsVisible] = useState(false);
   const [isochroneVisible, setIsochroneVisible] = useState(false);
-  const [filterPanelOpen, setFilterPanelOpen] = useState(true);
 
   const [halteFeatures, setHalteFeatures] = useState<HalteFeature[]>([]);
   const [detailTarget, setDetailTarget] = useState<HalteFeature | null>(null);
@@ -70,7 +67,6 @@ export default function DashboardPage() {
     setHalteVisible(true);
     setReportsVisible(false);
     setIsochroneVisible(false);
-    setFilterPanelOpen(true);
   }, [map]);
 
   return (
@@ -78,8 +74,21 @@ export default function DashboardPage() {
       <AppHeader active="dashboard" searchFeatures={halteFeatures} onSearchSelect={flyToHalte} />
 
       <div className="relative flex flex-1 overflow-hidden">
-        <DashboardSidebar onResetView={resetView} />
+        <DashboardSidebar
+          onResetView={resetView}
+          densityVisible={densityVisible}
+          onDensityChange={setDensityVisible}
+          halteVisible={halteVisible}
+          onHalteChange={setHalteVisible}
+          reportsVisible={reportsVisible}
+          onReportsChange={setReportsVisible}
+          isochroneVisible={isochroneVisible}
+          onIsochroneChange={setIsochroneVisible}
+        />
 
+        {/* Map canvas -- deliberately free of overlays now. Layer toggles
+            and the legend used to float here as separate cards; both moved
+            into DashboardSidebar so this area stays clear. */}
         <main className="relative flex-1 bg-surface-subtle">
           <div ref={containerRef} className="h-full w-full" />
           {map && (
@@ -88,30 +97,8 @@ export default function DashboardPage() {
               <PopulationLayer map={map} visible={densityVisible} />
               <HalteLayer map={map} visible={halteVisible} />
               <CommunityMapsLayer map={map} visible={reportsVisible} />
-              <MapControls
-                map={map}
-                panelOpen={filterPanelOpen}
-                onTogglePanel={() => setFilterPanelOpen((open) => !open)}
-              />
+              <MapControls map={map} />
             </>
-          )}
-
-          <div className="absolute bottom-margin-page right-margin-page z-20">
-            <DashboardLegend />
-          </div>
-          {filterPanelOpen && (
-            <div className="absolute bottom-margin-page left-margin-page z-20">
-              <DashboardFilterPanel
-                densityVisible={densityVisible}
-                onDensityChange={setDensityVisible}
-                halteVisible={halteVisible}
-                onHalteChange={setHalteVisible}
-                reportsVisible={reportsVisible}
-                onReportsChange={setReportsVisible}
-                isochroneVisible={isochroneVisible}
-                onIsochroneChange={setIsochroneVisible}
-              />
-            </div>
           )}
         </main>
       </div>
