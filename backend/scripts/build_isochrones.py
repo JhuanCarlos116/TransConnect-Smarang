@@ -1,5 +1,22 @@
 """Network Isochrone Analysis (PRD roadmap item, after Community Maps).
 
+SUPERSEDED as the source of the checked-in output. The two halte_isochrones.geojson
+files in this repo are no longer this script's output -- they come from a Valhalla
+isochrone (via Stadia Maps / FOSSGIS) computed by Marco from the same 42 halte survey
+points, same 3/5/10 min bands. That is a proper reachable-area polygon (grown from the
+network, not just a buffer drawn along it), and it shows: this script's corridor-buffer
+approach measured 6.96 km2 for the 10-min band where Valhalla's real isochrone measured
+13.21 km2 on the same 42 origins -- our buffer was only ever a rough stand-in, missing
+the block interiors between parallel streets that a real isochrone correctly includes.
+It also came out at 30 KB versus this script's 3.1 MB, which incidentally is most of the
+PRD's own risk #1 (large GeoJSON payloads) solved for free.
+
+Kept in the repo as a documented fallback: if Valhalla/Stadia Maps access is not available
+when the halte survey changes, running this script still produces *a* valid isochrone
+layer in the right schema, just a geometrically rougher one. Do not run it to "refresh"
+the isochrone layer while the Valhalla-sourced files are current -- that would silently
+regress the checked-in data back to the weaker approximation this note describes.
+
 Computes walking-time catchment areas ("isochrones") around the 42 surveyed
 halte, using the routable pedestrian graph built by build_pedestrian_network.py.
 Output answers: "which parts of the 9 surveyed kelurahan are within a 3 / 5 /
@@ -74,6 +91,13 @@ def load_halte_points():
 
 
 def main() -> None:
+    print(
+        "WARNING: the checked-in halte_isochrones.geojson files are currently sourced from a "
+        "Valhalla isochrone (see this script's module docstring), which is geometrically closer "
+        "to a real reachable-area polygon than this script's corridor-buffer approximation. "
+        "Running this script will OVERWRITE that with the rougher approximation. Ctrl+C now "
+        "unless the Valhalla source is genuinely unavailable and a fallback is needed.\n"
+    )
     print("Rebuilding pedestrian graph (should hit OSM cache from build_pedestrian_network.py)...")
     boundary = load_boundary()
     graph = build_graph(boundary)
