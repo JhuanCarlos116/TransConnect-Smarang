@@ -27,11 +27,14 @@ const TABS = [
  * looked like they were. Add them back only once there is something genuine
  * — a real alert feed, a real login — behind the icon.
  *
- * On the dashboard, the tab switcher collapses to a plain label rather than
- * offering "Peta Publik" as a destination: this is DISHUB's internal tool,
- * not a page a staff workflow should be routing back out of the public map
- * from. The public page keeps both tabs -- that direction (public -> staff
- * dashboard) isn't the one in question here.
+ * On the dashboard, the tab switcher is gone rather than offering "Peta
+ * Publik" as a destination: this is DISHUB's internal tool, not a page a
+ * staff workflow should be routing back out of the public map from. It used
+ * to collapse to a plain "Dashboard DISHUB" label instead of disappearing
+ * entirely, but that label was redundant with DashboardSidebar's own
+ * "DISHUB Dashboard" heading right underneath it. The public page keeps
+ * both tabs -- that direction (public -> staff dashboard) isn't the one in
+ * question here.
  */
 export default function AppHeader({ active, searchFeatures, onSearchSelect }: AppHeaderProps) {
   const showSearch = Boolean(searchFeatures && onSearchSelect);
@@ -43,11 +46,7 @@ export default function AppHeader({ active, searchFeatures, onSearchSelect }: Ap
         <span className="font-headline-md text-headline-md font-bold text-transport-blue">TransConnect</span>
       </Link>
 
-      {active === "dashboard" ? (
-        <span className="flex h-full items-center whitespace-nowrap border-b-2 border-transport-blue px-3 font-label-md text-label-md font-bold text-transport-blue">
-          Dashboard DISHUB
-        </span>
-      ) : (
+      {active === "public" && (
         <nav className="flex h-full items-stretch">
           {TABS.map((tab) => (
             <Link

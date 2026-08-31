@@ -61,21 +61,12 @@ export default function DashboardPage() {
     [map],
   );
 
-  const resetView = useCallback(() => {
-    map?.flyTo({ center: DEFAULT_CENTER, zoom: DEFAULT_ZOOM });
-    setDensityVisible(true);
-    setHalteVisible(true);
-    setReportsVisible(false);
-    setIsochroneVisible(false);
-  }, [map]);
-
   return (
     <div className="flex h-screen flex-col overflow-hidden font-sans">
       <AppHeader active="dashboard" searchFeatures={halteFeatures} onSearchSelect={flyToHalte} />
 
       <div className="relative flex flex-1 overflow-hidden">
         <DashboardSidebar
-          onResetView={resetView}
           densityVisible={densityVisible}
           onDensityChange={setDensityVisible}
           halteVisible={halteVisible}

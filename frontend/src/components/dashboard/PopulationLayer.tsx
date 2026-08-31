@@ -6,10 +6,13 @@ import * as maplibregl from "maplibre-gl";
 import { fetchPopulationData } from "@/lib/fetchPopulationData";
 import { densityFillExpression } from "@/lib/populationColor";
 import { HALTE_POINT_LAYER_ID } from "@/components/map/HalteLayer";
-import { COMMUNITY_POINT_LAYER_ID } from "@/components/map/CommunityMapsLayer";
+import { COMMUNITY_CLUSTER_LAYER_ID, COMMUNITY_POINT_LAYER_ID } from "@/components/map/CommunityMapsLayer";
 import type { KelurahanPopulationFeatureCollection } from "@/types/population";
 
-const TOP_LAYER_IDS = [HALTE_POINT_LAYER_ID, COMMUNITY_POINT_LAYER_ID];
+// Clusters (community-reports-clusters) and individual unclustered points
+// (community-reports-points) are two separate layers -- guarding only the
+// point layer left cluster bubbles able to trigger this popup too.
+const TOP_LAYER_IDS = [HALTE_POINT_LAYER_ID, COMMUNITY_POINT_LAYER_ID, COMMUNITY_CLUSTER_LAYER_ID];
 
 const SOURCE_ID = "kelurahan-population";
 const FILL_LAYER_ID = "kelurahan-population-fill";
@@ -84,14 +87,17 @@ export default function PopulationLayer({ map, visible }: PopulationLayerProps) 
         if (!feature) return;
         const p = feature.properties as Record<string, number | string>;
 
+        // Explicit dark colors throughout -- this is raw HTML via setHTML(),
+        // outside Tailwind's reach, and without them it fell back to
+        // MapLibre's own low-contrast popup default (pale gray on white).
         new maplibregl.Popup({ offset: 8 })
           .setLngLat(e.lngLat)
           .setHTML(
-            `<div style="font-family:system-ui,sans-serif;font-size:13px;min-width:160px">` +
-              `<div style="font-weight:700;margin-bottom:4px">${p.kelurahan}</div>` +
-              `<div>Penduduk: ${Number(p.jumlah_penduduk).toLocaleString("id-ID")} jiwa</div>` +
-              `<div>Luas: ${p.luas_km2} km²</div>` +
-              `<div>Kepadatan: ${Number(p.kepadatan_per_km2).toLocaleString("id-ID")} jiwa/km²</div>` +
+            `<div style="font-family:system-ui,sans-serif;font-size:13px;min-width:170px;color:var(--color-on-surface)">` +
+              `<div style="font-weight:700;font-size:15px;margin-bottom:6px;color:var(--color-on-surface)">${p.kelurahan}</div>` +
+              `<div style="margin-bottom:2px"><span style="color:var(--color-on-surface-variant)">Penduduk:</span> <b>${Number(p.jumlah_penduduk).toLocaleString("id-ID")} jiwa</b></div>` +
+              `<div style="margin-bottom:2px"><span style="color:var(--color-on-surface-variant)">Luas:</span> <b>${p.luas_km2} km²</b></div>` +
+              `<div><span style="color:var(--color-on-surface-variant)">Kepadatan:</span> <b>${Number(p.kepadatan_per_km2).toLocaleString("id-ID")} jiwa/km²</b></div>` +
               `</div>`,
           )
           .addTo(map);

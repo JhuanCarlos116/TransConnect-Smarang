@@ -9,7 +9,8 @@ import CommunityReportPopup from "@/components/map/CommunityReportPopup";
 import type { CommunityReportFeatureCollection } from "@/types/communityReport";
 
 const SOURCE_ID = "community-reports";
-const CLUSTER_LAYER_ID = "community-reports-clusters";
+export const COMMUNITY_CLUSTER_LAYER_ID = "community-reports-clusters";
+const CLUSTER_LAYER_ID = COMMUNITY_CLUSTER_LAYER_ID;
 const CLUSTER_COUNT_LAYER_ID = "community-reports-cluster-count";
 export const COMMUNITY_POINT_LAYER_ID = "community-reports-points";
 const POINT_LAYER_ID = COMMUNITY_POINT_LAYER_ID;
