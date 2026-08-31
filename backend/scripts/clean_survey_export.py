@@ -125,15 +125,16 @@ def extract_variable(text: str, keywords: list[str], max_window: int = 90) -> st
     return "ada"
 
 
-def pick_photo_url(medias: list[str]) -> str | None:
+def pick_photo_urls(medias: list[str]) -> list[str]:
     """MAPID Apps always puts an auto-generated map-location thumbnail
-    (.png) first in `medias`, followed by the actual field photos (.jpg)
-    and sometimes videos (.mp4). Skip the map thumbnail and any video.
+    (.png) first in `medias`, followed by the actual field photos (.jpg,
+    usually several per point -- the team took 2-5 per halte) and sometimes
+    videos (.mp4). Skip the map thumbnail and any video, keep every photo.
+
+    Was pick_photo_url (singular), returning only the first match -- silently
+    dropping every other photo the team took at each point down to one.
     """
-    for url in medias:
-        if url.lower().split("?")[0].endswith((".jpg", ".jpeg")):
-            return url
-    return None
+    return [url for url in medias if url.lower().split("?")[0].endswith((".jpg", ".jpeg"))]
 
 
 def load_manual_corrections() -> dict[str, dict[str, str]]:
@@ -202,7 +203,7 @@ def clean(raw_activities: list[dict]) -> tuple[dict, list[tuple[str, str]]]:
             "sidewalk_condition": extract_variable(combined_text, KEYWORDS["sidewalk_condition"]),
             "route_info_signage": extract_variable(combined_text, KEYWORDS["route_info_signage"]),
             "canopy": extract_variable(combined_text, KEYWORDS["canopy"]),
-            "photo_url": pick_photo_url(activity.get("medias") or []),
+            "photo_urls": pick_photo_urls(activity.get("medias") or []),
             "survey_date": (activity.get("created_at") or "")[:10] or None,
             "catatan_lapangan": description,
         }

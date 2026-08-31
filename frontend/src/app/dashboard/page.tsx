@@ -95,7 +95,7 @@ export default function DashboardPage() {
             <>
               <IsochroneLayer map={map} visible={isochroneVisible} />
               <PopulationLayer map={map} visible={densityVisible} />
-              <HalteLayer map={map} visible={halteVisible} />
+              <HalteLayer map={map} visible={halteVisible} onSelect={setDetailTarget} />
               <CommunityMapsLayer map={map} visible={reportsVisible} />
               <MapControls map={map} />
             </>

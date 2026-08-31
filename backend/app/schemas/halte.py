@@ -15,7 +15,7 @@ class HalteProperties(BaseModel):
     route_info_signage: Literal["ada", "tidak", "-"]
     canopy: Literal["ada", "tidak", "-"]
 
-    photo_url: str | None = None
+    photo_urls: list[str] = []
     survey_date: str | None = None
     catatan_lapangan: str | None = None  # original MAPID Activity description, for spot-checking the extracted values above
 

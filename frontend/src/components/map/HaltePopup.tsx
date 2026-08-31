@@ -23,10 +23,10 @@ interface HaltePopupProps {
 export default function HaltePopup({ properties }: HaltePopupProps) {
   return (
     <div className="min-w-[220px] max-w-[260px] font-sans">
-      {properties.photo_url ? (
+      {properties.photo_urls[0] ? (
         // eslint-disable-next-line @next/next/no-img-element -- popup is rendered into a Mapbox GL DOM node, outside Next's page tree
         <img
-          src={properties.photo_url}
+          src={properties.photo_urls[0]}
           alt={properties.nama_halte}
           className="mb-2 h-[120px] w-full rounded-md object-cover"
         />

@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { conditionColor, conditionLabelText } from "@/lib/conditionScore";
 import type { HalteFeature, HalteProperties } from "@/types/halte";
 
@@ -23,11 +25,78 @@ function formatState(value: string): { text: string; colorClass: string } {
   return { text: "Tidak Disebutkan", colorClass: "text-on-surface-variant bg-surface-container" };
 }
 
-export default function HalteDetailModal({
-  feature,
-  onClose,
-  onFlyTo,
-}: HalteDetailModalProps) {
+interface PhotoCarouselProps {
+  photoUrls: string[];
+  alt: string;
+}
+
+/**
+ * Every survey point has 2-5 field photos (see clean_survey_export.py's
+ * pick_photo_urls), not one -- an earlier version of the pipeline kept only
+ * the first and silently dropped the rest.
+ *
+ * Rendered with `key={halte_id}` by the parent, so switching to a different
+ * halte remounts this fresh (index back to 0) instead of needing an effect
+ * to reset state in response to a prop change.
+ */
+function PhotoCarousel({ photoUrls, alt }: PhotoCarouselProps) {
+  const [index, setIndex] = useState(0);
+
+  if (photoUrls.length === 0) {
+    return (
+      <div className="flex h-full w-full items-center justify-center text-label-sm text-on-surface-variant">
+        Foto survei tidak tersedia
+      </div>
+    );
+  }
+
+  const hasMultiple = photoUrls.length > 1;
+
+  return (
+    <>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={photoUrls[index]} alt={alt} className="h-full w-full object-cover" />
+
+      {hasMultiple && (
+        <>
+          <button
+            onClick={() => setIndex((i) => (i - 1 + photoUrls.length) % photoUrls.length)}
+            aria-label="Foto sebelumnya"
+            className="absolute left-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/70"
+          >
+            <span className="material-symbols-outlined text-[20px]">chevron_left</span>
+          </button>
+          <button
+            onClick={() => setIndex((i) => (i + 1) % photoUrls.length)}
+            aria-label="Foto berikutnya"
+            className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/70"
+          >
+            <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+          </button>
+
+          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+            {photoUrls.map((url, i) => (
+              <button
+                key={url}
+                onClick={() => setIndex(i)}
+                aria-label={`Foto ${i + 1} dari ${photoUrls.length}`}
+                className={`h-1.5 w-1.5 rounded-full transition-all ${
+                  i === index ? "w-4 bg-white" : "bg-white/60"
+                }`}
+              />
+            ))}
+          </div>
+
+          <span className="absolute right-3 top-3 rounded-full bg-black/60 px-2 py-0.5 font-label-sm text-[11px] text-white">
+            {index + 1}/{photoUrls.length}
+          </span>
+        </>
+      )}
+    </>
+  );
+}
+
+export default function HalteDetailModal({ feature, onClose, onFlyTo }: HalteDetailModalProps) {
   if (!feature) return null;
   const p = feature.properties;
 
@@ -57,20 +126,9 @@ export default function HalteDetailModal({
 
         {/* Body Content */}
         <div className="mt-4 flex flex-col gap-4">
-          {/* Photo & Score Banner */}
-          <div className="relative h-48 w-full rounded-lg overflow-hidden bg-surface-container border border-border-low">
-            {p.photo_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={p.photo_url}
-                alt={p.nama_halte}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-on-surface-variant font-label-sm">
-                Foto survei tidak tersedia
-              </div>
-            )}
+          {/* Photo carousel & score banner */}
+          <div className="relative h-56 w-full rounded-lg overflow-hidden bg-surface-container border border-border-low">
+            <PhotoCarousel key={p.halte_id} photoUrls={p.photo_urls} alt={p.nama_halte} />
             <div className="absolute top-3 left-3 bg-surface/90 backdrop-blur-sm px-3 py-1 rounded-lg border border-border-low shadow-sm flex items-center gap-2">
               <span
                 className="h-3 w-3 rounded-full"
@@ -101,9 +159,13 @@ export default function HalteDetailModal({
 
           {/* Facility Attributes Checklist */}
           <div>
-            <h4 className="font-label-md text-[13px] font-bold text-on-surface mb-2">
-              Status 5 Atribut Fasilitas & Pedestrian
+            <h4 className="font-label-md text-[13px] font-bold text-on-surface mb-1">
+              Ketersediaan Fasilitas
             </h4>
+            <p className="font-label-sm text-[11px] text-on-surface-variant mb-2">
+              Hasil pengamatan manual tim survei di lapangan -- YOLOv8 belum terintegrasi ke aplikasi ini, jadi ini
+              bukan deteksi otomatis.
+            </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {ATTRIBUTE_ROWS.map(({ key, label, icon }) => {
                 const state = formatState(p[key] as string);
@@ -159,4 +221,3 @@ export default function HalteDetailModal({
     </div>
   );
 }
-

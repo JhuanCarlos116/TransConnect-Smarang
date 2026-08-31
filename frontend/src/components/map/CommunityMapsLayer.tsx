@@ -11,7 +11,8 @@ import type { CommunityReportFeatureCollection } from "@/types/communityReport";
 const SOURCE_ID = "community-reports";
 const CLUSTER_LAYER_ID = "community-reports-clusters";
 const CLUSTER_COUNT_LAYER_ID = "community-reports-cluster-count";
-const POINT_LAYER_ID = "community-reports-points";
+export const COMMUNITY_POINT_LAYER_ID = "community-reports-points";
+const POINT_LAYER_ID = COMMUNITY_POINT_LAYER_ID;
 const ALL_LAYER_IDS = [CLUSTER_LAYER_ID, CLUSTER_COUNT_LAYER_ID, POINT_LAYER_ID];
 
 interface CommunityMapsLayerProps {

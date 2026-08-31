@@ -12,7 +12,7 @@ export interface HalteProperties {
   route_info_signage: "ada" | "tidak" | "-";
   canopy: "ada" | "tidak" | "-";
 
-  photo_url: string | null;
+  photo_urls: string[];
   survey_date: string | null;
   catatan_lapangan: string | null;
 
