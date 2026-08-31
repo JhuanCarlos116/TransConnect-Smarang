@@ -75,7 +75,7 @@ export default function DashboardSidebar({
   onIsochroneChange,
 }: DashboardSidebarProps) {
   return (
-    <nav className="z-40 hidden h-full w-panel-width shrink-0 flex-col overflow-y-auto border-r border-border-low bg-surface md:flex">
+    <nav className="z-40 hidden h-full w-panel-width shrink-0 flex-col overflow-y-auto scrollbar-hide border-r border-border-low bg-surface md:flex">
       <div className="flex items-center gap-4 border-b border-border-low p-gutter">
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded bg-surface-container">
           <span className="material-symbols-outlined text-[24px] text-transport-blue">shield</span>
@@ -156,10 +156,11 @@ export default function DashboardSidebar({
       <div className="border-t border-border-low p-gutter">
         <button
           onClick={onResetView}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-transport-blue py-3 font-label-md text-label-md font-bold text-on-primary transition-colors hover:bg-primary active:scale-95"
+          title="Atur Ulang Peta"
+          aria-label="Atur Ulang Peta"
+          className="flex w-full items-center justify-center rounded-lg bg-transport-blue py-3 text-on-primary transition-colors hover:bg-primary active:scale-95"
         >
           <span className="material-symbols-outlined text-[20px]">restart_alt</span>
-          Atur Ulang Peta
         </button>
       </div>
     </nav>
