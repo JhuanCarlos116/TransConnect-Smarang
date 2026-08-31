@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 
 import { conditionColor, conditionLabelText } from "@/lib/conditionScore";
@@ -13,24 +16,20 @@ const ISOCHRONE_BANDS = [
 
 interface LayerToggleRowProps {
   label: string;
-  hint: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
 }
 
-function LayerToggleRow({ label, hint, checked, onChange }: LayerToggleRowProps) {
+function LayerToggleRow({ label, checked, onChange }: LayerToggleRowProps) {
   return (
-    <label className="flex cursor-pointer items-start gap-2">
+    <label className="flex cursor-pointer items-center gap-2">
       <input
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="mt-0.5 rounded border-outline text-transport-blue focus:ring-transport-blue"
+        className="rounded border-outline text-transport-blue focus:ring-transport-blue"
       />
-      <span className="min-w-0">
-        <span className="block font-label-sm text-label-sm text-on-surface">{label}</span>
-        <span className="block font-label-sm text-[10px] leading-tight text-on-surface-variant">{hint}</span>
-      </span>
+      <span className="font-label-sm text-label-sm text-on-surface">{label}</span>
     </label>
   );
 }
@@ -64,6 +63,11 @@ interface DashboardSidebarProps {
  * dihitung"); replaced with a real reset-camera-and-toggles button for a
  * while, then removed outright at the user's request rather than kept
  * around as an icon-only affordance.
+ *
+ * "Layer Peta" is a collapsible drawer (closed removes the toggles from the
+ * DOM entirely, not just visually) rather than always-open -- each row's
+ * one-line hint text ("42 titik, skor kondisi" etc.) is gone too, on the
+ * same request: keep the layer name, drop the explanatory copy under it.
  */
 export default function DashboardSidebar({
   densityVisible,
@@ -75,6 +79,8 @@ export default function DashboardSidebar({
   isochroneVisible,
   onIsochroneChange,
 }: DashboardSidebarProps) {
+  const [layersOpen, setLayersOpen] = useState(true);
+
   return (
     <nav className="z-40 hidden h-full w-panel-width shrink-0 flex-col overflow-y-auto scrollbar-hide border-r border-border-low bg-surface md:flex">
       <div className="flex items-center gap-4 border-b border-border-low p-gutter">
@@ -92,33 +98,26 @@ export default function DashboardSidebar({
       </div>
 
       <div className="border-t border-border-low p-gutter">
-        <h3 className="mb-3 font-label-md text-label-md font-bold text-on-surface">Layer Peta</h3>
-        <div className="flex flex-col gap-3">
-          <LayerToggleRow
-            label="Titik Survei Halte"
-            hint="42 titik, skor kondisi"
-            checked={halteVisible}
-            onChange={onHalteChange}
-          />
-          <LayerToggleRow
-            label="Kepadatan Penduduk"
-            hint="9 kelurahan, BPS"
-            checked={densityVisible}
-            onChange={onDensityChange}
-          />
-          <LayerToggleRow
-            label="Jangkauan Jalan Kaki"
-            hint="Isochrone 3/5/10 menit"
-            checked={isochroneVisible}
-            onChange={onIsochroneChange}
-          />
-          <LayerToggleRow
-            label="Laporan Warga"
-            hint="Data contoh, bukan laporan asli"
-            checked={reportsVisible}
-            onChange={onReportsChange}
-          />
-        </div>
+        <button
+          onClick={() => setLayersOpen((open) => !open)}
+          aria-expanded={layersOpen}
+          className="flex w-full items-center justify-between font-label-md text-label-md font-bold text-on-surface"
+        >
+          Layer Peta
+          <span
+            className={`material-symbols-outlined text-[18px] text-on-surface-variant transition-transform ${layersOpen ? "rotate-180" : ""}`}
+          >
+            expand_more
+          </span>
+        </button>
+        {layersOpen && (
+          <div className="mt-3 flex flex-col gap-3">
+            <LayerToggleRow label="Titik Survei Halte" checked={halteVisible} onChange={onHalteChange} />
+            <LayerToggleRow label="Kepadatan Penduduk" checked={densityVisible} onChange={onDensityChange} />
+            <LayerToggleRow label="Jangkauan Jalan Kaki" checked={isochroneVisible} onChange={onIsochroneChange} />
+            <LayerToggleRow label="Laporan Warga" checked={reportsVisible} onChange={onReportsChange} />
+          </div>
+        )}
       </div>
 
       <div className="border-t border-border-low p-gutter">

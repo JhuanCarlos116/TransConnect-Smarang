@@ -74,13 +74,16 @@ export default function IsochroneLayer({ map, visible }: IsochroneLayerProps) {
         if (!feature) return;
         const p = feature.properties as Record<string, number>;
 
+        // Explicit dark colors -- raw HTML via setHTML(), outside Tailwind's
+        // reach, otherwise falls back to MapLibre's low-contrast popup
+        // default (pale gray on white). Same fix as PopulationLayer's popup.
         new maplibregl.Popup({ offset: 8 })
           .setLngLat(e.lngLat)
           .setHTML(
-            `<div style="font-family:system-ui,sans-serif;font-size:13px;min-width:180px">` +
-              `<div style="font-weight:700;margin-bottom:4px">Jangkauan ${p.minutes} menit jalan kaki</div>` +
-              `<div>Dari ${p.halte_count} halte tersurvei</div>` +
-              `<div>Luas area: ${p.area_km2} km²</div>` +
+            `<div style="font-family:system-ui,sans-serif;font-size:13px;min-width:180px;color:var(--color-on-surface)">` +
+              `<div style="font-weight:700;font-size:15px;margin-bottom:6px;color:var(--color-on-surface)">Jangkauan ${p.minutes} menit jalan kaki</div>` +
+              `<div style="margin-bottom:2px"><span style="color:var(--color-on-surface-variant)">Dari</span> <b>${p.halte_count} halte tersurvei</b></div>` +
+              `<div><span style="color:var(--color-on-surface-variant)">Luas area:</span> <b>${p.area_km2} km²</b></div>` +
               `</div>`,
           )
           .addTo(map);
