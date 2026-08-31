@@ -15,7 +15,6 @@ import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import DashboardFilterPanel from "@/components/dashboard/DashboardFilterPanel";
 import DashboardLegend from "@/components/dashboard/DashboardLegend";
 import MapControls from "@/components/dashboard/MapControls";
-import PriorityList from "@/components/dashboard/PriorityList";
 import HalteDetailModal from "@/components/dashboard/HalteDetailModal";
 import type { HalteFeature } from "@/types/halte";
 
@@ -81,56 +80,39 @@ export default function DashboardPage() {
       <div className="relative flex flex-1 overflow-hidden">
         <DashboardSidebar onResetView={resetView} />
 
-        <main className="relative flex flex-1 flex-col bg-surface-subtle md:flex-row">
-          {/* Map canvas */}
-          <div className="relative z-10 flex-1">
-            <div ref={containerRef} className="h-full w-full" />
-            {map && (
-              <>
-                <IsochroneLayer map={map} visible={isochroneVisible} />
-                <PopulationLayer map={map} visible={densityVisible} />
-                <HalteLayer map={map} visible={halteVisible} />
-                <CommunityMapsLayer map={map} visible={reportsVisible} />
-                <MapControls
-                  map={map}
-                  panelOpen={filterPanelOpen}
-                  onTogglePanel={() => setFilterPanelOpen((open) => !open)}
-                />
-              </>
-            )}
+        <main className="relative flex-1 bg-surface-subtle">
+          <div ref={containerRef} className="h-full w-full" />
+          {map && (
+            <>
+              <IsochroneLayer map={map} visible={isochroneVisible} />
+              <PopulationLayer map={map} visible={densityVisible} />
+              <HalteLayer map={map} visible={halteVisible} />
+              <CommunityMapsLayer map={map} visible={reportsVisible} />
+              <MapControls
+                map={map}
+                panelOpen={filterPanelOpen}
+                onTogglePanel={() => setFilterPanelOpen((open) => !open)}
+              />
+            </>
+          )}
 
-            <div className="absolute bottom-margin-page right-margin-page z-20">
-              <DashboardLegend />
-            </div>
-            {filterPanelOpen && (
-              <div className="absolute bottom-margin-page left-margin-page z-20">
-                <DashboardFilterPanel
-                  densityVisible={densityVisible}
-                  onDensityChange={setDensityVisible}
-                  halteVisible={halteVisible}
-                  onHalteChange={setHalteVisible}
-                  reportsVisible={reportsVisible}
-                  onReportsChange={setReportsVisible}
-                  isochroneVisible={isochroneVisible}
-                  onIsochroneChange={setIsochroneVisible}
-                />
-              </div>
-            )}
+          <div className="absolute bottom-margin-page right-margin-page z-20">
+            <DashboardLegend />
           </div>
-
-          {/* Right panel — actionable data */}
-          <div className="z-30 flex h-full w-full flex-col border-l border-border-low bg-surface shadow-[-4px_0_16px_rgba(0,0,0,0.04)] md:w-[420px]">
-            <div className="border-b border-border-low bg-surface-subtle p-gutter">
-              <h2 className="font-headline-md text-headline-md text-on-surface">Prioritas Perbaikan</h2>
-              <p className="mt-1 font-label-sm text-label-sm text-on-surface-variant">
-                Diurutkan dari skor kondisi hasil survei lapangan — belum memakai Location-Allocation maupun AI.
-              </p>
+          {filterPanelOpen && (
+            <div className="absolute bottom-margin-page left-margin-page z-20">
+              <DashboardFilterPanel
+                densityVisible={densityVisible}
+                onDensityChange={setDensityVisible}
+                halteVisible={halteVisible}
+                onHalteChange={setHalteVisible}
+                reportsVisible={reportsVisible}
+                onReportsChange={setReportsVisible}
+                isochroneVisible={isochroneVisible}
+                onIsochroneChange={setIsochroneVisible}
+              />
             </div>
-
-            <div className="flex-1 overflow-y-auto p-gutter">
-              <PriorityList features={halteFeatures} onSelect={flyToHalte} />
-            </div>
-          </div>
+          )}
         </main>
       </div>
 
