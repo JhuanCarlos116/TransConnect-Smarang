@@ -41,7 +41,9 @@ def build_report_properties(halte_props: dict) -> dict:
         "judul": f"Laporan kondisi: {nama}",
         "deskripsi": deskripsi,
         "kelurahan": halte_props.get("kelurahan", "-"),
-        "photo_url": halte_props.get("photo_url"),
+        # halte-survey.geojson now carries every field photo (photo_urls);
+        # this demo layer's popup only ever shows one, so take the first.
+        "photo_url": (halte_props.get("photo_urls") or [None])[0],
         "pelapor": PELAPOR_LABEL,
         "tanggal_lapor": halte_props.get("survey_date"),
         "verification_status": "verified",

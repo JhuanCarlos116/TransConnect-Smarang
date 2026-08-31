@@ -5,7 +5,11 @@ import * as maplibregl from "maplibre-gl";
 
 import { fetchPopulationData } from "@/lib/fetchPopulationData";
 import { densityFillExpression } from "@/lib/populationColor";
+import { HALTE_POINT_LAYER_ID } from "@/components/map/HalteLayer";
+import { COMMUNITY_POINT_LAYER_ID } from "@/components/map/CommunityMapsLayer";
 import type { KelurahanPopulationFeatureCollection } from "@/types/population";
+
+const TOP_LAYER_IDS = [HALTE_POINT_LAYER_ID, COMMUNITY_POINT_LAYER_ID];
 
 const SOURCE_ID = "kelurahan-population";
 const FILL_LAYER_ID = "kelurahan-population-fill";
@@ -64,6 +68,18 @@ export default function PopulationLayer({ map, visible }: PopulationLayerProps) 
       });
 
       map.on("click", FILL_LAYER_ID, (e: maplibregl.MapLayerMouseEvent) => {
+        // Halte markers and community-report points are drawn on top of this
+        // fill, but MapLibre fires each layer's click handler independently
+        // for whatever the cursor is over -- clicking a halte marker sitting
+        // inside a kelurahan polygon used to open both popups at once,
+        // stacked on top of each other. Filtered to layers that currently
+        // exist, since this can fire before HalteLayer/CommunityMapsLayer
+        // have finished their own async setup.
+        const existingTopLayers = TOP_LAYER_IDS.filter((id) => map.getLayer(id));
+        if (existingTopLayers.length > 0 && map.queryRenderedFeatures(e.point, { layers: existingTopLayers }).length > 0) {
+          return;
+        }
+
         const feature = e.features?.[0];
         if (!feature) return;
         const p = feature.properties as Record<string, number | string>;

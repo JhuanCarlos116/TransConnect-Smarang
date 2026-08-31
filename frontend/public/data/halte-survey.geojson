@@ -20,7 +20,11 @@
         "sidewalk_condition": "tidak",
         "route_info_signage": "-",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/1b9d1584-e249-467d-9ad7-eaac157754cf_1787462723525.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/1b9d1584-e249-467d-9ad7-eaac157754cf_1787462723525.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/372356a3-071f-437d-a180-597b0ab7b9be_1787462723592.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/df9cea73-3c15-4b98-b428-c224c0b00402_1787462723644.jpg"
+        ],
         "survey_date": "2026-08-23",
         "catatan_lapangan": "Halte ini berada di pemukiman yang cukup kumuh daripada halte lain. Terdapat fasikutas seperti tangga dan kursi yang sudah berdebu. Vegetasi ada tetapi daun yang sangat berserakan. Pedestrian pun tidak ada. Halte ini sama sekali tidak mempunyai penerangan walaupun di pertengahan permukiman warga. #timGOPEK",
         "condition_score": 25,
@@ -46,7 +50,12 @@
         "sidewalk_condition": "tidak",
         "route_info_signage": "tidak",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/b8011dc9-9ee6-4f71-8246-2ae1af4e1ab9_1787462239812.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/b8011dc9-9ee6-4f71-8246-2ae1af4e1ab9_1787462239812.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/9ce311f9-b91b-48e6-bab3-9d862b8acb83_1787462239906.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/a57248a9-b3fc-407f-8f42-891bee844125_1787462239999.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/0f08b567-a02b-436b-8d22-a99dd9b26bc6_1787462240084.jpg"
+        ],
         "survey_date": "2026-08-23",
         "catatan_lapangan": "Halte ini memiliki area yang cukup luas dibanding hakte seberangannya. Halte ini terlihat seperti sepi dan kurang terfasilitasi tempat duduk dengan baik. Layanan seperti pedestrian dan papan informasi pun tidak ada. Walaupun begitu, halte ini memiliki kanopi yany cukup panjang sehingga memiliki suasana yang cukup adem. #timGOPEK",
         "condition_score": 28,
@@ -72,7 +81,11 @@
         "sidewalk_condition": "tidak",
         "route_info_signage": "-",
         "canopy": "-",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/d33aac40-5460-44cf-b60d-45de16a7154d_1787462056037.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/d33aac40-5460-44cf-b60d-45de16a7154d_1787462056037.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/4b9dd7ca-141c-4dac-b316-657e3f88b26f_1787462056118.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/ac2b5c9b-a167-4cd0-9260-235b3b29bd31_1787462056182.jpg"
+        ],
         "survey_date": "2026-08-23",
         "catatan_lapangan": "Halte ini tampak agak kurang terfasilitasi dengan baik. Tampak tangga dan tempat duduk yang cukup usang dan rusak dibandingkan dengan halte seberangannya. Halte ini tidak memiliki pedestrian yang baik. Halte ini berhadapan langsung dengan jalan raya sehingga kenyamanan pengunjung belum terjamin aman dan nyaman. #timGOPEK",
         "condition_score": 30,
@@ -98,7 +111,11 @@
         "sidewalk_condition": "ada",
         "route_info_signage": "tidak",
         "canopy": "-",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/a21801fd-e157-45b2-9e0a-2d0c7ff11e12_1787461721575.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/a21801fd-e157-45b2-9e0a-2d0c7ff11e12_1787461721575.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/de82f92a-7b53-4222-a52e-b10d4a122c74_1787461721657.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/40f4734e-9162-49c8-af42-d250d7baff20_1787461721753.jpg"
+        ],
         "survey_date": "2026-08-23",
         "catatan_lapangan": "Halte ini mempunyai tempat duduk yang sangat kecil dan agak meleyot. Seperti halte di sebelahnya, halte ini mempunyai pedestrian yang cukup memperihatinkan. Suasana yang cukup panas membuat pengunjung terasa lebih sepi saat kami menyusuri halte ini. Halte ini banyak ditempeli spanduk-spanduk bersifat promosi daripada informasi rute Bus Trans Semarang. #timGOPEK",
         "condition_score": 62,
@@ -124,7 +141,12 @@
         "sidewalk_condition": "tidak",
         "route_info_signage": "-",
         "canopy": "-",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/627b9db0-9f77-43ce-b2cc-a31ee705c0e8_1787461497020.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/627b9db0-9f77-43ce-b2cc-a31ee705c0e8_1787461497020.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/87b225a7-69ba-4394-8d1d-d38ba423e973_1787461497116.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/9a9f3065-98e5-497c-b856-71dc713c2d44_1787461497196.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/38fb28b0-02ff-46b8-b922-26a9bd7f7c7b_1787461497268.jpg"
+        ],
         "survey_date": "2026-08-23",
         "catatan_lapangan": "Halte ini cukuo sepi darioada halte lain. Pedestrian seperti trotoar dan guiding block pun tidak ada. Penerangan hanya mengandalkan lampu jalan. Tempat duduk dan tangga yang agak meleyot menjadi situasi yang riskan bagi pengunjung. #timGOPEK",
         "condition_score": 40,
@@ -150,7 +172,13 @@
         "sidewalk_condition": "ada",
         "route_info_signage": "ada",
         "canopy": "-",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/b5ac51ad-a522-45ca-b35b-542a40007822_1787460843620.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/b5ac51ad-a522-45ca-b35b-542a40007822_1787460843620.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/ae58bcd8-7dd4-4341-8ef5-dbd1316fcf2e_1787460843685.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/725da454-9ff6-41c0-9b42-0f5b60fe6a9d_1787460843764.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/d1cda78a-db01-4c0c-95d7-fdb8883c8ebe_1787460843835.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/fae004b7-33a4-4931-b276-12df79f8a7d9_1787463537930.jpg"
+        ],
         "survey_date": "2026-08-23",
         "catatan_lapangan": "Menyusuri wilayah Sendangmulyo, tampak halte dengan fasilitas yang cukup lengkap. Fasilitas tersebut di antaranya adalah trotoar, tempat duduk, charger, keramik, dinding tembok, papan informasi, bahkan halte ini sudah mempunyai penerangannya mandiri dibuktikan dengan adanya tempat token listrik. Saat kita suvey, kami melihat banyak sekali pengunjung yang mengunjungi halte di sini. #timGOPEK",
         "condition_score": 88,
@@ -176,7 +204,11 @@
         "sidewalk_condition": "tidak",
         "route_info_signage": "-",
         "canopy": "-",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/ff84d8e3-2340-4038-b4fa-967e00796c72_1787460398816.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/ff84d8e3-2340-4038-b4fa-967e00796c72_1787460398816.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/1a94f315-a49e-4dd6-9f9c-02e891d0bb81_1787460398905.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/c23e437a-8b18-476f-8a15-4db4c235b2c2_1787460399021.jpg"
+        ],
         "survey_date": "2026-08-23",
         "catatan_lapangan": "Terlihat halte ini cukup adem dikala teriknya panas matahari. Area halte yang sempit tak menjadi masalah bagi pengunjung yang turun pada pukul 11.45 WIB pada Minggu, 23 Agustus 2026. Halte ini tidak mempunyai trotoar dan guiding block tetapi aksesbilitas jalan bagi pengunjung sudah cukup terlayani dengan baik. Lain dari halte lain, halte ini menggunakan bangunan berupa semen tembok dan lantai keramik dengan kursi besi yang cukup kokoh. #timGOPEK",
         "condition_score": 30,
@@ -202,7 +234,13 @@
         "sidewalk_condition": "ada",
         "route_info_signage": "-",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/ed9f6702-5195-4766-bae3-02c5bdcd10b5_1787459339455.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/ed9f6702-5195-4766-bae3-02c5bdcd10b5_1787459339455.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/cbb58392-f05f-4f64-8b00-fa3bcf4bdcd3_1787459339522.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/a148fedc-00d4-4093-9609-1a5918041548_1787459339581.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/2e6607d4-e2a9-4da4-ac90-fc122ed6da61_1787459339636.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/aac98f5f-1568-40f5-8072-31f0313bb1bf_1787459339713.jpg"
+        ],
         "survey_date": "2026-08-23",
         "catatan_lapangan": "Halte satu ini memiliki area yang sangat luas. Jika dibandingkan dengan halte lain, penempatan halte ini lumayan adem karena kanopi yang panjang. Halte ini pun ada pengawas yang mengawasi sehingga apabila ada pengunjung yang memerlukan bantuan cukup terlayani. Penerangan yang minim. Trotoar dan guiding block yang terhalang oleh benda benda lain. Jalanan di depan halte tersebut ada dua lubang yang membuat keselamatan pengunjung cukup diperhatikan. #timGOPEK",
         "condition_score": 85,
@@ -228,7 +266,11 @@
         "sidewalk_condition": "ada",
         "route_info_signage": "-",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/51641314-2b1a-467a-996f-7bf7d8211e1b_1787458539010.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/51641314-2b1a-467a-996f-7bf7d8211e1b_1787458539010.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/e11618ab-2ab2-411d-822a-10cb529d9c7d_1787458539098.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/daa9d715-0d94-4a6b-9b42-7d3d98c35a4c_1787458539160.jpg"
+        ],
         "survey_date": "2026-08-23",
         "catatan_lapangan": "Suasana panas pada tanggal 23 Agustus 2026 menyelimuti halte ini, tetapi untung saja ada kanopi yang cukup bagus lain daripada halte lain yang menghalanginya. Walaupun halte ini memiliki trotoar yang cukup rapih tetapi tidak memiliki guiding block dan biasanya digunakan oleh pedagang untuk berjualan. Halte ini tidak mempunyai peberangan khusus untuk meneranginya terutama di malam hari. Terlihat cukup ramai walaupun keadaan halte lumayan sempit. #timGOPEK",
         "condition_score": 65,
@@ -254,7 +296,11 @@
         "sidewalk_condition": "ada",
         "route_info_signage": "-",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/4dce5f85-346c-4a5e-89ee-4d6a1de6d8fe_1787457822976.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/4dce5f85-346c-4a5e-89ee-4d6a1de6d8fe_1787457822976.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/db78e0f4-6b94-4a0b-9d2b-56503bbdd6d9_1787457823055.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/cb83cbe1-5a58-480d-aaad-585684d92a0b_1787457823119.jpg"
+        ],
         "survey_date": "2026-08-23",
         "catatan_lapangan": "Tepat pukul 11.00 menjelang siang hari yang sangat panas, berada di area halte yang biasa digunakan oleh anak-anak sekolah terutama siswa SMAN 15 Semarang. Halte ini tampak kecil. Halte ini mempunyai kanopi, tangga, dan kursi bangunan yang kokoh. Halte ini berbatasan langsung dengan drainase yang cukup dalam. Pedestrian yang cukup kurang karena berpotensi menjadi wilaya pedagang. #timGOPEK",
         "condition_score": 75,
@@ -280,7 +326,10 @@
         "sidewalk_condition": "tidak",
         "route_info_signage": "-",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/cc91c683-5b62-4d03-ab10-9551c36bbc41_1787457064382.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/cc91c683-5b62-4d03-ab10-9551c36bbc41_1787457064382.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/ca3bed64-c4e9-436d-a35d-7606bc041da7_1787457064451.jpg"
+        ],
         "survey_date": "2026-08-23",
         "catatan_lapangan": "Tampak sekali halte ini diselimuti kanopi yang panjang. Walaupun adem, halte ini tidak mempunyai trotoar dan guiding block, hal ini dikarenakan wilayah sekitarnya malahan dijadikan sebagai selokan. Tempat duduk dan penopang halte pun agak riskan dikarenakab kurang kokohnya besi bangunan halte tersebut. #timGOPEK",
         "condition_score": 35,
@@ -306,7 +355,9 @@
         "sidewalk_condition": "ada",
         "route_info_signage": "-",
         "canopy": "-",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/47141686-3c96-41f3-b54c-5429e1b5fa8a_1787456577296.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/47141686-3c96-41f3-b54c-5429e1b5fa8a_1787456577296.jpg"
+        ],
         "survey_date": "2026-08-23",
         "catatan_lapangan": "Halte (bus stop) hanya berupa plang yang sudah hampir jatuh (miring) dan ditempatkan di belakang drainase tanpa penutup sehingga keselamatan pedestrian sangat kurang. #timGOPEK",
         "condition_score": 70,
@@ -332,7 +383,10 @@
         "sidewalk_condition": "tidak",
         "route_info_signage": "-",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/4b646646-b9e0-4072-b0c7-703b3ba24cff_1787456291934.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/4b646646-b9e0-4072-b0c7-703b3ba24cff_1787456291934.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/a01f6c05-0a20-41ec-8bb1-a1706beeecb3_1787456292017.jpg"
+        ],
         "survey_date": "2026-08-23",
         "catatan_lapangan": "Suasana yang panas menyelimuti halte ini, tepat pada Minggu, 23 Agustus 2026 pukul 10.35 saya melihat halte ini sedang sepi tidak ada pengunjung. Halte ini mempunyai kanopi, tangga, dan kursi fasilitas yang kokoh. Halte ini tidak mempunyai trotoar dan guiding block. Area sekitarnya dimanfaatkan untuk keperluan bangunan toko. Walaupun terdapat kanopi, halte ini cenderung panas dikarenakan terletak di tengah tengah jalan raya dan tidak ada vegetasi di sekitarnya. #timGOPEK",
         "condition_score": 35,
@@ -358,7 +412,11 @@
         "sidewalk_condition": "ada",
         "route_info_signage": "-",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/8f07073d-99a0-42c9-8403-0706c8bcb1ad_1787455177197.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/8f07073d-99a0-42c9-8403-0706c8bcb1ad_1787455177197.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/323c0c8e-49f4-49ac-b0c8-2c8563ed2138_1787455177272.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/f8d55d42-0fc1-46a6-9545-7122690f9a73_1787455177358.jpg"
+        ],
         "survey_date": "2026-08-23",
         "catatan_lapangan": "Tepat pada Minggu, 23 Agustus 2026 pukul 10.15 saya berada pada halte di sekitar area yang cukup ramai. Halte ini tampak memiliki kursi, tangga, dan kanopi. Peletakkan halte yang kurang cocok dikarenakan terletak di atas trotoar sehingga orang yang ingin mengunjungi halte tersebut kurang terfasilitasi. Maka dari itu, keselamatan para pengunjung Trans Semarang tidak terlayani dengan baik. Halte ini hanya memanfaatkan penerangan di sekitar jalanan saja sehingga jika pengunjung berada di halte ini malam hari akan terasa gelap sebagian. #timGOPEK ",
         "condition_score": 85,
@@ -384,7 +442,10 @@
         "sidewalk_condition": "tidak",
         "route_info_signage": "-",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/8191fe8a-6ce6-429e-8a90-fc7cc56e4dba_1787373623278.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/8191fe8a-6ce6-429e-8a90-fc7cc56e4dba_1787373623278.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/90db081e-0efe-4f86-b891-9cec8868ab37_1787373623344.jpg"
+        ],
         "survey_date": "2026-08-22",
         "catatan_lapangan": "Pada pukul 11.07, kami mendatangi Halte BRT Dinar Elok I. Halte ini berbentuk bangunan semipermanen dengan kursi, tangga, dan atap. Halte ini cukup layak karena memiliki vegetasi (pohon) di sampingnya sehingga memberikan rasa teduh bagi pengguna maupun penulis. Halte ini sudah memiliki penerangan yang baik karena berdekatan dengan lampu jalan. Kekurangan dari halte ini adalah tidak adanya jalur pejalan kaki yang layak karena langsung berbatasan dengan jalan. Sebagai tambahan, pada saat penulis menulis ulasan ini, seorang bapak bapak yang sepertinya ditugaskan oleh instansi terkait Trans Semarang datang dan membersihkan halte tersebut. #timGOPEK",
         "condition_score": 45,
@@ -410,7 +471,11 @@
         "sidewalk_condition": "ada",
         "route_info_signage": "-",
         "canopy": "tidak",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/a3fd4257-25d4-4388-ba5d-a12ed4af43d8_1787373253104.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/a3fd4257-25d4-4388-ba5d-a12ed4af43d8_1787373253104.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/069fac4b-c204-4648-8e30-5b1fad486f12_1787373253161.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/11c2c333-2908-44db-9bb2-6aefe9ac91e7_1787373253213.jpg"
+        ],
         "survey_date": "2026-08-22",
         "catatan_lapangan": "Pada pukul 11.21 kami mendatangi Halte BRT Pasar Meteseh I, halte ini berupa bangunan semipermanen dengan tangga, kursi, dan atap. Saat berada di halte ini, penulis merasa sangat panas karena tidak adanya vegetasi (pohon) di sekitar. Aksesibilitas bagi pejalan kaki juga tidak layak karena adanya  sampah sampah , batuan, dan pasir yang beterbangan. Selain itu, penulis juga tidak melihat adanya tiang lampu atau lampu penerangan di halte ini. #timGOPEK",
         "condition_score": 55,
@@ -436,7 +501,11 @@
         "sidewalk_condition": "-",
         "route_info_signage": "tidak",
         "canopy": "tidak",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/6db6e813-3467-4b9f-8f4c-6c07ad3ea566_1787372425551.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/6db6e813-3467-4b9f-8f4c-6c07ad3ea566_1787372425551.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/0cd60741-859c-482d-bda6-000ebcf322fe_1787372425981.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/d35c13ed-01a4-46e7-99e7-e74f887e9c03_1787372426374.jpg"
+        ],
         "survey_date": "2026-08-22",
         "catatan_lapangan": "pada tanggal 22 Agustus 2026, pukul 11.16. Saya sedang berada di Bus Stop Bukit Kencana Jaya arah utara,  suasana lalu lintas tidak begitu ramai dan cuaca sedang panas terik. Untuk bus stop sendiri terletak di dekat bundaran toko risol, warung, alfamart, dan perumahan warga sekitar. Untuk bus stop sendiri tidak tertutup dengan pohon ataupun kanopi sehingga panas terik dapat langsung mengenai penumpang yang sedang menunggu bus. Selain itu bus stop ini tidak menyediakan tempat duduk dan informasi mengenai rute perjalanan bus. Penerangan bersumber dari lampu jalan di sebelah kanan dan tidak tersedia cctv. #timGOPEK",
         "condition_score": 40,
@@ -462,7 +531,11 @@
         "sidewalk_condition": "-",
         "route_info_signage": "tidak",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/9f4071d7-b527-4c46-b60a-34f9e6c0de76_1787371549180.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/9f4071d7-b527-4c46-b60a-34f9e6c0de76_1787371549180.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/5010fa67-3400-4027-99d1-b8b571a13ebb_1787371549523.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/927bbc2d-052b-4578-bbc0-e7220640c02f_1787371549937.jpg"
+        ],
         "survey_date": "2026-08-22",
         "catatan_lapangan": "pada tanggal 22 Agustus 2026, pukul 11.06. Saya sedang berada di Bus Stop Bukit Kencaba Jaya arah selatan, suasana lalu lintas tidak begitu ramai dan cuaca sedang panas terik. Untuk bus stop sendiri terletak di dekat bangunan ruko, lahan kosong, toko kuliner, dan perumahan warga setempat. Untuk bus stop sendiri tidak menyediakan informasi rute perjalanan bus, mengandalkan tanaman dan pohon sekitar sebagai kanopi menangkal panas matahari. Tidak tersedia  tempat duduk bagi penumpang yang menungu bus. Sumber penerangan berasal dari lampu jalan dan tidak tersedia cctv. Penumpang yang menunggu juga harus berhati-hati karena ada kabel listrik menggantung cukup dekat dengan kepala orang dewasa. #timGOPEK",
         "condition_score": 50,
@@ -488,7 +561,9 @@
         "sidewalk_condition": "tidak",
         "route_info_signage": "-",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/37d3dd4e-fac2-4c10-b896-6c8260517fbd_1787371525827.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/37d3dd4e-fac2-4c10-b896-6c8260517fbd_1787371525827.jpg"
+        ],
         "survey_date": "2026-08-22",
         "catatan_lapangan": "Pada pukul 11.07, kami mendatangi Halte BRT Dinar Elok II. Halte ini berbentuk bangunan semipermanen dengan kursi, tangga, dan atap. Halte ini cukup layak karena memiliki vegetasi (pohon) di sampingnya sehingga memberikan rasa teduh bagi pengguna maupun penulis. Halte ini sudah memiliki penerangan yang baik karena berdekatan dengan lampu jalan. Kekurangan dari halte ini adalah tidak adanya jalur pejalan kaki yang layak karena langsung berbatasan dengan jalan. Sebagai tambahan, pada saat penulis menulis ulasan ini, seorang bapak bapak yang sepertinya ditugaskan oleh instansi terkait Trans Semarang datang dan membersihkan halte tersebut. #timGOPEK",
         "condition_score": 45,
@@ -514,7 +589,12 @@
         "sidewalk_condition": "-",
         "route_info_signage": "-",
         "canopy": "tidak",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/4232aa15-5bea-47f1-b098-b1d286afdc43_1787371302002.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/4232aa15-5bea-47f1-b098-b1d286afdc43_1787371302002.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/14307ffb-12c4-4a91-b203-9b7216668ed2_1787371302055.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/9a5b2148-9c1f-4ba0-81f6-c663ac03b142_1787371302103.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/9302dd7b-f815-4dd6-bd6c-9318d8c1c26c_1787371302155.jpg"
+        ],
         "survey_date": "2026-08-22",
         "catatan_lapangan": "Pada pukul 10.58, kami mendatangi Halte Inar Asri I. Halte ini berupa bangunan semipermanen dengan atap, tangga, dan kursi bagi penumpang dan pengguna BRT Trans Semarang yang menunggu. Halte ini terlihat sudah cukup lama dan tua dan nampaknya belum ada revitalisasi. Di sekitar halte ini tidak ada vegetasi sehingga saat berada halte sangat panas. Namun, penerangan sudah ada karena bersebelahan dengan tiang lampu jalan. #timGOPEK",
         "condition_score": 55,
@@ -540,7 +620,11 @@
         "sidewalk_condition": "-",
         "route_info_signage": "tidak",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/c4332658-db29-4ee4-9cb6-6521f76f4909_1787371165884.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/c4332658-db29-4ee4-9cb6-6521f76f4909_1787371165884.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/e67d9049-5739-4600-b998-128981ad477b_1787371166321.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/4c3b2fbe-71d1-4ebd-8aae-1bf233857b99_1787371166746.jpg"
+        ],
         "survey_date": "2026-08-22",
         "catatan_lapangan": "pada tanggal 22 Agustus 2026, pukul 10.53. Saya sedang berada di bus stop Victoria Residence II arah barat, suasana lalu lintas tidak begitu ramai dan cuaca sedang panas terik. Untuk bus stop sendiri terletak di dekat bundaran Victoria Residence II, rumah makan padang, dan toko kuliner lain. Untuk bus stop sendiri sudah ditutupi tenda berwarna biru sehingga tertutup dari panas matahari. Sudah tersedia juga tempat duduk bagi penumpang yang menungu bus namun masih tidak ada informasi mengenai rute perjalanan bus. Sumber penerangan berasal dari lampu bundaran dan tidak tersedia cctv. #timGOPEK",
         "condition_score": 50,
@@ -566,7 +650,10 @@
         "sidewalk_condition": "tidak",
         "route_info_signage": "-",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/30c93134-140f-4604-99b2-25c34d633715_1787370768666.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/30c93134-140f-4604-99b2-25c34d633715_1787370768666.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/62fd0074-c465-446b-8f9c-e4c9d4954bbe_1787370768744.jpg"
+        ],
         "survey_date": "2026-08-22",
         "catatan_lapangan": "Pada pukul 10.49 kami mendatangi halte ..... . Halte ini berada di dalam kawasan dan jalan perumahan. Halte ini hanya berupa plang penanda naik/turun. Akses pejalan kali sudah ada, tetapi belum cukup karna tidak ada trotoar atau bahkan guiding block. Vegetasi di sekitar halte ini sedikit, kurang dari 3 pohon dalam 100m di ruas jalan ini. Namun, ada pohon yang cukup rindang di samping plang tersebut sehingga pengguna trans Semarang yang menunggu bisa berteduh.#timGOPEK",
         "condition_score": 35,
@@ -592,7 +679,11 @@
         "sidewalk_condition": "ada",
         "route_info_signage": "tidak",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/eb8f2bcb-6d02-4097-b4ea-b576f09a69c7_1787370502229.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/eb8f2bcb-6d02-4097-b4ea-b576f09a69c7_1787370502229.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/1f2dfa58-ae02-4a39-8ef9-aa56996719b2_1787370502340.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/d667e81e-a33a-4312-b510-b4bb5a9d4f35_1787370502762.jpg"
+        ],
         "survey_date": "2026-08-22",
         "catatan_lapangan": "Tepat pada tanggal 22 Agustus 2026, pukul 10.41. Saya sedang berada di bus stop Emerald Garden arah utara, suasana lalu lintas tidak begitu ramai dan cuaca sedang panas terik. Untuk bus stop sendiri terletak di dekat perumahan emerald green dan ruko-ruko sekitar. Kondisi area pejalan kaki menggunakan tanah dan sudah tertutupi daun daun kering. Tidak tersedia informasi mengenai rute perjalanan bus. Bus stop ini bergantung pada tanaman sekitar sebagai kanopi yang cukup untuk menangkal panas matahari. Terdapat platform besi yang ditopang dengan batu bata yang digunakan sebagai tempat duduk penumpang yang menunggu bus. Sumber penerangan berumber dari lampu jalan di samping rambu dan lampu dari ruko-ruko sekitar. Untuk cctv belum tersedia. #timGOPEK",
         "condition_score": 70,
@@ -618,7 +709,11 @@
         "sidewalk_condition": "ada",
         "route_info_signage": "tidak",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/51aafe4a-f821-4751-b767-f4bda0395f1c_1787369655405.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/51aafe4a-f821-4751-b767-f4bda0395f1c_1787369655405.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/eff9a6a3-1c5b-44bb-a029-2cde3700175b_1787369655450.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/f88fb1ba-f995-44c6-85d9-8fbbda9df0ff_1787369655803.jpg"
+        ],
         "survey_date": "2026-08-22",
         "catatan_lapangan": "Tepat pada tanggal 22 Agustus 2026, pukul 10.30 Saya sedang berada di bus stop SDN Meteseh arah utara, suasana lalu lintas tidak begitu ramai dan cuaca sedang cerah. Untuk bus stop sendiri terletak di dekat SDN Meteseh, indomaret, dan tempat tinggal warga Meteseh. Kondisi trotoar tidak cukup layak, melihat banyak area tempat tunggu banyak ditumbuhi rumput dan serpihan batu, selain itu terletak cukup dekat dengan jalan kendaraan. Tidak tersedia informasi mengenai rute perjalanan bus. Bus stop ini bergantung pada satu pohon di dekat sebuah bangunan sebagai kanopi untuk menangkal panas matahari. Tidak ada sumber penerangan pasti dari lampu jalan (bersumber dari indomaret dan lampu rumah warga sekitar). Untuk cctv belum tersedia. #timGOPEK",
         "condition_score": 70,
@@ -644,7 +739,10 @@
         "sidewalk_condition": "tidak",
         "route_info_signage": "-",
         "canopy": "tidak",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/8cd2fcc7-5d18-473a-a562-f16b13be476c_1787369143782.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/8cd2fcc7-5d18-473a-a562-f16b13be476c_1787369143782.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/619ab98e-2c55-409d-a432-c1b240b558a5_1787369143940.jpg"
+        ],
         "survey_date": "2026-08-22",
         "catatan_lapangan": "Pada pukul 10.19 kami mendatangi halte POS Tembalang. Halte ini hanya berupa plang penanda naik atau turun BRT Trans semarang saja. Cukup mudah ditemukan, tetapi aksesibilitas pejalan kaki kurang baik karena pedestrian way-nya tidak ada, langsung bersinggungan dengan jalan raya. Selain itu, plang ini berada di bawah tiang kabel listrik yang berisiko terhadap keselamatan penunggu BRT Trans Semarang. Halte ini juga panas karena tidak ada vegetasi (pohon) yang meneduhi halte tersebut. #timGOPEK",
         "condition_score": 25,
@@ -670,7 +768,11 @@
         "sidewalk_condition": "ada",
         "route_info_signage": "tidak",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/67b6c569-9ffe-4270-b98b-73f31ff4e68c_1787369071395.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/67b6c569-9ffe-4270-b98b-73f31ff4e68c_1787369071395.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/bbd05093-25b5-4e8e-8580-9005258b05c9_1787369071787.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/e8d096b2-c26a-43b9-89bb-5c793127069e_1787369072153.jpg"
+        ],
         "survey_date": "2026-08-22",
         "catatan_lapangan": "Tepat pada tanggal 22 Agustus 2026, pukul 10.17. Saya sedang berada di bus stop SDN Meteseh arah selatan, suasana lalu lintas tidak begitu ramai dan cuaca sedang cerah. Untuk bus stop sendiri terletak di dekat SDN Meteseh, toko bubur ayam, dan tempat tinggal warga Meteseh. Kondisi trotoar tidak cukup layak, melihat banyak area tempat tunggu banyak ditumbuhi rumput dan serpihan batu, selain itu terletak cukup dekat dengan jalan kendaraan. Tidak tersedia informasi mengenai rute perjalanan bus. Bus stop ini bergantung pada tanaman sekitar sebagai kanopi namun tidak cukup tinggi untuk menangkal panas matahari. Sumber penerangan berumber dari lampu jalan di seberang jalan yang sepertinya sudah rusak. Untuk cctv belum tersedia. #timGOPEK",
         "condition_score": 70,
@@ -696,7 +798,10 @@
         "sidewalk_condition": "ada",
         "route_info_signage": "tidak",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/a32b9f90-6ef3-46e5-8b66-9715d7ff5d9f_1787368122595.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/a32b9f90-6ef3-46e5-8b66-9715d7ff5d9f_1787368122595.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/c9e6ac54-c147-4ada-a7e1-0d97a7ef2245_1787368123070.jpg"
+        ],
         "survey_date": "2026-08-22",
         "catatan_lapangan": "Tepat pada tanggal 22 Agustus 2026, pukul 10.00. Saya sedang berada di bus stop Jl. Imam Soeparto, suasana lalu lintas tidak begitu ramai dan cuaca sedang cerah. Untuk bus stop sendiri terletak di seberang ruko-ruko, dan area pembangunan, dan jauh dari tempat tinggal warga dan mahasiswa. Kondisi area pejalan kaki tidak begitu aman, melihat posisinya begitu dekat dengan jalan kendaraan sehingga penumpang yang menunggu bus dan pejalan kaki yang berlalu lalang harus waspada akan kendaraan sekitar. Tidak tersedia juga informasi mengenai rute perjalanan bus bagi penumpang yang menunggu. Bus stop ini bergantung pada pepohonan sekitar sebagai kanopi untuk menangkal panas matahari. Sumber penerangan hanya bersumber dari lampu jalan di sebelah kanan. Untuk cctv belum tersedia. #timGOPEK",
         "condition_score": 70,
@@ -722,7 +827,12 @@
         "sidewalk_condition": "ada",
         "route_info_signage": "tidak",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/4e164f6b-8998-46e7-936e-eb071ebeb6b7_1787367313735.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/4e164f6b-8998-46e7-936e-eb071ebeb6b7_1787367313735.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/a06f4976-42e6-4e2f-8943-c0676a0dd58f_1787367314196.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/277b7181-754a-4f0e-a2b7-5a3aca3c0dcd_1787367314634.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/271f2dd6-530d-4ce4-9329-9dba5cedc6aa_1787367315066.jpg"
+        ],
         "survey_date": "2026-08-22",
         "catatan_lapangan": "Tepat pada tanggal 22 Agustus 2026, pukul 09.44. Saya sedang berada di bus stop kantor kecamatan tembalang, suasana lalu lintas cukup ramai dan cuaca sedang cerah. Untuk bus stop sendiri terletak di dekat kantor kecamatan tembalang, Alfamart, dan caffe, namun cukup jauh dari tempat tinggal warga sekitar. Rambu bus stop sendiri tertutupi oleh beberapa bendera dan area pejalan kaki sudah menyentuh jalan kendaraan sehingga penumpang yang menunggu bus harus lebih waspada ketika sedang berdiri disini. Tidak tersedia informasi rute perjalanan bus. Bus stop ini bergantung pada pepohonan sekitar sebagai kanopi untuk menangkal panas matahari. Sumber penerangan berumber dari lampu cafee dan lampu dari atah alfamart. Untuk cctv belum tersedia. #timGOPEK",
         "condition_score": 70,
@@ -748,7 +858,11 @@
         "sidewalk_condition": "ada",
         "route_info_signage": "-",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/874d91d7-db19-48e5-a067-b23bafa11e4e_1787367120777.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/874d91d7-db19-48e5-a067-b23bafa11e4e_1787367120777.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/02b23514-f6f7-4896-9d74-5230a6120476_1787367120843.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/dcdbd4e9-288b-4610-9448-58f9a562687a_1787367120910.jpg"
+        ],
         "survey_date": "2026-08-22",
         "catatan_lapangan": "Pada pukul 09.47 kami mendatangi halte Masjid Al Hidayah. Halte ini hanya berupa plang penanda naik/turun BRT Trans Semarang. Terdapat pedestrian way namun kurang layak karena terlalu bersinggungan dengan jalan dan tidak ada guiding block. Vegetasi tidak banyak (cukup panas). Namun, penerangan terpantau baik karena berada di sekitar kawasan komersial dan juga terdapat lampu penerangan. \n#timGOPEK",
         "condition_score": 85,
@@ -774,7 +888,11 @@
         "sidewalk_condition": "ada",
         "route_info_signage": "-",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/cc4a53be-ae48-4774-9d2e-edeb4c5cfdba_1787366633120.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/cc4a53be-ae48-4774-9d2e-edeb4c5cfdba_1787366633120.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/9966bd60-48d8-486e-84f9-88832291e864_1787366633177.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/2a227497-5384-46b5-8fb3-c8556c804e04_1787366633229.jpg"
+        ],
         "survey_date": "2026-08-22",
         "catatan_lapangan": "Pada pukul 09.38 kami mendatangi halte SDN Tembalang. Halte ini hanya berupa plang penanda naik atau berhentinya bus. Plang yang adapun terpantau sidah miring dari posisi aslinya sehingga bisa berisiko menimpa penunggu BRT Trans Semarang atau pejalan kaki. Selain itu Pedestrian waynya pun tidak layak, banyak bebatuan dan terlalu sempit sehingga keselamatan pengguna brt yang menunggu dan aksesibilitas pengguna BRT kurang tercover dengan baik. Namun, kelebihannya ada pada penerangan berupa lampu dan vegetasi pohon yang rimbun sehingga memberi suasana teduh. #timGOPEK",
         "condition_score": 85,
@@ -800,7 +918,12 @@
         "sidewalk_condition": "tidak",
         "route_info_signage": "tidak",
         "canopy": "tidak",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/10781dbc-e886-4c5b-b1a4-211b4c9c1a63_1787366274475.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/10781dbc-e886-4c5b-b1a4-211b4c9c1a63_1787366274475.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/c77e7039-c446-4ee6-aa1e-a675e0006612_1787366274874.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/f2123206-dd94-43d1-bd30-5bc503f3b0bd_1787366275294.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/a74b31ba-5a14-44c1-9d3a-66fd2960d22d_1787366275757.jpg"
+        ],
         "survey_date": "2026-08-22",
         "catatan_lapangan": "Tepat pada tanggal 22 Agustus 2026, Pukul 09.30, saya sedang berada di bus stop J&T Bulusan, kondisi lalu lintas cukup ramai dengan kondisi cuaca cerah. Bus stop ini terletak di dekat kantor layabab ekpedisi J&T, toko elektronik, dan tempat tinggal warga dan mahasiswa. Kondisi bus stop ini sendiri hanya menyediakan rambu naik turun saja, tidak tersedia trotoar hanya jalanan yang terbuat dari semen, terlihat juga serpihan serpihan batu memenuhu area pejalan kaki. Tidak ada pohon maupun kanopi yang tersedia sebagai penangkal panas matahari. Tidak tersedia juga rute perjalanan bus bagi penumpang yang menunggu. Sumber pencahayaan bersumber dari satu lampu jalan dan lampu banner toko sekitar. Tidak tersedia cctv sebagai pemantau keadaan sekitar. #timGOPEK",
         "condition_score": 20,
@@ -826,7 +949,11 @@
         "sidewalk_condition": "ada",
         "route_info_signage": "-",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/01be9f53-ab94-45d2-8407-633676e6a106_1787366160879.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/01be9f53-ab94-45d2-8407-633676e6a106_1787366160879.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/d13971ea-da99-41b1-b630-b26aba9a607b_1787366160930.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/7949fd48-18fd-469d-ba21-86f2f01450f3_1787366160974.jpg"
+        ],
         "survey_date": "2026-08-22",
         "catatan_lapangan": "Pada pukul 09.30 kami mendatangi halte BRT Trans Semarang SPBU UNDIP. Yang ada di sini adalah sebuah plang penanda bus berhenti/naik. Jalan pedestrian ada, namun kurang layak karena masih tertup oleh pohon. Ada penerangan di dekat halte berupa lampu vegetasi berupa pohon di samping plang halte tersebut sehingga cukup memberi sensasi teduh bagi pengguna yang menunggu BRT saat dalam cuaca panas. Namun, tidak adanya bangunan dengan atap membuat pengguna BRT sulit untuk menunggu saat hujan datang. #timGOPEK",
         "condition_score": 85,
@@ -852,7 +979,13 @@
         "sidewalk_condition": "ada",
         "route_info_signage": "-",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/61012c27-e5af-4c3a-8a50-180717d8b24e_1787365449721.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/61012c27-e5af-4c3a-8a50-180717d8b24e_1787365449721.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/9124db1c-e9b8-434b-9a43-1c286d92bac6_1787365450111.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/74fec3ec-f228-4573-8ef3-660684dd3538_1787365450497.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/52ad97a7-4543-4b31-af34-4937202e1530_1787365450885.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/22cd8847-6d79-4643-9727-df7c1f1bdf1a_1787365450921.jpg"
+        ],
         "survey_date": "2026-08-22",
         "catatan_lapangan": "Tepat pada tanggal 22 Agustus 2026, pukul 09.16. Saya sedang berada di bus stop bulusan arah timur, suasana lalu lintas cukup ramai dan cuaca sedang cerah. Untuk bus stop sendiri terletak di dekat toko-toko penjual makanan, Puskesmas bulusan, dan tempat tinggal warga dan mahasiswa. Kondisi trotoar tidak cukup layak, melihat banyak pecahan batu yang tercampur dengan tanah menutupi area pejalan kaki. Bus stop ini bergantubg pada pepohonan sekitar sebagai kanopi untuk menangkal panas matahari. Sumber penerangan berumber dari lampu puskesma dan lampu spanduk di seberang jalan. Untuk cctv belum tersedia. #timGOPEK",
         "condition_score": 78,
@@ -878,7 +1011,10 @@
         "sidewalk_condition": "ada",
         "route_info_signage": "-",
         "canopy": "-",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/c9fd0b47-5a06-492e-9620-f94cfdc86648_1787365396582.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/c9fd0b47-5a06-492e-9620-f94cfdc86648_1787365396582.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/67d0819f-d787-47b6-a664-00b9d43f1980_1787365396628.jpg"
+        ],
         "survey_date": "2026-08-22",
         "catatan_lapangan": "Pada pukul 09.21, kami mendatangi Halte BRT Trans Semarang Bulusari. Yang terlihat di halte ini hanyalah sebuah plang yang menandakan tempat naik/turun BRT Trans Semarang. Tidak ada bangunan. Kelebihan halte ini ialah terdapat pedestiran way berupa trotoar dan penerangan yang cukup karena berada dekat dengan permukiman warga. #timGOPEK",
         "condition_score": 80,
@@ -904,7 +1040,10 @@
         "sidewalk_condition": "tidak",
         "route_info_signage": "tidak",
         "canopy": "tidak",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/6504374d-620b-4e84-9e5e-db6ed9634935_1787364201377.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/6504374d-620b-4e84-9e5e-db6ed9634935_1787364201377.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/8c6cb01d-4539-49f7-9163-5fecf3851c5c_1787364201828.jpg"
+        ],
         "survey_date": "2026-08-22",
         "catatan_lapangan": "Tepat pada tanggal 22 Agustus 2026, pukul 08.57, suasana lalu lintas ramai. Terlihat bustop hanya terapat plang naik turun, tidak tersedia kanopi untuk berteduh, tidak tersedia informasi rute perjalan bus, dan tidak tersedia juga trotoar yang layak. Untuk keamanan seperti penerangan hanya mengandalkan sinar lampu dari toko dan bangunan terdekat, tidak tersedia juga kamera cctv sebagai alat pemantau keadaan. Meskipun begitu, bus stop ini terletak di dekat area tempat tinggal mahasiswa dan warga sekitar, juga toko-toko makanan, sehingga penumpang yang menunggu bus bisa berteduh di toko-toko tersebut. #timGOPEK",
         "condition_score": 20,
@@ -930,7 +1069,11 @@
         "sidewalk_condition": "tidak",
         "route_info_signage": "-",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/898acece-9237-4921-a890-706a3b114891_1787299766942.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/898acece-9237-4921-a890-706a3b114891_1787299766942.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/973c7c6c-307d-422b-9def-aaff5a4eaa5d_1787299767015.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/14538432-bc81-43a2-af95-bc709978d299_1787299767069.jpg"
+        ],
         "survey_date": "2026-08-21",
         "catatan_lapangan": "Pada pukul 15.05, kami mendatangi Halte Victoria Residence II arah timur . Halte tersebut sudah memadai mempunyai penerangan yang baik dan kanopi yang bisa manangkal panas sinar matahari di halte tersebut juga tersedia staf penjaga halte , untuk kekurangan di sekitar halte adalah trotoar yang belum tersedia dan juga keamanan seperti CCTV.#timGOPEK",
         "condition_score": 38,
@@ -956,7 +1099,12 @@
         "sidewalk_condition": "ada",
         "route_info_signage": "-",
         "canopy": "-",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/b92e372d-4eb1-4e7e-86a1-787629623341_1787298897355.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/b92e372d-4eb1-4e7e-86a1-787629623341_1787298897355.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/eac6ddce-cb1a-4b76-9060-db6aae60e8a6_1787298897417.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/3b53ac6a-7a42-4e49-a02b-7476d8ba4a6d_1787300849572.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/c23f20cf-a6c5-4c9f-bd3b-1a5c1e52bb52_1787300994593.jpg"
+        ],
         "survey_date": "2026-08-21",
         "catatan_lapangan": "Pada pukul 14.51, kami mendatangi Halte BRT Kelurahan Kramas. Yang terlihat di halte ini hanyalah sebuah plang yang menandakan tempat naik/turun BRT Trans Semarang. Tidak ada bangunan, tidak ada tanda-tanda penerangan yang layak. Jalan pedestrian pun tampak tidak layak. Bahkan, plang tersebut diletakkan tepad dengan zebra cross tempat penyebrangan. #timGOPEK",
         "condition_score": 60,
@@ -982,7 +1130,11 @@
         "sidewalk_condition": "-",
         "route_info_signage": "tidak",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/7cda58e2-1134-4d89-a501-74c5a86aa848_1787298609401.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/7cda58e2-1134-4d89-a501-74c5a86aa848_1787298609401.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/78971479-1788-4519-ab2a-e71d27ba558a_1787298609470.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/4cd8dec8-2776-49be-84f7-6dca6022f3ef_1787298609531.jpg"
+        ],
         "survey_date": "2026-08-21",
         "catatan_lapangan": "Pada pukul 14.44, kami mendatangi Bus stop emerald garden arah selatan. Bus stop berfungsi dengan baik dan sudah dilengkapi dengan tempat duduk serta penerangan yang cukup dari lampu jalan terdapat beberapa pohon untuk manangkal panas matahari dan untuk keamanan tersedia cctv ,Hal yang perlu dievaluasi selanjutnya adalah rute perjalanan bus yang belum tersedia. #timGOPEK",
         "condition_score": 65,
@@ -1008,7 +1160,11 @@
         "sidewalk_condition": "tidak",
         "route_info_signage": "tidak",
         "canopy": "-",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/517836e0-296d-4940-b1b0-709a6cf0096c_1787296920377.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/517836e0-296d-4940-b1b0-709a6cf0096c_1787296920377.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/53da1c13-a167-453f-b75b-4dbf3c41de4c_1787296920471.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/624a92bc-58e8-4951-85b2-38fa83c47172_1787296920548.jpg"
+        ],
         "survey_date": "2026-08-21",
         "catatan_lapangan": "Tepat pada Jumat, 21 Agustus 2026 pukul 14.15 saya melihat bus stop di area kelurahan Bulusan 1A arah timur. Bus stop ini biasanya dipakai oleh masyarakat setempat dan mahasiswa UNDIP. Bus stop ini diapit oleh beberapa toko bangunan di sekitarnya. Lain hal dari halte pada umumnya, tempat ini tidak mempunyai tempat duduk bagi pengunjung, tidak ada trotoar dan guiding block, cctv tidak ada, serta penerangan hanya mengandalkan penerangan beberapa toko di sekitarnya saja. Bus stop ini belum mempunyai spanduk yang berisikan rute Bus Trans Semarang. #timGOPEK",
         "condition_score": 25,
@@ -1034,7 +1190,10 @@
         "sidewalk_condition": "ada",
         "route_info_signage": "ada",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/b35599d2-70f8-4207-84c6-8ccdb4a71433_1787295735811.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/b35599d2-70f8-4207-84c6-8ccdb4a71433_1787295735811.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/20e37951-68c3-4d45-a274-2960201ae4b5_1787295735852.jpg"
+        ],
         "survey_date": "2026-08-21",
         "catatan_lapangan": "Suasana Halte BRT RUSUNAWA UNDIP pukul 13.54 tanggal 21 Agustus 2026, Cuaca sedang panas terik, lalu lintas tidak terlalu ramai. Untuk haltenya sendiri terletak di dekat RUSUNAWA UNDIP dan dekat dengan tempat tinggal Mahasiswa Undip . Bangunan halte sudah terpasang kanopi dan tersedia informasi mengenai rute perjalanan BRT, sudah tersedianya trotoar dan rambu stop, terdapat banyak pohon baik dari sisi depan maupun belakang halte . Kekurangannya, bangunan halte yang kurang kokoh dan juga kanopi pada halte tidak cukup lebar untuk menangkal panas yang masuk dan trotoar tidak mempunyai guiding block serta beberapa paving block terlapas keluar dari trotoar. Untuk sumber penerangan cukup  yaitu bersumber dari lampu jalan di samping halte dan dari arah rusunawa undip. Selain itu CCTV sebagai sumber pengawasan masih belum tersedia. #timGOPEK",
         "condition_score": 85,
@@ -1060,7 +1219,13 @@
         "sidewalk_condition": "tidak",
         "route_info_signage": "ada",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/163057a9-86dc-4426-87a5-cc353173fb44_1787295634444.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/163057a9-86dc-4426-87a5-cc353173fb44_1787295634444.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/1f44766c-0ce4-4894-a8a1-05204a61878f_1787295634533.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/ac8dc222-3a22-45e3-b6a5-3ec0a16f0e81_1787295634569.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/7303d130-3574-4b0c-80c3-13b6dfcc44ae_1787384590627.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/7251e64d-c825-405e-8fd8-17b1cb613c5f_1787384590677.jpg"
+        ],
         "survey_date": "2026-08-21",
         "catatan_lapangan": "Suasana halte BRT Muladi Dome Undip pada pukul 13.55 terpantau cukup sepi, tetapi banyak kendaraan roda 4 yang parkir di sekitar halte. Kelebihan halte ini adalah ia berdiri di ruas jalan yang kecil namun tetap menyediakan atap sebagai peneduh bagi pengguna BRT yang sedang menunggu dan terdapat spanduk yang merupakan map dari rute BRT terkait. Namun, tidak terdapat penerangan di sekitar halte dan akses pedestrian kurang aman dan nyaman (tidak ada trotoar karena dipakai naruh halte). #timGOPEK",
         "condition_score": 32,
@@ -1086,7 +1251,10 @@
         "sidewalk_condition": "ada",
         "route_info_signage": "ada",
         "canopy": "ada",
-        "photo_url": "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/c13b6352-3e90-46aa-b392-bbc0bd297ac3_1787294783507.jpg",
+        "photo_urls": [
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/c13b6352-3e90-46aa-b392-bbc0bd297ac3_1787294783507.jpg",
+          "https://mapid-app-chat.cdn.mapid.io/692d03413a0cf54ea6633e89/f2766f86-fd02-45b4-ade7-8aacbae3589f_1787294784010.jpg"
+        ],
         "survey_date": "2026-08-21",
         "catatan_lapangan": "Suasana Halte BRT Fakultas Kedoktetan UNDIP pukul 13.38 tanggal 21 Agustus 2026, Cuaca sedang panas terik, lalu lintas tidak terlalu ramai. Untuk haltenya sendiri terletak di dekat fakultas kedokteran dan dekat dengan tempat tinggal warga sekitar. Bangunan halte sudah terpasang kanopi dan tersedia informasi mengenai rute perjalanan BRT, trotoar di sekitarnya sudah ada guidingblock dan trotarnya masih mulus. Kekurangannya, bangunan halte yang kurang kokoh dan juga kanopi pada halte tidak cukup lebar untuk menangkal panas yang masuk. Untuk sumber penerangan cukup minim yaitu hanya bersumber dari lampu jalan di samping halte. Selain itu CCTV sebagai sumber pengawasan masih belum tersedia. #timGOPEK",
         "condition_score": 85,
