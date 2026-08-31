@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import { conditionColor, conditionLabelText } from "@/lib/conditionScore";
 import { densityGradientCss } from "@/lib/populationColor";
 import type { ConditionLabel } from "@/types/halte";
@@ -76,9 +78,7 @@ export default function DashboardSidebar({
   return (
     <nav className="z-40 hidden h-full w-panel-width shrink-0 flex-col overflow-y-auto scrollbar-hide border-r border-border-low bg-surface md:flex">
       <div className="flex items-center gap-4 border-b border-border-low p-gutter">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded bg-surface-container">
-          <span className="material-symbols-outlined text-[24px] text-transport-blue">shield</span>
-        </div>
+        <Image src="/dishub-logo.png" alt="Logo Kementerian Perhubungan" width={137} height={160} className="h-12 w-auto shrink-0" />
         <h2 className="font-headline-lg text-headline-lg font-bold leading-tight text-transport-blue">
           DISHUB Dashboard
         </h2>
