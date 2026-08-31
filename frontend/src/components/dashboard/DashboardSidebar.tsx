@@ -39,9 +39,9 @@ export default function DashboardSidebar({ onResetView }: DashboardSidebarProps)
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 px-3 py-4">
+      <div className="flex flex-col gap-2 p-gutter">
         <span className="flex items-center gap-3 rounded-lg bg-primary-fixed px-4 py-3 font-label-md text-label-md font-bold text-on-primary-fixed-variant">
-          <span className="material-symbols-outlined">map</span>
+          <span className="material-symbols-outlined text-[20px]">map</span>
           Map View (DISHUB)
         </span>
       </div>
@@ -51,7 +51,7 @@ export default function DashboardSidebar({ onResetView }: DashboardSidebarProps)
           onClick={onResetView}
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-transport-blue py-3 font-label-md text-label-md font-bold text-on-primary transition-colors hover:bg-primary active:scale-95"
         >
-          <span className="material-symbols-outlined">restart_alt</span>
+          <span className="material-symbols-outlined text-[20px]">restart_alt</span>
           Atur Ulang Peta
         </button>
       </div>
