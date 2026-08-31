@@ -43,8 +43,13 @@ export default function HalteSearch({ features, onSelect, placeholder }: HalteSe
 
   return (
     <div className="relative w-full">
-      <span className="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[20px] text-outline">
-        search
+      {/* Fixed-size box with overflow clipping, not just a font-size on the
+          glyph directly -- Material Symbols' advance width per glyph doesn't
+          reliably equal its font-size, so a bare text-[Npx] can render wider
+          than expected and eat into the input's left padding. Clamping to a
+          known 20x20 box guarantees the icon never exceeds it. */}
+      <span className="pointer-events-none absolute left-3 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center overflow-hidden text-outline">
+        <span className="material-symbols-outlined text-[20px] leading-none">search</span>
       </span>
       <input
         type="text"
@@ -63,7 +68,7 @@ export default function HalteSearch({ features, onSelect, placeholder }: HalteSe
           if (e.key === "Escape") setOpen(false);
           if (e.key === "Enter" && results[0]) choose(results[0]);
         }}
-        className="w-full rounded border border-border-low bg-surface-container-low py-2 pl-10 pr-4 font-body-md text-body-md text-on-surface transition-colors focus:border-transport-blue focus:outline-none focus:ring-1 focus:ring-transport-blue"
+        className="w-full rounded border border-border-low bg-surface-container-low py-2 pl-11 pr-4 font-body-md text-body-md text-on-surface transition-colors focus:border-transport-blue focus:outline-none focus:ring-1 focus:ring-transport-blue"
       />
 
       {open && query.trim() && (
