@@ -7,7 +7,8 @@ import { fetchIsochrones } from "@/lib/fetchIsochrones";
 import type { IsochroneFeatureCollection } from "@/types/isochrone";
 
 const SOURCE_ID = "halte-isochrones";
-const FILL_LAYER_ID = "halte-isochrones-fill";
+export const ISOCHRONE_FILL_LAYER_ID = "halte-isochrones-fill";
+const FILL_LAYER_ID = ISOCHRONE_FILL_LAYER_ID;
 const LINE_LAYER_ID = "halte-isochrones-line";
 
 interface IsochroneLayerProps {
@@ -69,26 +70,9 @@ export default function IsochroneLayer({ map, visible }: IsochroneLayerProps) {
         beforeId,
       );
 
-      map.on("click", FILL_LAYER_ID, (e: maplibregl.MapLayerMouseEvent) => {
-        const feature = e.features?.[0];
-        if (!feature) return;
-        const p = feature.properties as Record<string, number>;
-
-        // Explicit dark colors -- raw HTML via setHTML(), outside Tailwind's
-        // reach, otherwise falls back to MapLibre's low-contrast popup
-        // default (pale gray on white). Same fix as PopulationLayer's popup.
-        new maplibregl.Popup({ offset: 8 })
-          .setLngLat(e.lngLat)
-          .setHTML(
-            `<div style="font-family:system-ui,sans-serif;font-size:13px;min-width:180px;color:var(--color-on-surface)">` +
-              `<div style="font-weight:700;font-size:15px;margin-bottom:6px;color:var(--color-on-surface)">Jangkauan ${p.minutes} menit jalan kaki</div>` +
-              `<div style="margin-bottom:2px"><span style="color:var(--color-on-surface-variant)">Dari</span> <b>${p.halte_count} halte tersurvei</b></div>` +
-              `<div><span style="color:var(--color-on-surface-variant)">Luas area:</span> <b>${p.area_km2} km²</b></div>` +
-              `</div>`,
-          )
-          .addTo(map);
-      });
-
+      // Click/popup handling lives in MapInfoPopup instead -- this fill
+      // overlaps the population layer, and a click that hit both used to
+      // open two popups stacked on top of each other.
       map.on("mouseenter", FILL_LAYER_ID, () => {
         map.getCanvas().style.cursor = "pointer";
       });

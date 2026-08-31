@@ -10,6 +10,7 @@ import HalteLayer from "@/components/map/HalteLayer";
 import CommunityMapsLayer from "@/components/map/CommunityMapsLayer";
 import PopulationLayer from "@/components/dashboard/PopulationLayer";
 import IsochroneLayer from "@/components/dashboard/IsochroneLayer";
+import MapInfoPopup from "@/components/dashboard/MapInfoPopup";
 import AppHeader from "@/components/ui/AppHeader";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MapControls from "@/components/dashboard/MapControls";
@@ -88,6 +89,7 @@ export default function DashboardPage() {
               <PopulationLayer map={map} visible={densityVisible} />
               <HalteLayer map={map} visible={halteVisible} onSelect={setDetailTarget} />
               <CommunityMapsLayer map={map} visible={reportsVisible} />
+              <MapInfoPopup map={map} />
               <MapControls map={map} />
             </>
           )}

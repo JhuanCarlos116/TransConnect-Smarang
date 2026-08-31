@@ -5,17 +5,11 @@ import * as maplibregl from "maplibre-gl";
 
 import { fetchPopulationData } from "@/lib/fetchPopulationData";
 import { densityFillExpression } from "@/lib/populationColor";
-import { HALTE_POINT_LAYER_ID } from "@/components/map/HalteLayer";
-import { COMMUNITY_CLUSTER_LAYER_ID, COMMUNITY_POINT_LAYER_ID } from "@/components/map/CommunityMapsLayer";
 import type { KelurahanPopulationFeatureCollection } from "@/types/population";
 
-// Clusters (community-reports-clusters) and individual unclustered points
-// (community-reports-points) are two separate layers -- guarding only the
-// point layer left cluster bubbles able to trigger this popup too.
-const TOP_LAYER_IDS = [HALTE_POINT_LAYER_ID, COMMUNITY_POINT_LAYER_ID, COMMUNITY_CLUSTER_LAYER_ID];
-
 const SOURCE_ID = "kelurahan-population";
-const FILL_LAYER_ID = "kelurahan-population-fill";
+export const POPULATION_FILL_LAYER_ID = "kelurahan-population-fill";
+const FILL_LAYER_ID = POPULATION_FILL_LAYER_ID;
 const LINE_LAYER_ID = "kelurahan-population-line";
 
 interface PopulationLayerProps {
@@ -70,39 +64,9 @@ export default function PopulationLayer({ map, visible }: PopulationLayerProps) 
         },
       });
 
-      map.on("click", FILL_LAYER_ID, (e: maplibregl.MapLayerMouseEvent) => {
-        // Halte markers and community-report points are drawn on top of this
-        // fill, but MapLibre fires each layer's click handler independently
-        // for whatever the cursor is over -- clicking a halte marker sitting
-        // inside a kelurahan polygon used to open both popups at once,
-        // stacked on top of each other. Filtered to layers that currently
-        // exist, since this can fire before HalteLayer/CommunityMapsLayer
-        // have finished their own async setup.
-        const existingTopLayers = TOP_LAYER_IDS.filter((id) => map.getLayer(id));
-        if (existingTopLayers.length > 0 && map.queryRenderedFeatures(e.point, { layers: existingTopLayers }).length > 0) {
-          return;
-        }
-
-        const feature = e.features?.[0];
-        if (!feature) return;
-        const p = feature.properties as Record<string, number | string>;
-
-        // Explicit dark colors throughout -- this is raw HTML via setHTML(),
-        // outside Tailwind's reach, and without them it fell back to
-        // MapLibre's own low-contrast popup default (pale gray on white).
-        new maplibregl.Popup({ offset: 8 })
-          .setLngLat(e.lngLat)
-          .setHTML(
-            `<div style="font-family:system-ui,sans-serif;font-size:13px;min-width:170px;color:var(--color-on-surface)">` +
-              `<div style="font-weight:700;font-size:15px;margin-bottom:6px;color:var(--color-on-surface)">${p.kelurahan}</div>` +
-              `<div style="margin-bottom:2px"><span style="color:var(--color-on-surface-variant)">Penduduk:</span> <b>${Number(p.jumlah_penduduk).toLocaleString("id-ID")} jiwa</b></div>` +
-              `<div style="margin-bottom:2px"><span style="color:var(--color-on-surface-variant)">Luas:</span> <b>${p.luas_km2} km²</b></div>` +
-              `<div><span style="color:var(--color-on-surface-variant)">Kepadatan:</span> <b>${Number(p.kepadatan_per_km2).toLocaleString("id-ID")} jiwa/km²</b></div>` +
-              `</div>`,
-          )
-          .addTo(map);
-      });
-
+      // Click/popup handling lives in MapInfoPopup instead -- this fill
+      // overlaps the isochrone layer, and a click that hit both used to
+      // open two popups stacked on top of each other.
       map.on("mouseenter", FILL_LAYER_ID, () => {
         map.getCanvas().style.cursor = "pointer";
       });
