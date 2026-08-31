@@ -1,23 +1,5 @@
 import Link from "next/link";
 
-const STEPS = [
-  {
-    n: 1,
-    title: "Pilih layer",
-    body: "Centang di kotak Layer Peta (kiri bawah). Nyalakan satu per satu — semuanya sekaligus membuat peta sulit dibaca.",
-  },
-  {
-    n: 2,
-    title: "Klik objek di peta",
-    body: "Titik halte membuka detail foto survei, skor kondisi, dan catatan lapangan. Area isochrone menampilkan luas jangkauan.",
-  },
-  {
-    n: 3,
-    title: "Telusuri daftar prioritas",
-    body: "Klik salah satu halte di panel kanan untuk memindahkan peta ke lokasinya.",
-  },
-];
-
 interface DashboardSidebarProps {
   onResetView: () => void;
 }
@@ -29,11 +11,17 @@ interface DashboardSidebarProps {
  * Analytics, Reports, plus Support/Sign Out) that opened modals full of
  * invented numbers, or a toast claiming a fake login session. None of that
  * is real, so the nav here carries only the two pages that are: this one and
- * the public map. In their place is what the dashboard actually lacked —
- * numbered steps saying where to start. "Run Spatial Analysis" also
- * previously simulated a computation with setTimeout and reported fabricated
- * results ("3 Kandidat Halte... berhasil dihitung"); the button now does a
- * real, if modest, thing: resets the camera and every layer toggle.
+ * the public map. "Run Spatial Analysis" also previously simulated a
+ * computation with setTimeout and reported fabricated results ("3 Kandidat
+ * Halte... berhasil dihitung"); the button now does a real, if modest,
+ * thing: resets the camera and every layer toggle.
+ *
+ * A numbered "Cara pakai" walkthrough lived here too, but its step 3
+ * ("klik salah satu halte di panel kanan") pointed at the Prioritas
+ * Perbaikan panel, which is gone. Removed rather than patched -- there is
+ * no persistent onboarding copy here right now, put it back once the
+ * dashboard's shape has settled enough that a walkthrough won't go stale
+ * again in the next pass.
  */
 export default function DashboardSidebar({ onResetView }: DashboardSidebarProps) {
   return (
@@ -62,28 +50,7 @@ export default function DashboardSidebar({ onResetView }: DashboardSidebarProps)
         </Link>
       </div>
 
-      <div className="border-t border-border-low px-gutter py-4">
-        <h3 className="mb-stack-md font-label-md text-label-md font-bold uppercase tracking-wider text-on-surface-variant">
-          Cara pakai
-        </h3>
-        <ol className="flex flex-col gap-stack-md">
-          {STEPS.map((step) => (
-            <li key={step.n} className="flex gap-3">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary-fixed font-label-sm text-label-sm font-bold text-on-primary-fixed-variant">
-                {step.n}
-              </span>
-              <div>
-                <h4 className="font-label-md text-label-md font-bold text-on-surface">{step.title}</h4>
-                <p className="mt-0.5 font-label-sm text-label-sm leading-relaxed text-on-surface-variant">
-                  {step.body}
-                </p>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </div>
-
-      <div className="p-gutter">
+      <div className="border-t border-border-low p-gutter">
         <button
           onClick={onResetView}
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-transport-blue py-3 font-label-md text-label-md font-bold text-on-primary transition-colors hover:bg-primary active:scale-95"
