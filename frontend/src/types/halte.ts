@@ -1,5 +1,10 @@
 export type ConditionLabel = "green" | "yellow" | "red";
 
+export interface HalteMediaItem {
+  url: string;
+  type: "photo" | "video";
+}
+
 export interface HalteProperties {
   halte_id: string;
   nama_halte: string;
@@ -12,7 +17,8 @@ export interface HalteProperties {
   route_info_signage: "ada" | "tidak" | "-";
   canopy: "ada" | "tidak" | "-";
 
-  photo_urls: string[];
+  // Photos and (18 of 42 points) one video, in original upload order.
+  media: HalteMediaItem[];
   survey_date: string | null;
   catatan_lapangan: string | null;
 

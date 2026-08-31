@@ -103,7 +103,7 @@ export default function DashboardPage() {
         </main>
       </div>
 
-      <HalteDetailModal feature={detailTarget} onClose={() => setDetailTarget(null)} onFlyTo={flyToHalte} />
+      <HalteDetailModal feature={detailTarget} onClose={() => setDetailTarget(null)} />
     </div>
   );
 }

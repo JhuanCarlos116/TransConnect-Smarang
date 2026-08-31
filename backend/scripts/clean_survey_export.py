@@ -125,16 +125,25 @@ def extract_variable(text: str, keywords: list[str], max_window: int = 90) -> st
     return "ada"
 
 
-def pick_photo_urls(medias: list[str]) -> list[str]:
+def pick_media(medias: list[str]) -> list[dict[str, str]]:
     """MAPID Apps always puts an auto-generated map-location thumbnail
     (.png) first in `medias`, followed by the actual field photos (.jpg,
-    usually several per point -- the team took 2-5 per halte) and sometimes
-    videos (.mp4). Skip the map thumbnail and any video, keep every photo.
+    usually several per point -- the team took 2-5 per halte) and, for 18 of
+    the 42 points, one video (.mp4) last. Skip only the map thumbnail; keep
+    photos and videos, tagged by type, in their original order.
 
-    Was pick_photo_url (singular), returning only the first match -- silently
-    dropping every other photo the team took at each point down to one.
+    Was pick_photo_url(s) -- singular kept only the first photo, plural kept
+    every photo but dropped every video outright (18 points had one silently
+    discarded).
     """
-    return [url for url in medias if url.lower().split("?")[0].endswith((".jpg", ".jpeg"))]
+    media = []
+    for url in medias:
+        ext = url.lower().split("?")[0].rsplit(".", 1)[-1]
+        if ext in ("jpg", "jpeg"):
+            media.append({"url": url, "type": "photo"})
+        elif ext == "mp4":
+            media.append({"url": url, "type": "video"})
+    return media
 
 
 def load_manual_corrections() -> dict[str, dict[str, str]]:
@@ -203,7 +212,7 @@ def clean(raw_activities: list[dict]) -> tuple[dict, list[tuple[str, str]]]:
             "sidewalk_condition": extract_variable(combined_text, KEYWORDS["sidewalk_condition"]),
             "route_info_signage": extract_variable(combined_text, KEYWORDS["route_info_signage"]),
             "canopy": extract_variable(combined_text, KEYWORDS["canopy"]),
-            "photo_urls": pick_photo_urls(activity.get("medias") or []),
+            "media": pick_media(activity.get("medias") or []),
             "survey_date": (activity.get("created_at") or "")[:10] or None,
             "catatan_lapangan": description,
         }
