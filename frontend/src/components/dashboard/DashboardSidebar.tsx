@@ -34,7 +34,6 @@ function LayerToggleRow({ label, hint, checked, onChange }: LayerToggleRowProps)
 }
 
 interface DashboardSidebarProps {
-  onResetView: () => void;
   densityVisible: boolean;
   onDensityChange: (v: boolean) => void;
   halteVisible: boolean;
@@ -60,11 +59,11 @@ interface DashboardSidebarProps {
  * so that link is gone (from the header tabs too, see AppHeader).
  * "Run Spatial Analysis" also previously simulated a computation with
  * setTimeout and reported fabricated results ("3 Kandidat Halte... berhasil
- * dihitung"); the button now does a real, if modest, thing: resets the
- * camera and every layer toggle.
+ * dihitung"); replaced with a real reset-camera-and-toggles button for a
+ * while, then removed outright at the user's request rather than kept
+ * around as an icon-only affordance.
  */
 export default function DashboardSidebar({
-  onResetView,
   densityVisible,
   onDensityChange,
   halteVisible,
@@ -80,7 +79,7 @@ export default function DashboardSidebar({
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded bg-surface-container">
           <span className="material-symbols-outlined text-[24px] text-transport-blue">shield</span>
         </div>
-        <h2 className="font-headline-lg text-headline-lg font-bold leading-tight text-on-surface">
+        <h2 className="font-headline-lg text-headline-lg font-bold leading-tight text-transport-blue">
           DISHUB Dashboard
         </h2>
       </div>
@@ -151,17 +150,6 @@ export default function DashboardSidebar({
             <span className="font-label-sm text-label-sm text-on-surface-variant">{band.minutes} menit</span>
           </div>
         ))}
-      </div>
-
-      <div className="border-t border-border-low p-gutter">
-        <button
-          onClick={onResetView}
-          title="Atur Ulang Peta"
-          aria-label="Atur Ulang Peta"
-          className="flex w-full items-center justify-center rounded-lg bg-transport-blue py-3 text-on-primary transition-colors hover:bg-primary active:scale-95"
-        >
-          <span className="material-symbols-outlined text-[20px]">restart_alt</span>
-        </button>
       </div>
     </nav>
   );
