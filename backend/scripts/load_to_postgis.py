@@ -5,14 +5,15 @@ Usage:
 
 Reads backend/data/processed/halte-survey.geojson and (re)creates the
 halte_survey table in the database pointed to by DATABASE_URL (backend/.env).
-Run docker-compose up first so PostGIS is available.
 """
 
+import json
 import sys
 from pathlib import Path
 
 import geopandas as gpd
-from sqlalchemy import create_engine
+from sqlalchemy import Date, create_engine
+from sqlalchemy.dialects.postgresql import JSONB
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from app.config import settings  # noqa: E402
@@ -29,11 +30,24 @@ def main() -> None:
     gdf = gpd.read_file(GEOJSON_PATH)
     gdf = gdf.rename(columns={"geometry": "geom"}).set_geometry("geom")
 
+    # geopandas reads `media` back as a Python list-of-dicts column; left as
+    # object dtype, to_postgis stringifies it with str() (single-quoted repr,
+    # not valid JSON) and infers a plain text column -- the app.models.halte
+    # SQLAlchemy model expects a real jsonb column. json.dumps + an explicit
+    # dtype makes to_postgis create/fill it correctly instead.
+    gdf["media"] = gdf["media"].apply(json.dumps)
+
     # to_postgis needs a sync (psycopg2) engine, not the async one used by the API.
     sync_url = settings.database_url.replace("postgresql+asyncpg", "postgresql+psycopg2")
     engine = create_engine(sync_url)
 
-    gdf.to_postgis("halte_survey", engine, if_exists="replace", index=False)
+    gdf.to_postgis(
+        "halte_survey",
+        engine,
+        if_exists="replace",
+        index=False,
+        dtype={"media": JSONB, "survey_date": Date},
+    )
     print(f"Loaded {len(gdf)} halte points into halte_survey.")
 
 
