@@ -8,3 +8,5 @@ pydantic-settings
 geopandas
 shapely
 python-dotenv
+osmnx
+scikit-learn
