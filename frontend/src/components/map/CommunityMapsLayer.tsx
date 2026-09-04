@@ -7,6 +7,10 @@ import * as maplibregl from "maplibre-gl";
 import { fetchCommunityReports } from "@/lib/fetchCommunityReports";
 import CommunityReportPopup from "@/components/map/CommunityReportPopup";
 import type { CommunityReportFeatureCollection } from "@/types/communityReport";
+import type { ConditionLabel } from "@/types/halte";
+
+/** Which condition of report to show -- see ReportFilterButton in DashboardSidebar. */
+export type ReportConditionFilter = ConditionLabel | "all";
 
 const SOURCE_ID = "community-reports";
 export const COMMUNITY_CLUSTER_LAYER_ID = "community-reports-clusters";
@@ -27,14 +31,42 @@ interface CommunityMapsLayerProps {
    * report summary. Left unset on the public map, which keeps the popup.
    */
   onSelect?: (reportId: string) => void;
+  /**
+   * Which condition of report to show. Defaults to "all" (the public map
+   * shows every report); the dashboard cycles it through the three labels.
+   * Applied by swapping the source's data rather than by setFilter, because
+   * this source clusters -- cluster counts are computed from the source
+   * data, so a layer-level filter would leave clusters counting points that
+   * are no longer drawn.
+   */
+  conditionFilter?: ReportConditionFilter;
 }
 
-export default function CommunityMapsLayer({ map, visible, onSelect }: CommunityMapsLayerProps) {
+function filterByCondition(
+  data: CommunityReportFeatureCollection,
+  condition: ReportConditionFilter,
+): CommunityReportFeatureCollection {
+  if (condition === "all") return data;
+  return { ...data, features: data.features.filter((f) => f.properties.condition_label === condition) };
+}
+
+export default function CommunityMapsLayer({
+  map,
+  visible,
+  onSelect,
+  conditionFilter = "all",
+}: CommunityMapsLayerProps) {
   const loadedRef = useRef(false);
   const onSelectRef = useRef(onSelect);
   useEffect(() => {
     onSelectRef.current = onSelect;
   }, [onSelect]);
+  // Full unfiltered collection, kept so the filter effect can re-derive any
+  // subset without refetching.
+  const dataRef = useRef<CommunityReportFeatureCollection | null>(null);
+  // Same async-load race as visibleRef below: the filter can change while the
+  // fetch is still in flight.
+  const filterRef = useRef(conditionFilter);
   // The layer is added once, asynchronously, after its data arrives. `visible`
   // can flip while that fetch is still in flight, and the sync effect below
   // bails out whenever the layer does not exist yet -- so a value captured on
@@ -48,9 +80,11 @@ export default function CommunityMapsLayer({ map, visible, onSelect }: Community
     loadedRef.current = true;
 
     fetchCommunityReports().then((data: CommunityReportFeatureCollection) => {
-            map.addSource(SOURCE_ID, {
+      dataRef.current = data;
+
+      map.addSource(SOURCE_ID, {
         type: "geojson",
-        data,
+        data: filterByCondition(data, filterRef.current),
         cluster: true,
         clusterMaxZoom: 14,
         clusterRadius: 50,
@@ -170,6 +204,13 @@ export default function CommunityMapsLayer({ map, visible, onSelect }: Community
       map.setLayoutProperty(id, "visibility", visible ? "visible" : "none");
     }
   }, [map, visible]);
+
+  useEffect(() => {
+    filterRef.current = conditionFilter;
+    const source = map.getSource(SOURCE_ID) as maplibregl.GeoJSONSource | undefined;
+    if (!source || !dataRef.current) return;
+    source.setData(filterByCondition(dataRef.current, conditionFilter) as never);
+  }, [map, conditionFilter]);
 
   return null;
 }
