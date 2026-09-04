@@ -38,7 +38,13 @@ def main() -> None:
     gdf["media"] = gdf["media"].apply(json.dumps)
 
     # to_postgis needs a sync (psycopg2) engine, not the async one used by the API.
-    sync_url = settings.database_url.replace("postgresql+asyncpg", "postgresql+psycopg2")
+    # asyncpg and psycopg2 also disagree on the SSL query param's name
+    # (?ssl=require vs ?sslmode=require) -- Neon's pooled/direct connection
+    # strings need SSL, so DATABASE_URL is asyncpg-flavored (?ssl=require) and
+    # gets translated for psycopg2 here.
+    sync_url = settings.database_url.replace("postgresql+asyncpg", "postgresql+psycopg2").replace(
+        "ssl=require", "sslmode=require"
+    )
     engine = create_engine(sync_url)
 
     gdf.to_postgis(
