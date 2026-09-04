@@ -7,7 +7,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { DEFAULT_CENTER, DEFAULT_ZOOM, mapStyleUrl } from "@/lib/maplibre";
 import { fetchHalteData } from "@/lib/fetchHalteData";
 import BusStopLayer from "@/components/dashboard/BusStopLayer";
-import CommunityMapsLayer from "@/components/map/CommunityMapsLayer";
+import CommunityMapsLayer, { type ReportConditionFilter } from "@/components/map/CommunityMapsLayer";
 import PopulationLayer from "@/components/dashboard/PopulationLayer";
 import IsochroneLayer from "@/components/dashboard/IsochroneLayer";
 import RecommendationLayer from "@/components/dashboard/RecommendationLayer";
@@ -26,6 +26,10 @@ export default function DashboardPage() {
   const [densityVisible, setDensityVisible] = useState(true);
   const [busStopsVisible, setBusStopsVisible] = useState(true);
   const [reportsVisible, setReportsVisible] = useState(false);
+  // Starts on the worst condition -- that is the subset DISHUB triages first,
+  // and it keeps the initial view readable instead of dropping all 42 sample
+  // reports on the map at once.
+  const [reportFilter, setReportFilter] = useState<ReportConditionFilter>("red");
   const [isochroneVisible, setIsochroneVisible] = useState(false);
   const [recommendationsVisible, setRecommendationsVisible] = useState(false);
 
@@ -101,6 +105,8 @@ export default function DashboardPage() {
           onBusStopsChange={setBusStopsVisible}
           reportsVisible={reportsVisible}
           onReportsChange={setReportsVisible}
+          reportFilter={reportFilter}
+          onReportFilterChange={setReportFilter}
           isochroneVisible={isochroneVisible}
           onIsochroneChange={setIsochroneVisible}
           recommendationsVisible={recommendationsVisible}
@@ -117,7 +123,12 @@ export default function DashboardPage() {
               <IsochroneLayer map={map} visible={isochroneVisible} />
               <PopulationLayer map={map} visible={densityVisible} />
               <BusStopLayer map={map} visible={busStopsVisible} />
-              <CommunityMapsLayer map={map} visible={reportsVisible} onSelect={openSurveyDetail} />
+              <CommunityMapsLayer
+                map={map}
+                visible={reportsVisible}
+                conditionFilter={reportFilter}
+                onSelect={openSurveyDetail}
+              />
               <RecommendationLayer map={map} visible={recommendationsVisible} />
               <MapInfoPopup map={map} />
               <MapControls map={map} />
