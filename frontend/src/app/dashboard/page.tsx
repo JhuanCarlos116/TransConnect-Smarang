@@ -10,6 +10,7 @@ import HalteLayer from "@/components/map/HalteLayer";
 import CommunityMapsLayer from "@/components/map/CommunityMapsLayer";
 import PopulationLayer from "@/components/dashboard/PopulationLayer";
 import IsochroneLayer from "@/components/dashboard/IsochroneLayer";
+import RecommendationLayer from "@/components/dashboard/RecommendationLayer";
 import MapInfoPopup from "@/components/dashboard/MapInfoPopup";
 import AppHeader from "@/components/ui/AppHeader";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
@@ -25,6 +26,7 @@ export default function DashboardPage() {
   const [halteVisible, setHalteVisible] = useState(true);
   const [reportsVisible, setReportsVisible] = useState(false);
   const [isochroneVisible, setIsochroneVisible] = useState(false);
+  const [recommendationsVisible, setRecommendationsVisible] = useState(false);
 
   const [halteFeatures, setHalteFeatures] = useState<HalteFeature[]>([]);
   const [detailTarget, setDetailTarget] = useState<HalteFeature | null>(null);
@@ -76,6 +78,8 @@ export default function DashboardPage() {
           onReportsChange={setReportsVisible}
           isochroneVisible={isochroneVisible}
           onIsochroneChange={setIsochroneVisible}
+          recommendationsVisible={recommendationsVisible}
+          onRecommendationsChange={setRecommendationsVisible}
         />
 
         {/* Map canvas -- deliberately free of overlays now. Layer toggles
@@ -89,6 +93,7 @@ export default function DashboardPage() {
               <PopulationLayer map={map} visible={densityVisible} />
               <HalteLayer map={map} visible={halteVisible} onSelect={setDetailTarget} />
               <CommunityMapsLayer map={map} visible={reportsVisible} />
+              <RecommendationLayer map={map} visible={recommendationsVisible} />
               <MapInfoPopup map={map} />
               <MapControls map={map} />
             </>

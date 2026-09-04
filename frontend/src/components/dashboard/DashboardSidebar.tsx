@@ -43,6 +43,8 @@ interface DashboardSidebarProps {
   onReportsChange: (v: boolean) => void;
   isochroneVisible: boolean;
   onIsochroneChange: (v: boolean) => void;
+  recommendationsVisible: boolean;
+  onRecommendationsChange: (v: boolean) => void;
 }
 
 /**
@@ -78,6 +80,8 @@ export default function DashboardSidebar({
   onReportsChange,
   isochroneVisible,
   onIsochroneChange,
+  recommendationsVisible,
+  onRecommendationsChange,
 }: DashboardSidebarProps) {
   const [layersOpen, setLayersOpen] = useState(true);
 
@@ -116,6 +120,11 @@ export default function DashboardSidebar({
             <LayerToggleRow label="Kepadatan Penduduk" checked={densityVisible} onChange={onDensityChange} />
             <LayerToggleRow label="Jangkauan Jalan Kaki" checked={isochroneVisible} onChange={onIsochroneChange} />
             <LayerToggleRow label="Laporan Warga" checked={reportsVisible} onChange={onReportsChange} />
+            <LayerToggleRow
+              label="Rekomendasi Halte Baru"
+              checked={recommendationsVisible}
+              onChange={onRecommendationsChange}
+            />
           </div>
         )}
       </div>
@@ -149,6 +158,14 @@ export default function DashboardSidebar({
             <span className="font-label-sm text-label-sm text-on-surface-variant">{band.minutes} menit</span>
           </div>
         ))}
+
+        <h3 className="mb-1 mt-3 font-label-sm text-label-sm font-bold text-on-surface">Rekomendasi Halte Baru</h3>
+        <div className="flex items-center gap-2">
+          <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "#f59e0b" }} />
+          <span className="font-label-sm text-label-sm text-on-surface-variant">
+            Hasil Location Allocation Model
+          </span>
+        </div>
       </div>
     </nav>
   );
