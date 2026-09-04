@@ -5,6 +5,7 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+asyncpg://transconnect:transconnect@localhost:5432/transconnect_semarang"
     cors_origins: str = "http://localhost:3000"
     geomapid_api_key: str = ""
+    gemini_api_key: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
