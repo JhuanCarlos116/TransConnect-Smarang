@@ -19,10 +19,22 @@ const ALL_LAYER_IDS = [CLUSTER_LAYER_ID, CLUSTER_COUNT_LAYER_ID, POINT_LAYER_ID]
 interface CommunityMapsLayerProps {
   map: maplibregl.Map;
   visible: boolean;
+  /**
+   * When provided, clicking an individual report calls this instead of
+   * opening the inline popup. Used on the DISHUB dashboard, where these
+   * points are the surveyed halte (report_id === halte_id) and staff need
+   * the full survey detail -- photos, facilities, condition -- not just the
+   * report summary. Left unset on the public map, which keeps the popup.
+   */
+  onSelect?: (reportId: string) => void;
 }
 
-export default function CommunityMapsLayer({ map, visible }: CommunityMapsLayerProps) {
+export default function CommunityMapsLayer({ map, visible, onSelect }: CommunityMapsLayerProps) {
   const loadedRef = useRef(false);
+  const onSelectRef = useRef(onSelect);
+  useEffect(() => {
+    onSelectRef.current = onSelect;
+  }, [onSelect]);
   // The layer is added once, asynchronously, after its data arrives. `visible`
   // can flip while that fetch is still in flight, and the sync effect below
   // bails out whenever the layer does not exist yet -- so a value captured on
@@ -84,7 +96,21 @@ export default function CommunityMapsLayer({ map, visible }: CommunityMapsLayerP
         layout: { visibility: initialVisibility },
         paint: {
           "circle-radius": 7,
-          "circle-color": "#3b82f6",
+          // Colored by the survey condition these sample reports carry, so
+          // the dashboard's condition legend still maps to something once
+          // the halte layer there switches to the unassessed bus stop
+          // inventory. Falls back to the old flat blue when absent.
+          "circle-color": [
+            "match",
+            ["get", "condition_label"],
+            "green",
+            "#22c55e",
+            "yellow",
+            "#eab308",
+            "red",
+            "#ef4444",
+            /* default */ "#3b82f6",
+          ],
           "circle-stroke-width": 2,
           "circle-stroke-color": "#fff",
         },
@@ -116,6 +142,14 @@ export default function CommunityMapsLayer({ map, visible }: CommunityMapsLayerP
       map.on("click", POINT_LAYER_ID, (e: maplibregl.MapLayerMouseEvent) => {
         const feature = e.features?.[0];
         if (!feature || feature.geometry.type !== "Point") return;
+
+        if (onSelectRef.current) {
+          const reportId = feature.properties?.report_id as string | undefined;
+          if (reportId) {
+            onSelectRef.current(reportId);
+            return;
+          }
+        }
 
         const coordinates = feature.geometry.coordinates.slice() as [number, number];
         const container = document.createElement("div");

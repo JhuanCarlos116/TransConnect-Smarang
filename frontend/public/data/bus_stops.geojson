@@ -1,0 +1,1003 @@
+{
+  "type": "FeatureCollection",
+  "properties": {
+    "source": "Inventaris halte/bus stop Tim GOPEK, dikurasi ke 9 kelurahan Kecamatan Tembalang",
+    "total_stops": 71
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-001",
+        "kelurahan": "Bulusan"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4441784,
+          -7.0546904
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-002",
+        "kelurahan": "Bulusan"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4451055,
+          -7.0599093
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-003",
+        "kelurahan": "Bulusan"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4454369,
+          -7.0602908
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-004",
+        "kelurahan": "Bulusan"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4471788,
+          -7.0604638
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-005",
+        "kelurahan": "Bulusan"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4472515,
+          -7.0601099
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-006",
+        "kelurahan": "Bulusan"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4623747,
+          -7.0584472
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-007",
+        "kelurahan": "Bulusan"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4639611,
+          -7.0545994
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-008",
+        "kelurahan": "Kedungmundu"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4596788,
+          -7.0214776
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-009",
+        "kelurahan": "Kedungmundu"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4601783,
+          -7.0205138
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-010",
+        "kelurahan": "Kedungmundu"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4636781,
+          -7.0220464
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-011",
+        "kelurahan": "Kedungmundu"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4648495,
+          -7.0226072
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-012",
+        "kelurahan": "Kedungmundu"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4651783,
+          -7.0227285
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-013",
+        "kelurahan": "Kedungmundu"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4656652,
+          -7.0184471
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-014",
+        "kelurahan": "Kedungmundu"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4657874,
+          -7.0209471
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-015",
+        "kelurahan": "Kedungmundu"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4659814,
+          -7.0187788
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-016",
+        "kelurahan": "Kedungmundu"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4662132,
+          -7.0211281
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-017",
+        "kelurahan": "Kedungmundu"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4676783,
+          -7.024739
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-018",
+        "kelurahan": "Kedungmundu"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4681787,
+          -7.0239669
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-019",
+        "kelurahan": "Kedungmundu"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4685236,
+          -7.0234266
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-020",
+        "kelurahan": "Kedungmundu"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4688875,
+          -7.0235594
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-021",
+        "kelurahan": "Kedungmundu"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4691237,
+          -7.0222872
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-022",
+        "kelurahan": "Kedungmundu"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4696025,
+          -7.0224476
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-023",
+        "kelurahan": "Kramas"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4361789,
+          -7.0680112
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-024",
+        "kelurahan": "Mangunharjo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4594282,
+          -7.0385867
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-025",
+        "kelurahan": "Mangunharjo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4598378,
+          -7.0382827
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-026",
+        "kelurahan": "Mangunharjo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4616785,
+          -7.0444726
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-027",
+        "kelurahan": "Mangunharjo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4624923,
+          -7.0439475
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-028",
+        "kelurahan": "Mangunharjo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4626783,
+          -7.0465535
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-029",
+        "kelurahan": "Mangunharjo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4634688,
+          -7.0459472
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-030",
+        "kelurahan": "Mangunharjo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4683979,
+          -7.0389469
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-031",
+        "kelurahan": "Mangunharjo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4688506,
+          -7.0509469
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-032",
+        "kelurahan": "Mangunharjo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4698981,
+          -7.0484471
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-033",
+        "kelurahan": "Meteseh"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4587149,
+          -7.0674469
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-034",
+        "kelurahan": "Meteseh"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4619174,
+          -7.0625847
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-035",
+        "kelurahan": "Meteseh"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4634652,
+          -7.0585881
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-036",
+        "kelurahan": "Meteseh"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4641785,
+          -7.0618242
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-037",
+        "kelurahan": "Meteseh"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4644309,
+          -7.0547439
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-038",
+        "kelurahan": "Meteseh"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4646923,
+          -7.0629475
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-039",
+        "kelurahan": "Meteseh"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4683826,
+          -7.0612813
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-040",
+        "kelurahan": "Meteseh"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4691156,
+          -7.0564475
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-041",
+        "kelurahan": "Meteseh"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4691722,
+          -7.0594475
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-042",
+        "kelurahan": "Meteseh"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4701783,
+          -7.0604183
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-043",
+        "kelurahan": "Meteseh"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4702439,
+          -7.0569477
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-044",
+        "kelurahan": "Sambiroto"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4583808,
+          -7.0306599
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-045",
+        "kelurahan": "Sambiroto"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.458812,
+          -7.0309104
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-046",
+        "kelurahan": "Sambiroto"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4596788,
+          -7.0260478
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-047",
+        "kelurahan": "Sambiroto"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4600067,
+          -7.0262466
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-048",
+        "kelurahan": "Sambiroto"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4631787,
+          -7.022996
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-049",
+        "kelurahan": "Sendangmulyo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4678176,
+          -7.0329476
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-050",
+        "kelurahan": "Sendangmulyo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4684176,
+          -7.042447
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-051",
+        "kelurahan": "Sendangmulyo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.469006,
+          -7.0324474
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-052",
+        "kelurahan": "Sendangmulyo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4693115,
+          -7.0384476
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-053",
+        "kelurahan": "Sendangmulyo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4695459,
+          -7.042447
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-054",
+        "kelurahan": "Sendangmulyo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4716785,
+          -7.0370042
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-055",
+        "kelurahan": "Sendangmulyo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4790941,
+          -7.0428153
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-056",
+        "kelurahan": "Sendangmulyo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4793079,
+          -7.0398446
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-057",
+        "kelurahan": "Sendangmulyo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4793843,
+          -7.0428607
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-058",
+        "kelurahan": "Sendangmulyo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4795496,
+          -7.0400684
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-059",
+        "kelurahan": "Tandang"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4521788,
+          -7.0183651
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-060",
+        "kelurahan": "Tandang"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4531786,
+          -7.0174592
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-061",
+        "kelurahan": "Tembalang"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4326746,
+          -7.0547546
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-062",
+        "kelurahan": "Tembalang"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4341783,
+          -7.0552699
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-063",
+        "kelurahan": "Tembalang"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4346572,
+          -7.0579471
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-064",
+        "kelurahan": "Tembalang"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.435462,
+          -7.0586656
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-065",
+        "kelurahan": "Tembalang"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4380465,
+          -7.0595652
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-066",
+        "kelurahan": "Tembalang"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4381785,
+          -7.0592308
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-067",
+        "kelurahan": "Tembalang"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4381785,
+          -7.0466034
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-068",
+        "kelurahan": "Tembalang"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4401782,
+          -7.0567409
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-069",
+        "kelurahan": "Tembalang"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4411789,
+          -7.0466943
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-070",
+        "kelurahan": "Tembalang"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4441784,
+          -7.0467282
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "stop_id": "BS-071",
+        "kelurahan": "Tembalang"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.444526,
+          -7.0504833
+        ]
+      }
+    }
+  ]
+}

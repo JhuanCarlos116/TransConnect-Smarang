@@ -96,7 +96,7 @@ export default function ChatWidget({ onRecommendations }: ChatWidgetProps) {
               </div>
             )}
             {error && (
-              <div className="self-start rounded-lg border border-alert-red bg-red-50 px-3 py-2 font-label-sm text-label-sm text-alert-red">
+              <div className="max-w-[85%] break-words rounded-lg border border-alert-red bg-red-50 px-3 py-2 font-label-sm text-label-sm text-alert-red">
                 {error}
               </div>
             )}

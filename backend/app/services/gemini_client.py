@@ -34,7 +34,11 @@ async def generate_reply(system_instruction: str, user_message: str) -> str:
         except httpx.HTTPStatusError as exc:
             raise GeminiError(f"Gemini API error {exc.response.status_code}: {exc.response.text}") from exc
         except httpx.HTTPError as exc:
-            raise GeminiError(f"Gagal menghubungi Gemini API: {exc}") from exc
+            # httpx timeout/connect errors often carry an empty str(), which
+            # made this read as "Gagal menghubungi Gemini API: " with nothing
+            # after it -- useless when the real cause was DNS/network.
+            reason = str(exc) or type(exc).__name__
+            raise GeminiError(f"Gagal menghubungi Gemini API ({reason}). Cek koneksi internet.") from exc
 
     data = response.json()
     try:
