@@ -10,3 +10,4 @@ shapely
 python-dotenv
 osmnx
 scikit-learn
+httpx
