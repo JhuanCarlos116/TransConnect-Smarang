@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import * as maplibregl from "maplibre-gl";
 
 import { fetchBusStops } from "@/lib/fetchBusStops";
-import type { BusStopFeatureCollection } from "@/types/busStop";
+import type { BusStopFeatureCollection, BusStopProperties } from "@/types/busStop";
 
 const SOURCE_ID = "bus-stops";
 export const BUS_STOP_POINT_LAYER_ID = "bus-stops-points";
@@ -60,8 +60,16 @@ export default function BusStopLayer({ map, visible }: BusStopLayerProps) {
       map.on("click", BUS_STOP_POINT_LAYER_ID, (e: maplibregl.MapLayerMouseEvent) => {
         const feature = e.features?.[0];
         if (!feature || feature.geometry.type !== "Point") return;
-        const p = feature.properties as Record<string, string>;
+        const p = feature.properties as unknown as BusStopProperties;
         const coordinates = feature.geometry.coordinates.slice() as [number, number];
+
+        // Most stops have no nearby report -- see match_survey_to_bus_stops.py.
+        // Only ~13/71 land within 50m of one, so this is the exception, not
+        // the rule, and it is a *possible* match, not a confirmed one (two
+        // independently-captured GPS points, never the same measurement).
+        const footerHtml = p.surveyed_report_id
+          ? `Kemungkinan sudah disurvei (±${p.match_distance_m}m dari titik ini) — cek kondisinya di layer Laporan Warga.`
+          : `Titik inventaris infrastruktur — belum disurvei kondisinya. Titik yang sudah disurvei ada di layer Laporan Warga.`;
 
         const container = document.createElement("div");
         container.innerHTML =
@@ -72,7 +80,7 @@ export default function BusStopLayer({ map, visible }: BusStopLayerProps) {
           `<span class="material-symbols-outlined" style="font-size:16px">close</span></button></div>` +
           `<div style="margin-bottom:2px"><span style="color:var(--color-on-surface-variant)">Kode:</span> <b>${p.stop_id}</b></div>` +
           `<div style="margin-bottom:6px"><span style="color:var(--color-on-surface-variant)">Kelurahan:</span> <b>${p.kelurahan}</b></div>` +
-          `<div style="font-size:11px;color:var(--color-on-surface-variant);border-top:1px solid #e5e7eb;padding-top:6px">Titik inventaris infrastruktur — belum disurvei kondisinya. Titik yang sudah disurvei ada di layer Laporan Warga.</div>` +
+          `<div style="font-size:11px;color:var(--color-on-surface-variant);border-top:1px solid #e5e7eb;padding-top:6px">${footerHtml}</div>` +
           `</div>`;
 
         const popup = new maplibregl.Popup({ offset: 10, closeButton: false })
