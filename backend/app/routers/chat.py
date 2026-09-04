@@ -42,6 +42,9 @@ ATURAN KETAT:
   jujur bahwa itu di luar cakupan data yang kamu punya -- jangan menebak.
 - Bahasa Indonesia, ramah tapi profesional, ringkas (maksimal 4-5 kalimat),
   sebutkan angka konkret dari data saat relevan.
+- Tulis sebagai paragraf teks BIASA. JANGAN pakai markdown (tanpa **tebal**,
+  tanpa daftar bernomor/bullet, tanpa heading) -- ini ditampilkan apa adanya
+  di kotak chat, bukan di-render sebagai markdown.
 
 DATA (metode: {method}, ambang batas "terlayani": {threshold} menit jalan kaki,
 total populasi Tembalang (estimasi grid): {total_population} jiwa, sudah
