@@ -51,6 +51,12 @@ def build_report_properties(halte_props: dict) -> dict:
         "tanggal_lapor": halte_props.get("survey_date"),
         "verification_status": "verified",
         "verified_by": VERIFIED_BY_LABEL,
+        # Carried over so the dashboard can color these points by condition:
+        # on the DISHUB dashboard this layer *is* the survey data (the halte
+        # layer there shows the full bus stop inventory instead), so it owns
+        # the green/yellow/red condition legend now.
+        "condition_score": halte_props.get("condition_score"),
+        "condition_label": halte_props.get("condition_label"),
     }
 
 

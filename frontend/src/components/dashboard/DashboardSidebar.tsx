@@ -37,8 +37,8 @@ function LayerToggleRow({ label, checked, onChange }: LayerToggleRowProps) {
 interface DashboardSidebarProps {
   densityVisible: boolean;
   onDensityChange: (v: boolean) => void;
-  halteVisible: boolean;
-  onHalteChange: (v: boolean) => void;
+  busStopsVisible: boolean;
+  onBusStopsChange: (v: boolean) => void;
   reportsVisible: boolean;
   onReportsChange: (v: boolean) => void;
   isochroneVisible: boolean;
@@ -74,8 +74,8 @@ interface DashboardSidebarProps {
 export default function DashboardSidebar({
   densityVisible,
   onDensityChange,
-  halteVisible,
-  onHalteChange,
+  busStopsVisible,
+  onBusStopsChange,
   reportsVisible,
   onReportsChange,
   isochroneVisible,
@@ -116,7 +116,7 @@ export default function DashboardSidebar({
         </button>
         {layersOpen && (
           <div className="mt-3 flex flex-col gap-3">
-            <LayerToggleRow label="Titik Survei Halte" checked={halteVisible} onChange={onHalteChange} />
+            <LayerToggleRow label="Titik Bus Stop / Halte" checked={busStopsVisible} onChange={onBusStopsChange} />
             <LayerToggleRow label="Kepadatan Penduduk" checked={densityVisible} onChange={onDensityChange} />
             <LayerToggleRow label="Jangkauan Jalan Kaki" checked={isochroneVisible} onChange={onIsochroneChange} />
             <LayerToggleRow label="Laporan Warga" checked={reportsVisible} onChange={onReportsChange} />
@@ -130,7 +130,15 @@ export default function DashboardSidebar({
       </div>
 
       <div className="border-t border-border-low p-gutter">
-        <h3 className="mb-2 font-label-sm text-label-sm font-bold text-on-surface">Skor Kondisi Halte</h3>
+        <h3 className="mb-2 font-label-sm text-label-sm font-bold text-on-surface">Titik Bus Stop / Halte</h3>
+        <div className="mb-1 flex items-center gap-2">
+          <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "#546e7a" }} />
+          <span className="font-label-sm text-label-sm text-on-surface-variant">Inventaris, belum disurvei</span>
+        </div>
+
+        <h3 className="mb-2 mt-3 font-label-sm text-label-sm font-bold text-on-surface">
+          Skor Kondisi (Laporan Warga)
+        </h3>
         {CONDITION_LABELS.map((label) => (
           <div key={label} className="mb-1 flex items-center gap-2">
             <span

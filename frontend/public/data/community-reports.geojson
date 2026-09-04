@@ -19,7 +19,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-23",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 25,
+        "condition_label": "red"
       }
     },
     {
@@ -40,7 +42,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-23",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 28,
+        "condition_label": "red"
       }
     },
     {
@@ -61,7 +65,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-23",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 30,
+        "condition_label": "red"
       }
     },
     {
@@ -82,7 +88,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-23",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 62,
+        "condition_label": "yellow"
       }
     },
     {
@@ -103,7 +111,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-23",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 40,
+        "condition_label": "yellow"
       }
     },
     {
@@ -124,7 +134,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-23",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 88,
+        "condition_label": "green"
       }
     },
     {
@@ -145,7 +157,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-23",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 30,
+        "condition_label": "red"
       }
     },
     {
@@ -166,7 +180,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-23",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 85,
+        "condition_label": "green"
       }
     },
     {
@@ -187,7 +203,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-23",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 65,
+        "condition_label": "yellow"
       }
     },
     {
@@ -208,7 +226,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-23",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 75,
+        "condition_label": "green"
       }
     },
     {
@@ -229,7 +249,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-23",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 35,
+        "condition_label": "red"
       }
     },
     {
@@ -250,7 +272,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-23",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 70,
+        "condition_label": "green"
       }
     },
     {
@@ -271,7 +295,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-23",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 35,
+        "condition_label": "red"
       }
     },
     {
@@ -292,7 +318,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-23",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 85,
+        "condition_label": "green"
       }
     },
     {
@@ -313,7 +341,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-22",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 45,
+        "condition_label": "yellow"
       }
     },
     {
@@ -334,7 +364,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-22",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 55,
+        "condition_label": "yellow"
       }
     },
     {
@@ -355,7 +387,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-22",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 40,
+        "condition_label": "yellow"
       }
     },
     {
@@ -376,7 +410,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-22",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 50,
+        "condition_label": "yellow"
       }
     },
     {
@@ -397,7 +433,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-22",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 45,
+        "condition_label": "yellow"
       }
     },
     {
@@ -418,7 +456,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-22",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 55,
+        "condition_label": "yellow"
       }
     },
     {
@@ -439,7 +479,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-22",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 50,
+        "condition_label": "yellow"
       }
     },
     {
@@ -460,7 +502,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-22",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 35,
+        "condition_label": "red"
       }
     },
     {
@@ -481,7 +525,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-22",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 70,
+        "condition_label": "green"
       }
     },
     {
@@ -502,7 +548,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-22",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 70,
+        "condition_label": "green"
       }
     },
     {
@@ -523,7 +571,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-22",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 25,
+        "condition_label": "red"
       }
     },
     {
@@ -544,7 +594,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-22",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 70,
+        "condition_label": "green"
       }
     },
     {
@@ -565,7 +617,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-22",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 70,
+        "condition_label": "green"
       }
     },
     {
@@ -586,7 +640,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-22",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 70,
+        "condition_label": "green"
       }
     },
     {
@@ -607,7 +663,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-22",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 85,
+        "condition_label": "green"
       }
     },
     {
@@ -628,7 +686,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-22",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 85,
+        "condition_label": "green"
       }
     },
     {
@@ -649,7 +709,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-22",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 20,
+        "condition_label": "red"
       }
     },
     {
@@ -670,7 +732,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-22",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 85,
+        "condition_label": "green"
       }
     },
     {
@@ -691,7 +755,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-22",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 78,
+        "condition_label": "green"
       }
     },
     {
@@ -712,7 +778,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-22",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 80,
+        "condition_label": "green"
       }
     },
     {
@@ -733,7 +801,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-22",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 20,
+        "condition_label": "red"
       }
     },
     {
@@ -754,7 +824,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-21",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 38,
+        "condition_label": "red"
       }
     },
     {
@@ -775,7 +847,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-21",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 60,
+        "condition_label": "yellow"
       }
     },
     {
@@ -796,7 +870,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-21",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 65,
+        "condition_label": "yellow"
       }
     },
     {
@@ -817,7 +893,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-21",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 25,
+        "condition_label": "red"
       }
     },
     {
@@ -838,7 +916,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-21",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 85,
+        "condition_label": "green"
       }
     },
     {
@@ -859,7 +939,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-21",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 32,
+        "condition_label": "red"
       }
     },
     {
@@ -880,7 +962,9 @@
         "pelapor": "Tim Survei GOPEK (data contoh, bukan laporan warga asli)",
         "tanggal_lapor": "2026-08-21",
         "verification_status": "verified",
-        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8"
+        "verified_by": "QA manual tim — placeholder untuk verifikasi otomatis YOLOv8",
+        "condition_score": 85,
+        "condition_label": "green"
       }
     }
   ]
