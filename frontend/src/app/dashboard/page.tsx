@@ -12,6 +12,7 @@ import PopulationLayer from "@/components/dashboard/PopulationLayer";
 import IsochroneLayer from "@/components/dashboard/IsochroneLayer";
 import RecommendationLayer from "@/components/dashboard/RecommendationLayer";
 import MapInfoPopup from "@/components/dashboard/MapInfoPopup";
+import ChatWidget from "@/components/dashboard/ChatWidget";
 import AppHeader from "@/components/ui/AppHeader";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MapControls from "@/components/dashboard/MapControls";
@@ -64,6 +65,19 @@ export default function DashboardPage() {
     [map],
   );
 
+  const handleChatRecommendations = useCallback(
+    (coordinates: [number, number][]) => {
+      setRecommendationsVisible(true);
+      if (!map || coordinates.length === 0) return;
+      const bounds = coordinates.reduce(
+        (b, c) => b.extend(c),
+        new maplibregl.LngLatBounds(coordinates[0], coordinates[0]),
+      );
+      map.fitBounds(bounds, { padding: 80, maxZoom: 15, duration: 800 });
+    },
+    [map],
+  );
+
   return (
     <div className="flex h-screen flex-col overflow-hidden font-sans">
       <AppHeader active="dashboard" searchFeatures={halteFeatures} onSearchSelect={flyToHalte} />
@@ -96,6 +110,7 @@ export default function DashboardPage() {
               <RecommendationLayer map={map} visible={recommendationsVisible} />
               <MapInfoPopup map={map} />
               <MapControls map={map} />
+              <ChatWidget onRecommendations={handleChatRecommendations} />
             </>
           )}
         </main>
