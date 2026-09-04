@@ -7,11 +7,17 @@ import { HALTE_POINT_LAYER_ID } from "@/components/map/HalteLayer";
 import { COMMUNITY_CLUSTER_LAYER_ID, COMMUNITY_POINT_LAYER_ID } from "@/components/map/CommunityMapsLayer";
 import { ISOCHRONE_FILL_LAYER_ID } from "@/components/dashboard/IsochroneLayer";
 import { POPULATION_FILL_LAYER_ID } from "@/components/dashboard/PopulationLayer";
+import { RECOMMENDATION_POINT_LAYER_ID } from "@/components/dashboard/RecommendationLayer";
 
-// Point layers that already own their own click popups -- a halte marker or
-// community-report point/cluster sitting inside a kelurahan/isochrone
-// polygon takes precedence over this shared popup.
-const MARKER_LAYER_IDS = [HALTE_POINT_LAYER_ID, COMMUNITY_POINT_LAYER_ID, COMMUNITY_CLUSTER_LAYER_ID];
+// Point layers that already own their own click popups -- a halte marker,
+// community-report point/cluster, or new-halte recommendation sitting inside
+// a kelurahan/isochrone polygon takes precedence over this shared popup.
+const MARKER_LAYER_IDS = [
+  HALTE_POINT_LAYER_ID,
+  COMMUNITY_POINT_LAYER_ID,
+  COMMUNITY_CLUSTER_LAYER_ID,
+  RECOMMENDATION_POINT_LAYER_ID,
+];
 const INFO_LAYER_IDS = [ISOCHRONE_FILL_LAYER_ID, POPULATION_FILL_LAYER_ID];
 
 interface Panel {
