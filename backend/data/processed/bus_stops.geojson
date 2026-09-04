@@ -9,7 +9,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-001",
-        "kelurahan": "Bulusan"
+        "kelurahan": "Bulusan",
+        "surveyed_report_id": "6a87f7febcfea993a88b28ed",
+        "match_distance_m": 41.2
       },
       "geometry": {
         "type": "Point",
@@ -23,7 +25,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-002",
-        "kelurahan": "Bulusan"
+        "kelurahan": "Bulusan",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -37,7 +41,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-003",
-        "kelurahan": "Bulusan"
+        "kelurahan": "Bulusan",
+        "surveyed_report_id": "6a89085159146ea8941f8ec3",
+        "match_distance_m": 46.0
       },
       "geometry": {
         "type": "Point",
@@ -51,7 +57,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-004",
-        "kelurahan": "Bulusan"
+        "kelurahan": "Bulusan",
+        "surveyed_report_id": "6a890f9652d86e03b518171a",
+        "match_distance_m": 29.5
       },
       "geometry": {
         "type": "Point",
@@ -65,7 +73,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-005",
-        "kelurahan": "Bulusan"
+        "kelurahan": "Bulusan",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -79,7 +89,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-006",
-        "kelurahan": "Bulusan"
+        "kelurahan": "Bulusan",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -93,7 +105,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-007",
-        "kelurahan": "Bulusan"
+        "kelurahan": "Bulusan",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -107,7 +121,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-008",
-        "kelurahan": "Kedungmundu"
+        "kelurahan": "Kedungmundu",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -121,7 +137,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-009",
-        "kelurahan": "Kedungmundu"
+        "kelurahan": "Kedungmundu",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -135,7 +153,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-010",
-        "kelurahan": "Kedungmundu"
+        "kelurahan": "Kedungmundu",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -149,7 +169,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-011",
-        "kelurahan": "Kedungmundu"
+        "kelurahan": "Kedungmundu",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -163,7 +185,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-012",
-        "kelurahan": "Kedungmundu"
+        "kelurahan": "Kedungmundu",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -177,7 +201,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-013",
-        "kelurahan": "Kedungmundu"
+        "kelurahan": "Kedungmundu",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -191,7 +217,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-014",
-        "kelurahan": "Kedungmundu"
+        "kelurahan": "Kedungmundu",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -205,7 +233,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-015",
-        "kelurahan": "Kedungmundu"
+        "kelurahan": "Kedungmundu",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -219,7 +249,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-016",
-        "kelurahan": "Kedungmundu"
+        "kelurahan": "Kedungmundu",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -233,7 +265,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-017",
-        "kelurahan": "Kedungmundu"
+        "kelurahan": "Kedungmundu",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -247,7 +281,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-018",
-        "kelurahan": "Kedungmundu"
+        "kelurahan": "Kedungmundu",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -261,7 +297,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-019",
-        "kelurahan": "Kedungmundu"
+        "kelurahan": "Kedungmundu",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -275,7 +313,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-020",
-        "kelurahan": "Kedungmundu"
+        "kelurahan": "Kedungmundu",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -289,7 +329,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-021",
-        "kelurahan": "Kedungmundu"
+        "kelurahan": "Kedungmundu",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -303,7 +345,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-022",
-        "kelurahan": "Kedungmundu"
+        "kelurahan": "Kedungmundu",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -317,7 +361,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-023",
-        "kelurahan": "Kramas"
+        "kelurahan": "Kramas",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -331,7 +377,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-024",
-        "kelurahan": "Mangunharjo"
+        "kelurahan": "Mangunharjo",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -345,7 +393,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-025",
-        "kelurahan": "Mangunharjo"
+        "kelurahan": "Mangunharjo",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -359,7 +409,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-026",
-        "kelurahan": "Mangunharjo"
+        "kelurahan": "Mangunharjo",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -373,7 +425,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-027",
-        "kelurahan": "Mangunharjo"
+        "kelurahan": "Mangunharjo",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -387,7 +441,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-028",
-        "kelurahan": "Mangunharjo"
+        "kelurahan": "Mangunharjo",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -401,7 +457,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-029",
-        "kelurahan": "Mangunharjo"
+        "kelurahan": "Mangunharjo",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -415,7 +473,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-030",
-        "kelurahan": "Mangunharjo"
+        "kelurahan": "Mangunharjo",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -429,7 +489,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-031",
-        "kelurahan": "Mangunharjo"
+        "kelurahan": "Mangunharjo",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -443,7 +505,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-032",
-        "kelurahan": "Mangunharjo"
+        "kelurahan": "Mangunharjo",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -457,7 +521,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-033",
-        "kelurahan": "Meteseh"
+        "kelurahan": "Meteseh",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -471,7 +537,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-034",
-        "kelurahan": "Meteseh"
+        "kelurahan": "Meteseh",
+        "surveyed_report_id": "6a8807babcfea993a88b3b7f",
+        "match_distance_m": 25.4
       },
       "geometry": {
         "type": "Point",
@@ -485,7 +553,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-035",
-        "kelurahan": "Meteseh"
+        "kelurahan": "Meteseh",
+        "surveyed_report_id": "6a880334bcfea993a88b3510",
+        "match_distance_m": 33.9
       },
       "geometry": {
         "type": "Point",
@@ -499,7 +569,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-036",
-        "kelurahan": "Meteseh"
+        "kelurahan": "Meteseh",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -513,7 +585,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-037",
-        "kelurahan": "Meteseh"
+        "kelurahan": "Meteseh",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -527,7 +601,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-038",
-        "kelurahan": "Meteseh"
+        "kelurahan": "Meteseh",
+        "surveyed_report_id": "6a891d13478dc3b356b7219e",
+        "match_distance_m": 27.9
       },
       "geometry": {
         "type": "Point",
@@ -541,7 +617,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-039",
-        "kelurahan": "Meteseh"
+        "kelurahan": "Meteseh",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -555,7 +633,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-040",
-        "kelurahan": "Meteseh"
+        "kelurahan": "Meteseh",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -569,7 +649,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-041",
-        "kelurahan": "Meteseh"
+        "kelurahan": "Meteseh",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -583,7 +665,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-042",
-        "kelurahan": "Meteseh"
+        "kelurahan": "Meteseh",
+        "surveyed_report_id": "6a892840478dc3b356b72e15",
+        "match_distance_m": 47.0
       },
       "geometry": {
         "type": "Point",
@@ -597,7 +681,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-043",
-        "kelurahan": "Meteseh"
+        "kelurahan": "Meteseh",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -611,7 +697,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-044",
-        "kelurahan": "Sambiroto"
+        "kelurahan": "Sambiroto",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -625,7 +713,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-045",
-        "kelurahan": "Sambiroto"
+        "kelurahan": "Sambiroto",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -639,7 +729,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-046",
-        "kelurahan": "Sambiroto"
+        "kelurahan": "Sambiroto",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -653,7 +745,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-047",
-        "kelurahan": "Sambiroto"
+        "kelurahan": "Sambiroto",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -667,7 +761,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-048",
-        "kelurahan": "Sambiroto"
+        "kelurahan": "Sambiroto",
+        "surveyed_report_id": "6a8a6e2c52d86e03b5190000",
+        "match_distance_m": 24.2
       },
       "geometry": {
         "type": "Point",
@@ -681,7 +777,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-049",
-        "kelurahan": "Sendangmulyo"
+        "kelurahan": "Sendangmulyo",
+        "surveyed_report_id": "6a8a7b3352d86e03b5190c07",
+        "match_distance_m": 30.8
       },
       "geometry": {
         "type": "Point",
@@ -695,7 +793,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-050",
-        "kelurahan": "Sendangmulyo"
+        "kelurahan": "Sendangmulyo",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -709,7 +809,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-051",
-        "kelurahan": "Sendangmulyo"
+        "kelurahan": "Sendangmulyo",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -723,7 +825,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-052",
-        "kelurahan": "Sendangmulyo"
+        "kelurahan": "Sendangmulyo",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -737,7 +841,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-053",
-        "kelurahan": "Sendangmulyo"
+        "kelurahan": "Sendangmulyo",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -751,7 +857,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-054",
-        "kelurahan": "Sendangmulyo"
+        "kelurahan": "Sendangmulyo",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -765,7 +873,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-055",
-        "kelurahan": "Sendangmulyo"
+        "kelurahan": "Sendangmulyo",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -779,7 +889,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-056",
-        "kelurahan": "Sendangmulyo"
+        "kelurahan": "Sendangmulyo",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -793,7 +905,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-057",
-        "kelurahan": "Sendangmulyo"
+        "kelurahan": "Sendangmulyo",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -807,7 +921,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-058",
-        "kelurahan": "Sendangmulyo"
+        "kelurahan": "Sendangmulyo",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -821,7 +937,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-059",
-        "kelurahan": "Tandang"
+        "kelurahan": "Tandang",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -835,7 +953,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-060",
-        "kelurahan": "Tandang"
+        "kelurahan": "Tandang",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -849,7 +969,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-061",
-        "kelurahan": "Tembalang"
+        "kelurahan": "Tembalang",
+        "surveyed_report_id": "6a890b1259146ea8941f9008",
+        "match_distance_m": 32.4
       },
       "geometry": {
         "type": "Point",
@@ -863,7 +985,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-062",
-        "kelurahan": "Tembalang"
+        "kelurahan": "Tembalang",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -877,7 +1001,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-063",
-        "kelurahan": "Tembalang"
+        "kelurahan": "Tembalang",
+        "surveyed_report_id": "6a890cea59146ea8941f9085",
+        "match_distance_m": 36.8
       },
       "geometry": {
         "type": "Point",
@@ -891,7 +1017,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-064",
-        "kelurahan": "Tembalang"
+        "kelurahan": "Tembalang",
+        "surveyed_report_id": "6a890ed252d86e03b5181514",
+        "match_distance_m": 45.2
       },
       "geometry": {
         "type": "Point",
@@ -905,7 +1033,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-065",
-        "kelurahan": "Tembalang"
+        "kelurahan": "Tembalang",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -919,7 +1049,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-066",
-        "kelurahan": "Tembalang"
+        "kelurahan": "Tembalang",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -933,7 +1065,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-067",
-        "kelurahan": "Tembalang"
+        "kelurahan": "Tembalang",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -947,7 +1081,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-068",
-        "kelurahan": "Tembalang"
+        "kelurahan": "Tembalang",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -961,7 +1097,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-069",
-        "kelurahan": "Tembalang"
+        "kelurahan": "Tembalang",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -975,7 +1113,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-070",
-        "kelurahan": "Tembalang"
+        "kelurahan": "Tembalang",
+        "surveyed_report_id": null,
+        "match_distance_m": null
       },
       "geometry": {
         "type": "Point",
@@ -989,7 +1129,9 @@
       "type": "Feature",
       "properties": {
         "stop_id": "BS-071",
-        "kelurahan": "Tembalang"
+        "kelurahan": "Tembalang",
+        "surveyed_report_id": "6a87f44ed57440d48a1f0aa8",
+        "match_distance_m": 23.6
       },
       "geometry": {
         "type": "Point",

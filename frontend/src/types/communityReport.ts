@@ -17,6 +17,12 @@ export interface CommunityReportProperties {
   // halte layer there shows the unassessed bus stop inventory instead.
   condition_score: number | null;
   condition_label: ConditionLabel | null;
+  // Set when a bus stop inventory point (see BusStopProperties) sits within
+  // 50m of this report -- see backend/scripts/match_survey_to_bus_stops.py.
+  // Most reports have no match: the two datasets mostly describe different
+  // physical halte, not duplicates.
+  matched_stop_id: string | null;
+  match_distance_m: number | null;
 }
 
 export interface CommunityReportFeature {
