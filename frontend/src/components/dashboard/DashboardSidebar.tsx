@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 
 import { conditionColor, conditionLabelText } from "@/lib/conditionScore";
 import { densityGradientCss } from "@/lib/populationColor";
+import DashboardNav from "@/components/dashboard/DashboardNav";
 import type { ReportConditionFilter } from "@/components/map/CommunityMapsLayer";
 
 const ISOCHRONE_BANDS = [
@@ -69,10 +69,13 @@ interface DashboardSidebarProps {
  * An earlier pass wired this to five destinations (Infrastructure AI,
  * Analytics, Reports, plus Support/Sign Out) that opened modals full of
  * invented numbers, or a toast claiming a fake login session. None of that
- * is real, so the only nav item left is this page itself. It used to also
- * link out to the public map, but this is DISHUB's internal tool -- a staff
- * workflow has no reason to be routed from here to the citizen-facing page,
- * so that link is gone (from the header tabs too, see AppHeader).
+ * was real. The two nav items here now (Map View, Tugas Perbaikan) are the
+ * first genuinely real destinations since -- Policy & Task Dispatcher
+ * Dashboard is an actual CRUD workflow, not a fabricated stand-in. It used
+ * to also link out to the public map, but this is DISHUB's internal tool --
+ * a staff workflow has no reason to be routed from here to the
+ * citizen-facing page, so that link is gone (from the header tabs too, see
+ * AppHeader).
  * "Run Spatial Analysis" also previously simulated a computation with
  * setTimeout and reported fabricated results ("3 Kandidat Halte... berhasil
  * dihitung"); replaced with a real reset-camera-and-toggles button for a
@@ -115,19 +118,7 @@ export default function DashboardSidebar({
 
   return (
     <nav className="z-40 hidden h-full w-panel-width shrink-0 flex-col overflow-y-auto scrollbar-hide border-r border-border-low bg-surface md:flex">
-      <div className="flex items-center gap-4 border-b border-border-low p-gutter">
-        <Image src="/dishub-logo.png" alt="Logo Kementerian Perhubungan" width={137} height={160} className="h-12 w-auto shrink-0" />
-        <h2 className="font-headline-lg text-headline-lg font-bold leading-tight text-transport-blue">
-          DISHUB Dashboard
-        </h2>
-      </div>
-
-      <div className="flex flex-col gap-2 p-gutter">
-        <span className="flex items-center gap-3 rounded-lg bg-primary-fixed px-4 py-3 font-label-md text-label-md font-bold text-on-primary-fixed-variant">
-          <span className="material-symbols-outlined text-[20px]">map</span>
-          Map View (DISHUB)
-        </span>
-      </div>
+      <DashboardNav />
 
       <div className="border-t border-border-low p-gutter">
         <button
