@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 import { conditionColor, conditionLabelText } from "@/lib/conditionScore";
+import { createTask } from "@/lib/fetchTasks";
 import type { HalteFeature, HalteMediaItem, HalteProperties } from "@/types/halte";
 
 interface HalteDetailModalProps {
@@ -181,6 +183,97 @@ function MediaCarousel({ media, alt }: MediaCarouselProps) {
   );
 }
 
+interface TaskCreateSectionProps {
+  halteId: string;
+}
+
+/**
+ * Policy & Task Dispatcher Dashboard (PRD roadmap item) -- every task traces
+ * back to a specific surveyed halte, entered here rather than as a
+ * free-floating to-do. See app/routers/task.py for why "assigned_to" is
+ * plain text: there is no staff login/account system in this project.
+ */
+function TaskCreateSection({ halteId }: TaskCreateSectionProps) {
+  const [open, setOpen] = useState(false);
+  const [description, setDescription] = useState("");
+  const [assignedTo, setAssignedTo] = useState("");
+  const [status, setStatus] = useState<"idle" | "submitting" | "done" | "error">("idle");
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!description.trim()) return;
+    setStatus("submitting");
+    setError(null);
+    try {
+      await createTask({ halte_id: halteId, description: description.trim(), assigned_to: assignedTo.trim() || undefined });
+      setStatus("done");
+    } catch (err) {
+      setStatus("error");
+      setError(err instanceof Error ? err.message : "Gagal membuat tugas.");
+    }
+  }
+
+  if (status === "done") {
+    return (
+      <div className="flex items-center gap-2 rounded-lg border border-safety-green/30 bg-green-50 p-3 text-label-sm text-on-surface">
+        <span className="material-symbols-outlined text-[18px] text-safety-green">check_circle</span>
+        Tugas berhasil dibuat. Lihat di{" "}
+        <Link href="/dashboard/tasks" className="font-bold text-transport-blue underline">
+          Tugas Perbaikan
+        </Link>
+        .
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-lg border border-border-low bg-surface p-3">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between font-label-md text-[13px] font-bold text-on-surface"
+      >
+        <span className="flex items-center gap-2">
+          <span className="material-symbols-outlined text-[18px] text-transport-blue">assignment_add</span>
+          Buat Tugas Perbaikan
+        </span>
+        <span className="material-symbols-outlined text-[18px] text-on-surface-variant">
+          {open ? "expand_less" : "expand_more"}
+        </span>
+      </button>
+
+      {open && (
+        <form onSubmit={handleSubmit} className="mt-3 flex flex-col gap-2.5">
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Deskripsi perbaikan yang dibutuhkan..."
+            required
+            rows={3}
+            className="w-full rounded-lg border border-border-low bg-surface-container-low p-2.5 font-body-md text-[13px] text-on-surface focus:border-transport-blue focus:outline-none focus:ring-1 focus:ring-transport-blue"
+          />
+          <input
+            type="text"
+            value={assignedTo}
+            onChange={(e) => setAssignedTo(e.target.value)}
+            placeholder="Ditugaskan ke (opsional, mis. Tim Trotoar Wilayah 1)"
+            className="w-full rounded-lg border border-border-low bg-surface-container-low p-2.5 font-body-md text-[13px] text-on-surface focus:border-transport-blue focus:outline-none focus:ring-1 focus:ring-transport-blue"
+          />
+          {error && <p className="text-label-sm text-alert-red">{error}</p>}
+          <button
+            type="submit"
+            disabled={status === "submitting"}
+            className="self-start rounded-lg bg-transport-blue px-4 py-2 font-label-sm text-label-sm font-bold text-on-primary transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            {status === "submitting" ? "Menyimpan..." : "Simpan Tugas"}
+          </button>
+        </form>
+      )}
+    </div>
+  );
+}
+
 export default function HalteDetailModal({ feature, onClose }: HalteDetailModalProps) {
   if (!feature) return null;
   const p = feature.properties;
@@ -284,6 +377,8 @@ export default function HalteDetailModal({ feature, onClose }: HalteDetailModalP
               </p>
             </div>
           )}
+
+          <TaskCreateSection key={p.halte_id} halteId={p.halte_id} />
         </div>
       </div>
     </div>
