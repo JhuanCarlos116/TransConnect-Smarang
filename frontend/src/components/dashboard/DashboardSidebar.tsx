@@ -5,7 +5,7 @@ import { useState } from "react";
 import { conditionColor, conditionLabelText } from "@/lib/conditionScore";
 import { densityGradientCss } from "@/lib/populationColor";
 import DashboardNav from "@/components/dashboard/DashboardNav";
-import type { ReportConditionFilter } from "@/components/map/CommunityMapsLayer";
+import type { HalteConditionFilter } from "@/components/dashboard/BusStopLayer";
 
 const ISOCHRONE_BANDS = [
   { minutes: 3, opacity: 0.28 },
@@ -13,15 +13,15 @@ const ISOCHRONE_BANDS = [
   { minutes: 10, opacity: 0.1 },
 ];
 
-// Cycle order for the report filter button: worst condition first, since
+// Cycle order for the condition filter button: worst condition first, since
 // that is what DISHUB triages on, then widening to everything.
-const REPORT_FILTER_CYCLE: ReportConditionFilter[] = ["red", "yellow", "green", "all"];
+const CONDITION_FILTER_CYCLE: HalteConditionFilter[] = ["red", "yellow", "green", "all"];
 
-function reportFilterLabel(filter: ReportConditionFilter): string {
+function conditionFilterLabel(filter: HalteConditionFilter): string {
   return filter === "all" ? "Semua" : conditionLabelText(filter);
 }
 
-function reportFilterColor(filter: ReportConditionFilter): string | null {
+function conditionFilterColor(filter: HalteConditionFilter): string | null {
   return filter === "all" ? null : conditionColor(filter);
 }
 
@@ -50,10 +50,8 @@ interface DashboardSidebarProps {
   onDensityChange: (v: boolean) => void;
   busStopsVisible: boolean;
   onBusStopsChange: (v: boolean) => void;
-  reportsVisible: boolean;
-  onReportsChange: (v: boolean) => void;
-  reportFilter: ReportConditionFilter;
-  onReportFilterChange: (v: ReportConditionFilter) => void;
+  conditionFilter: HalteConditionFilter;
+  onConditionFilterChange: (v: HalteConditionFilter) => void;
   isochroneVisible: boolean;
   onIsochroneChange: (v: boolean) => void;
   recommendationsVisible: boolean;
@@ -87,33 +85,38 @@ interface DashboardSidebarProps {
  * one-line hint text ("42 titik, skor kondisi" etc.) is gone too, on the
  * same request: keep the layer name, drop the explanatory copy under it.
  *
+ * "Titik Bus Stop / Halte" and "Laporan Warga" used to be two separate
+ * layers (an unassessed inventory vs. the same 42 survey points shown again
+ * as sample citizen reports) -- the team found that split confusing and
+ * asked for one consolidated layer instead, sourced from the survey data
+ * but keeping the "Titik Bus Stop / Halte" name (see BusStopLayer.tsx).
+ * "Laporan Warga" is gone; its condition filter button moved under this
+ * layer's toggle instead.
+ *
  * Legends are tied to their layer rather than always on: each block only
  * renders while its layer is switched on, and the whole legend section
- * disappears when every layer is off. The condition scale in particular used
- * to sit here permanently; it is now carried by the report filter button
- * instead, which both states and controls which condition is on the map.
+ * disappears when every layer is off.
  */
 export default function DashboardSidebar({
   densityVisible,
   onDensityChange,
   busStopsVisible,
   onBusStopsChange,
-  reportsVisible,
-  onReportsChange,
-  reportFilter,
-  onReportFilterChange,
+  conditionFilter,
+  onConditionFilterChange,
   isochroneVisible,
   onIsochroneChange,
   recommendationsVisible,
   onRecommendationsChange,
 }: DashboardSidebarProps) {
   const [layersOpen, setLayersOpen] = useState(true);
-  const filterDotColor = reportFilterColor(reportFilter);
+  const filterDotColor = conditionFilterColor(conditionFilter);
   const showLegend = busStopsVisible || densityVisible || isochroneVisible || recommendationsVisible;
 
-  function cycleReportFilter() {
-    const next = REPORT_FILTER_CYCLE[(REPORT_FILTER_CYCLE.indexOf(reportFilter) + 1) % REPORT_FILTER_CYCLE.length];
-    onReportFilterChange(next);
+  function cycleConditionFilter() {
+    const next =
+      CONDITION_FILTER_CYCLE[(CONDITION_FILTER_CYCLE.indexOf(conditionFilter) + 1) % CONDITION_FILTER_CYCLE.length];
+    onConditionFilterChange(next);
   }
 
   return (
@@ -135,15 +138,12 @@ export default function DashboardSidebar({
         </button>
         {layersOpen && (
           <div className="mt-3 flex flex-col gap-3">
-            <LayerToggleRow label="Titik Bus Stop / Halte" checked={busStopsVisible} onChange={onBusStopsChange} />
-            <LayerToggleRow label="Kepadatan Penduduk" checked={densityVisible} onChange={onDensityChange} />
-            <LayerToggleRow label="Jangkauan Jalan Kaki" checked={isochroneVisible} onChange={onIsochroneChange} />
             <div className="flex flex-col gap-2">
-              <LayerToggleRow label="Laporan Warga" checked={reportsVisible} onChange={onReportsChange} />
-              {reportsVisible && (
+              <LayerToggleRow label="Titik Bus Stop / Halte" checked={busStopsVisible} onChange={onBusStopsChange} />
+              {busStopsVisible && (
                 <button
-                  onClick={cycleReportFilter}
-                  aria-label={`Filter laporan: ${reportFilterLabel(reportFilter)}. Klik untuk ganti.`}
+                  onClick={cycleConditionFilter}
+                  aria-label={`Filter kondisi: ${conditionFilterLabel(conditionFilter)}. Klik untuk ganti.`}
                   className="ml-6 flex w-fit items-center gap-2 rounded-full border border-border-low bg-surface-container px-2.5 py-1 font-label-sm text-label-sm text-on-surface transition-colors hover:border-transport-blue hover:text-transport-blue"
                 >
                   <span className="material-symbols-outlined text-[14px] text-on-surface-variant">filter_alt</span>
@@ -153,10 +153,12 @@ export default function DashboardSidebar({
                       style={{ backgroundColor: filterDotColor }}
                     />
                   )}
-                  {reportFilterLabel(reportFilter)}
+                  {conditionFilterLabel(conditionFilter)}
                 </button>
               )}
             </div>
+            <LayerToggleRow label="Kepadatan Penduduk" checked={densityVisible} onChange={onDensityChange} />
+            <LayerToggleRow label="Jangkauan Jalan Kaki" checked={isochroneVisible} onChange={onIsochroneChange} />
             <LayerToggleRow
               label="Rekomendasi Halte Baru"
               checked={recommendationsVisible}
@@ -171,11 +173,19 @@ export default function DashboardSidebar({
           {busStopsVisible && (
             <div>
               <h3 className="mb-2 font-label-sm text-label-sm font-bold text-on-surface">Titik Bus Stop / Halte</h3>
-              <div className="flex items-center gap-2">
-                <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "#546e7a" }} />
-                <span className="font-label-sm text-label-sm text-on-surface-variant">
-                  Inventaris, belum disurvei
-                </span>
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: conditionColor("green") }} />
+                  <span className="font-label-sm text-label-sm text-on-surface-variant">Layak & Aman</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: conditionColor("yellow") }} />
+                  <span className="font-label-sm text-label-sm text-on-surface-variant">Sedang</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: conditionColor("red") }} />
+                  <span className="font-label-sm text-label-sm text-on-surface-variant">Rawan</span>
+                </div>
               </div>
             </div>
           )}
