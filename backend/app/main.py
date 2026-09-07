@@ -1,11 +1,25 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.routers.chat import router as chat_router
 from app.routers.halte import router as halte_router
+from app.routers.route import router as route_router
+from app.services.pedestrian_graph import get_graph
 
-app = FastAPI(title="TransConnect Semarang API")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Builds the pedestrian graph (osmnx/Overpass, a multi-second call) once
+    # here so it's warm before the first real /route/safe-halte request,
+    # instead of that first citizen's request paying for it.
+    get_graph()
+    yield
+
+
+app = FastAPI(title="TransConnect Semarang API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -16,6 +30,7 @@ app.add_middleware(
 
 app.include_router(halte_router, prefix="/api/v1")
 app.include_router(chat_router, prefix="/api/v1")
+app.include_router(route_router, prefix="/api/v1")
 
 
 @app.get("/health")

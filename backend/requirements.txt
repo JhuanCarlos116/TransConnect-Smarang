@@ -9,5 +9,6 @@ geopandas
 shapely
 python-dotenv
 osmnx
+networkx
 scikit-learn
 httpx
