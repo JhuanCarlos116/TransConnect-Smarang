@@ -4,7 +4,8 @@ import { useCallback, useRef, useState } from "react";
 import * as maplibregl from "maplibre-gl";
 
 import { fetchSafeRoute } from "@/lib/fetchSafeRoute";
-import { conditionColor, conditionLabelText } from "@/lib/conditionScore";
+import { conditionLabelText } from "@/lib/conditionScore";
+import ScoreBadge from "@/components/ui/ScoreBadge";
 import type { RouteOption, SafeHalteRouteResponse } from "@/types/safeRoute";
 
 const USER_SOURCE_ID = "safe-route-user";
@@ -28,9 +29,10 @@ type Status = "idle" | "locating" | "loading" | "error";
  * walking budget, not a segment-weighted route -- we don't have per-segment
  * condition data to weight a path with).
  *
- * Placement/styling here is intentionally plain (a floating button + a plain
- * result card) -- functionality first, revisit the visual design once the
- * backend behavior is settled.
+ * Positioned to clear PublicMobileSheet's collapsed peek bar (~64px) on
+ * mobile with a bit of margin; when that sheet is expanded it covers this
+ * widget entirely, same as it covers the zoom controls -- expected, since
+ * the sheet becomes the focus at that point.
  */
 export default function SafeRouteWidget({ map }: SafeRouteWidgetProps) {
   const [status, setStatus] = useState<Status>("idle");
@@ -88,6 +90,17 @@ export default function SafeRouteWidget({ map }: SafeRouteWidgetProps) {
     [map],
   );
 
+  const clearRoute = useCallback(() => {
+    setResult(null);
+    setError(null);
+    setStatus("idle");
+    if (!layersReadyRef.current) return;
+    setLineData(RECOMMENDED_SOURCE_ID, null);
+    setLineData(NEAREST_SOURCE_ID, null);
+    const userSource = map.getSource(USER_SOURCE_ID) as maplibregl.GeoJSONSource | undefined;
+    userSource?.setData(EMPTY_COLLECTION);
+  }, [map, setLineData]);
+
   const handleClick = useCallback(() => {
     if (!("geolocation" in navigator)) {
       setStatus("error");
@@ -144,53 +157,72 @@ export default function SafeRouteWidget({ map }: SafeRouteWidgetProps) {
   const busy = status === "locating" || status === "loading";
 
   return (
-    // Desktop-only for now -- would collide with PublicMobileSheet's bottom
-    // peek bar below md until this gets its own mobile placement pass.
-    <div className="absolute bottom-margin-page left-margin-page z-20 hidden max-w-xs flex-col gap-2 md:flex">
+    <div className="absolute bottom-[72px] left-margin-page z-20 flex max-w-xs flex-col-reverse gap-2 md:bottom-margin-page">
       <button
         onClick={handleClick}
         disabled={busy}
-        className="flex items-center gap-2 self-start rounded-full bg-transport-blue px-4 py-2.5 font-label-md text-label-md font-bold text-on-primary shadow-lg transition-colors hover:bg-primary disabled:opacity-70"
+        className="flex items-center gap-2 self-start rounded-full bg-transport-blue px-4 py-2.5 font-label-md text-label-md font-bold text-on-primary shadow-lg transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-70"
       >
-        <span className="material-symbols-outlined text-[20px]">
+        <span className={`material-symbols-outlined text-[20px] ${busy ? "animate-spin" : ""}`}>
           {busy ? "progress_activity" : "my_location"}
         </span>
-        {status === "locating" ? "Mencari lokasi..." : status === "loading" ? "Menghitung rute..." : "Halte Teraman Terdekat"}
+        {status === "locating" ? "Mencari lokasi..." : status === "loading" ? "Menghitung rute..." : "Cari Halte Teraman"}
       </button>
 
       {error && (
-        <div className="rounded-lg bg-error-container px-3 py-2 text-label-sm text-on-error-container shadow-lg">
-          {error}
+        <div className="flex items-start gap-2 rounded-lg bg-error-container px-3 py-2 text-label-sm text-on-error-container shadow-lg">
+          <span className="material-symbols-outlined shrink-0 text-[18px]">error</span>
+          <span className="flex-1">{error}</span>
+          <button onClick={clearRoute} aria-label="Tutup" className="shrink-0 opacity-80 hover:opacity-100">
+            <span className="material-symbols-outlined text-[16px]">close</span>
+          </button>
         </div>
       )}
 
       {result && (
-        <div className="rounded-lg border border-border-low bg-surface p-3 shadow-lg">
-          <div className="mb-1 flex items-center gap-2">
-            <span
-              className="inline-block h-2.5 w-2.5 shrink-0 rounded-full"
-              style={{ backgroundColor: conditionColor(result.recommended.condition_label) }}
-            />
-            <span className="font-label-md text-label-md font-bold text-on-surface">
-              {result.recommended.nama_halte}
+        <div className="overflow-hidden rounded-lg border border-border-low bg-surface shadow-lg">
+          <div className="flex items-center justify-between gap-2 border-b border-border-low bg-surface-container-low px-3 py-2">
+            <span className="flex items-center gap-1.5 font-label-sm text-label-sm font-bold text-on-surface">
+              <span className="material-symbols-outlined text-[16px] text-transport-blue">alt_route</span>
+              Halte Teraman Terjangkau
             </span>
-          </div>
-          <div className="text-label-sm text-on-surface-variant">
-            {conditionLabelText(result.recommended.condition_label)} · {result.recommended.walk_minutes} menit jalan
-            kaki ({result.recommended.distance_m}m)
+            <button
+              onClick={clearRoute}
+              aria-label="Tutup rute"
+              className="flex items-center rounded-lg border border-alert-red p-1 text-alert-red transition-colors hover:bg-alert-red hover:text-on-error"
+            >
+              <span className="material-symbols-outlined text-[14px]">close</span>
+            </button>
           </div>
 
-          {result.nearest && (
-            <div className="mt-2 border-t border-border-low pt-2 text-label-sm text-on-surface-variant">
-              Halte terdekat sebenarnya <b className="text-on-surface">{result.nearest.nama_halte}</b> (
-              {conditionLabelText(result.nearest.condition_label)}, {result.nearest.walk_minutes} menit) kondisinya
-              kurang baik -- garis putus-putus di peta.
+          <div className="p-3">
+            <div className="mb-1.5 flex items-center gap-2">
+              <ScoreBadge score={result.recommended.condition_score} label={result.recommended.condition_label} />
             </div>
-          )}
+            <div className="font-label-md text-label-md font-bold text-on-surface">
+              {result.recommended.nama_halte}
+            </div>
+            <div className="mb-1.5 text-label-sm text-on-surface-variant">{result.recommended.kelurahan}</div>
+            <div className="flex items-center gap-1 text-label-sm text-on-surface-variant">
+              <span className="material-symbols-outlined text-[16px]">directions_walk</span>
+              {result.recommended.walk_minutes} menit &middot; {result.recommended.distance_m} m
+            </div>
 
-          <div className="mt-2 text-[11px] text-on-surface-variant">
-            {result.within_budget_count} halte terjangkau dalam {result.budget_minutes} menit jalan kaki dari titik
-            kamu.
+            {result.nearest && (
+              <div className="mt-2.5 flex items-start gap-2 rounded-md border border-border-low bg-surface-subtle p-2 text-label-sm text-on-surface-variant">
+                <span className="material-symbols-outlined mt-0.5 shrink-0 text-[16px] text-outline">info</span>
+                <span>
+                  Halte terdekat sebenarnya <b className="text-on-surface">{result.nearest.nama_halte}</b> (
+                  {conditionLabelText(result.nearest.condition_label)}, {result.nearest.walk_minutes} menit) tapi
+                  kondisinya kurang baik &mdash; ditandai garis putus-putus abu-abu di peta.
+                </span>
+              </div>
+            )}
+
+            <div className="mt-2.5 border-t border-border-low pt-2 text-[11px] leading-relaxed text-on-surface-variant">
+              {result.within_budget_count} halte tersurvei terjangkau dalam {result.budget_minutes} menit jalan kaki
+              dari lokasimu. Rute mengikuti jaringan jalan sungguhan, bukan garis lurus.
+            </div>
           </div>
         </div>
       )}
