@@ -6,8 +6,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 import { DEFAULT_CENTER, DEFAULT_ZOOM, mapStyleUrl } from "@/lib/maplibre";
 import { fetchHalteData } from "@/lib/fetchHalteData";
-import BusStopLayer from "@/components/dashboard/BusStopLayer";
-import CommunityMapsLayer, { type ReportConditionFilter } from "@/components/map/CommunityMapsLayer";
+import BusStopLayer, { type HalteConditionFilter } from "@/components/dashboard/BusStopLayer";
 import PopulationLayer from "@/components/dashboard/PopulationLayer";
 import IsochroneLayer from "@/components/dashboard/IsochroneLayer";
 import RecommendationLayer from "@/components/dashboard/RecommendationLayer";
@@ -25,11 +24,10 @@ export default function DashboardPage() {
 
   const [densityVisible, setDensityVisible] = useState(true);
   const [busStopsVisible, setBusStopsVisible] = useState(true);
-  const [reportsVisible, setReportsVisible] = useState(false);
   // Starts on the worst condition -- that is the subset DISHUB triages first,
-  // and it keeps the initial view readable instead of dropping all 42 sample
-  // reports on the map at once.
-  const [reportFilter, setReportFilter] = useState<ReportConditionFilter>("red");
+  // and it keeps the initial view readable instead of dropping all 42
+  // surveyed points on the map at once.
+  const [conditionFilter, setConditionFilter] = useState<HalteConditionFilter>("red");
   const [isochroneVisible, setIsochroneVisible] = useState(false);
   const [recommendationsVisible, setRecommendationsVisible] = useState(false);
 
@@ -69,17 +67,6 @@ export default function DashboardPage() {
     [map],
   );
 
-  // These sample "citizen reports" are the team's own survey points
-  // (report_id === halte_id), so a click opens the full survey detail
-  // rather than the lighter report popup used on the public map.
-  const openSurveyDetail = useCallback(
-    (reportId: string) => {
-      const match = halteFeatures.find((f) => f.properties.halte_id === reportId);
-      if (match) setDetailTarget(match);
-    },
-    [halteFeatures],
-  );
-
   const handleChatRecommendations = useCallback(
     (coordinates: [number, number][]) => {
       setRecommendationsVisible(true);
@@ -103,10 +90,8 @@ export default function DashboardPage() {
           onDensityChange={setDensityVisible}
           busStopsVisible={busStopsVisible}
           onBusStopsChange={setBusStopsVisible}
-          reportsVisible={reportsVisible}
-          onReportsChange={setReportsVisible}
-          reportFilter={reportFilter}
-          onReportFilterChange={setReportFilter}
+          conditionFilter={conditionFilter}
+          onConditionFilterChange={setConditionFilter}
           isochroneVisible={isochroneVisible}
           onIsochroneChange={setIsochroneVisible}
           recommendationsVisible={recommendationsVisible}
@@ -122,12 +107,11 @@ export default function DashboardPage() {
             <>
               <IsochroneLayer map={map} visible={isochroneVisible} />
               <PopulationLayer map={map} visible={densityVisible} />
-              <BusStopLayer map={map} visible={busStopsVisible} />
-              <CommunityMapsLayer
+              <BusStopLayer
                 map={map}
-                visible={reportsVisible}
-                conditionFilter={reportFilter}
-                onSelect={openSurveyDetail}
+                visible={busStopsVisible}
+                conditionFilter={conditionFilter}
+                onSelect={setDetailTarget}
               />
               <RecommendationLayer map={map} visible={recommendationsVisible} />
               <MapInfoPopup map={map} />
