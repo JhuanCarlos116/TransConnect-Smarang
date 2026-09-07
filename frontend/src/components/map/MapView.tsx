@@ -12,6 +12,7 @@ import CommunityMapsLayer from "@/components/map/CommunityMapsLayer";
 import ConditionLegend from "@/components/map/ConditionLegend";
 import AppHeader from "@/components/ui/AppHeader";
 import PublicSidePanel from "@/components/map/PublicSidePanel";
+import PublicMobileSheet from "@/components/map/PublicMobileSheet";
 import type { HalteFeature } from "@/types/halte";
 
 export default function MapView() {
@@ -89,10 +90,23 @@ export default function MapView() {
             </div>
           )}
 
-          <div className="absolute bottom-margin-page right-margin-page z-20">
+          {/* Below md, PublicMobileSheet's peek bar already surfaces this same
+              condition breakdown -- a second floating copy would duplicate it
+              and collide with the sheet, so the standalone legend is
+              desktop-only here. */}
+          <div className="absolute bottom-margin-page right-margin-page z-20 hidden md:block">
             <ConditionLegend />
           </div>
         </main>
+
+        <PublicMobileSheet
+          features={halteFeatures}
+          verifiedReportCount={verifiedCount}
+          halteVisible={halteVisible}
+          onHalteChange={setHalteVisible}
+          communityVisible={communityVisible}
+          onCommunityChange={setCommunityVisible}
+        />
       </div>
     </div>
   );
