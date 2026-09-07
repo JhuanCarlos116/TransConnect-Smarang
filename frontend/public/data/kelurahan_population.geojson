@@ -707,7 +707,8 @@
         "jumlah_penduduk": 6111,
         "laju_pertumbuhan_persen_2010_2020": -4.84,
         "luas_km2": 3.006,
-        "kepadatan_per_km2": 2032.9
+        "kepadatan_per_km2": 2032.9,
+        "halte_survey_count": 9
       }
     },
     {
@@ -1652,7 +1653,8 @@
         "jumlah_penduduk": 6736,
         "laju_pertumbuhan_persen_2010_2020": 0.98,
         "luas_km2": 3.911,
-        "kepadatan_per_km2": 1722.4
+        "kepadatan_per_km2": 1722.4,
+        "halte_survey_count": 5
       }
     },
     {
@@ -2461,7 +2463,8 @@
         "jumlah_penduduk": 11791,
         "laju_pertumbuhan_persen_2010_2020": 3.94,
         "luas_km2": 3.304,
-        "kepadatan_per_km2": 3568.8
+        "kepadatan_per_km2": 3568.8,
+        "halte_survey_count": 3
       }
     },
     {
@@ -2986,7 +2989,8 @@
         "jumlah_penduduk": 24394,
         "laju_pertumbuhan_persen_2010_2020": 1.05,
         "luas_km2": 1.983,
-        "kepadatan_per_km2": 12298.6
+        "kepadatan_per_km2": 12298.6,
+        "halte_survey_count": 0
       }
     },
     {
@@ -4067,7 +4071,8 @@
         "jumlah_penduduk": 24929,
         "laju_pertumbuhan_persen_2010_2020": 3.69,
         "luas_km2": 5.348,
-        "kepadatan_per_km2": 4661.5
+        "kepadatan_per_km2": 4661.5,
+        "halte_survey_count": 14
       }
     },
     {
@@ -4492,7 +4497,8 @@
         "jumlah_penduduk": 4404,
         "laju_pertumbuhan_persen_2010_2020": 3.36,
         "luas_km2": 1.145,
-        "kepadatan_per_km2": 3846.5
+        "kepadatan_per_km2": 3846.5,
+        "halte_survey_count": 1
       }
     },
     {
@@ -5471,7 +5477,8 @@
         "jumlah_penduduk": 40336,
         "laju_pertumbuhan_persen_2010_2020": 1.97,
         "luas_km2": 4.392,
-        "kepadatan_per_km2": 9184.6
+        "kepadatan_per_km2": 9184.6,
+        "halte_survey_count": 3
       }
     },
     {
@@ -6276,7 +6283,8 @@
         "jumlah_penduduk": 15520,
         "laju_pertumbuhan_persen_2010_2020": 0.59,
         "luas_km2": 3.093,
-        "kepadatan_per_km2": 5017.7
+        "kepadatan_per_km2": 5017.7,
+        "halte_survey_count": 2
       }
     },
     {
@@ -6793,7 +6801,8 @@
         "jumlah_penduduk": 12770,
         "laju_pertumbuhan_persen_2010_2020": 1.83,
         "luas_km2": 1.853,
-        "kepadatan_per_km2": 6891.6
+        "kepadatan_per_km2": 6891.6,
+        "halte_survey_count": 5
       }
     }
   ]
