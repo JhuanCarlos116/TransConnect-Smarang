@@ -24,10 +24,7 @@ export default function DashboardPage() {
 
   const [densityVisible, setDensityVisible] = useState(true);
   const [busStopsVisible, setBusStopsVisible] = useState(true);
-  // Starts on the worst condition -- that is the subset DISHUB triages first,
-  // and it keeps the initial view readable instead of dropping all 42
-  // surveyed points on the map at once.
-  const [conditionFilter, setConditionFilter] = useState<HalteConditionFilter>("red");
+  const [conditionFilter, setConditionFilter] = useState<HalteConditionFilter>("all");
   const [isochroneVisible, setIsochroneVisible] = useState(false);
   const [recommendationsVisible, setRecommendationsVisible] = useState(false);
 
