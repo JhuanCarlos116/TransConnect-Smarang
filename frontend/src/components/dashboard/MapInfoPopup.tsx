@@ -25,6 +25,7 @@ const INFO_LAYER_IDS = [ISOCHRONE_FILL_LAYER_ID, POPULATION_FILL_LAYER_ID];
 interface Panel {
   title: string;
   rows: { label: string; value: string }[];
+  warning?: string;
 }
 
 function isochronePanel(properties: Record<string, unknown>): Panel {
@@ -40,13 +41,19 @@ function isochronePanel(properties: Record<string, unknown>): Panel {
 
 function populationPanel(properties: Record<string, unknown>): Panel {
   const p = properties as Record<string, number | string>;
+  const surveyCount = Number(p.halte_survey_count);
   return {
     title: String(p.kelurahan),
     rows: [
       { label: "Penduduk", value: `${Number(p.jumlah_penduduk).toLocaleString("id-ID")} jiwa` },
       { label: "Luas", value: `${p.luas_km2} km²` },
       { label: "Kepadatan", value: `${Number(p.kepadatan_per_km2).toLocaleString("id-ID")} jiwa/km²` },
+      { label: "Halte tersurvei", value: `${surveyCount} titik` },
     ],
+    warning:
+      surveyCount === 0
+        ? "Belum ada halte yang disurvei di kelurahan ini -- kondisi halte di sini belum diketahui, bukan berarti tidak ada halte sama sekali."
+        : undefined,
   };
 }
 
@@ -84,12 +91,17 @@ function panelHtml(panel: Panel, index: number, total: number): string {
     )
     .join("");
 
+  const warning = panel.warning
+    ? `<div style="margin-top:8px;padding:6px 8px;border-radius:6px;background:#fef3c7;color:#92400e;font-size:11px;line-height:1.4">${panel.warning}</div>`
+    : "";
+
   return (
     `<div style="font-family:system-ui,sans-serif;font-size:13px;min-width:180px;color:var(--color-on-surface)">` +
     `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px">` +
     `<div style="font-weight:700;font-size:15px;color:var(--color-on-surface)">${panel.title}</div>` +
     `<div style="display:flex;align-items:center;gap:6px">${nav}${CLOSE_BUTTON_HTML}</div></div>` +
     rows +
+    warning +
     `</div>`
   );
 }
