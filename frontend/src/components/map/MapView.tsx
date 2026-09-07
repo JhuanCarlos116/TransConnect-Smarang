@@ -13,6 +13,7 @@ import ConditionLegend from "@/components/map/ConditionLegend";
 import AppHeader from "@/components/ui/AppHeader";
 import PublicSidePanel from "@/components/map/PublicSidePanel";
 import PublicMobileSheet from "@/components/map/PublicMobileSheet";
+import SafeRouteWidget from "@/components/map/SafeRouteWidget";
 import type { HalteFeature } from "@/types/halte";
 
 export default function MapView() {
@@ -82,6 +83,7 @@ export default function MapView() {
             <>
               <HalteLayer map={map} visible={halteVisible} />
               <CommunityMapsLayer map={map} visible={communityVisible} />
+              <SafeRouteWidget map={map} />
             </>
           )}
           {!MAPID_API_KEY && (
