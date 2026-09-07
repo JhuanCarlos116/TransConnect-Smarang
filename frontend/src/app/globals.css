@@ -239,9 +239,21 @@ body {
   }
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+/* Wrapped in @layer base (matching Tailwind's own Preflight layer) for the
+   same reason as the scrollbar-hide utilities above and the removed
+   unlayered padding/margin reset this file used to have: an unlayered rule
+   always wins over a layered one regardless of specificity, so this was
+   silently overriding every text-color utility applied to a <Link>/<a> --
+   invisible as long as anchors only ever used the default dark foreground
+   color, but broke the moment a nav item needed a specific color (e.g.
+   DashboardNav's active/inactive states, both text-{on-surface-variant,
+   on-primary-fixed-variant}, rendered as unreadable near-black/near-white
+   instead). */
+@layer base {
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
