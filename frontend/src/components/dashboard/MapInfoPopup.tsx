@@ -7,17 +7,12 @@ import { HALTE_POINT_LAYER_ID } from "@/components/map/HalteLayer";
 import { ISOCHRONE_FILL_LAYER_ID } from "@/components/dashboard/IsochroneLayer";
 import { POPULATION_FILL_LAYER_ID } from "@/components/dashboard/PopulationLayer";
 import { RECOMMENDATION_POINT_LAYER_ID } from "@/components/dashboard/RecommendationLayer";
-import { BUS_STOP_CLUSTER_LAYER_ID, BUS_STOP_POINT_LAYER_ID } from "@/components/dashboard/BusStopLayer";
+import { BUS_STOP_POINT_LAYER_ID } from "@/components/dashboard/BusStopLayer";
 
 // Point layers that already own their own click popups -- a halte marker,
-// bus stop point/cluster, or new-halte recommendation sitting inside a
+// bus stop point, or new-halte recommendation sitting inside a
 // kelurahan/isochrone polygon takes precedence over this shared popup.
-const MARKER_LAYER_IDS = [
-  HALTE_POINT_LAYER_ID,
-  RECOMMENDATION_POINT_LAYER_ID,
-  BUS_STOP_POINT_LAYER_ID,
-  BUS_STOP_CLUSTER_LAYER_ID,
-];
+const MARKER_LAYER_IDS = [HALTE_POINT_LAYER_ID, RECOMMENDATION_POINT_LAYER_ID, BUS_STOP_POINT_LAYER_ID];
 const INFO_LAYER_IDS = [ISOCHRONE_FILL_LAYER_ID, POPULATION_FILL_LAYER_ID];
 
 interface Panel {

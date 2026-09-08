@@ -9,12 +9,8 @@ import type { ConditionLabel, HalteFeature, HalteFeatureCollection } from "@/typ
 export type HalteConditionFilter = ConditionLabel | "all";
 
 const SOURCE_ID = "bus-stops";
-export const BUS_STOP_CLUSTER_LAYER_ID = "bus-stops-clusters";
-const CLUSTER_LAYER_ID = BUS_STOP_CLUSTER_LAYER_ID;
-const CLUSTER_COUNT_LAYER_ID = "bus-stops-cluster-count";
 export const BUS_STOP_POINT_LAYER_ID = "bus-stops-points";
 const POINT_LAYER_ID = BUS_STOP_POINT_LAYER_ID;
-const ALL_LAYER_IDS = [CLUSTER_LAYER_ID, CLUSTER_COUNT_LAYER_ID, POINT_LAYER_ID];
 
 interface BusStopLayerProps {
   map: maplibregl.Map;
@@ -34,8 +30,16 @@ function filterByCondition(
 
 /**
  * "Titik Bus Stop / Halte" on the DISHUB dashboard -- the single halte/bus
- * stop layer, sourced from the team's own 42-point survey (condition-scored,
- * clustered, filterable by condition).
+ * stop layer, sourced from the team's own 42-point survey, colored by
+ * condition_label and filterable by condition.
+ *
+ * Not clustered: this used to reuse CommunityMapsLayer's clustering
+ * approach, but with only 42 points the team found clusters counter-
+ * productive here specifically -- the whole point of this layer is seeing
+ * each halte's individual condition color, and a zoomed-out view turned
+ * most of them into plain blue numbered bubbles that hid that. (Clustering
+ * still makes sense for a genuinely large point set like the public map's
+ * community reports layer, which is unaffected by this.)
  *
  * This used to show the team's separate, wider 71-point inventory
  * (backend/scripts/build_bus_stops.py, no condition data, only loosely
@@ -71,46 +75,14 @@ export default function BusStopLayer({ map, visible, onSelect, conditionFilter =
       map.addSource(SOURCE_ID, {
         type: "geojson",
         data: filterByCondition(data, filterRef.current) as never,
-        cluster: true,
-        clusterMaxZoom: 14,
-        clusterRadius: 50,
       });
 
       const initialVisibility = visibleRef.current ? "visible" : "none";
 
       map.addLayer({
-        id: CLUSTER_LAYER_ID,
-        type: "circle",
-        source: SOURCE_ID,
-        filter: ["has", "point_count"],
-        layout: { visibility: initialVisibility },
-        paint: {
-          "circle-color": "#3b82f6",
-          "circle-opacity": 0.85,
-          "circle-radius": ["step", ["get", "point_count"], 16, 10, 20, 25, 26],
-          "circle-stroke-width": 2,
-          "circle-stroke-color": "#fff",
-        },
-      });
-
-      map.addLayer({
-        id: CLUSTER_COUNT_LAYER_ID,
-        type: "symbol",
-        source: SOURCE_ID,
-        filter: ["has", "point_count"],
-        layout: {
-          visibility: initialVisibility,
-          "text-field": ["get", "point_count_abbreviated"],
-          "text-size": 12,
-        },
-        paint: { "text-color": "#fff" },
-      });
-
-      map.addLayer({
         id: POINT_LAYER_ID,
         type: "circle",
         source: SOURCE_ID,
-        filter: ["!", ["has", "point_count"]],
         layout: { visibility: initialVisibility },
         paint: {
           "circle-radius": 7,
@@ -130,27 +102,11 @@ export default function BusStopLayer({ map, visible, onSelect, conditionFilter =
         },
       });
 
-      map.on("mouseenter", CLUSTER_LAYER_ID, () => {
-        map.getCanvas().style.cursor = "pointer";
-      });
-      map.on("mouseleave", CLUSTER_LAYER_ID, () => {
-        map.getCanvas().style.cursor = "";
-      });
       map.on("mouseenter", POINT_LAYER_ID, () => {
         map.getCanvas().style.cursor = "pointer";
       });
       map.on("mouseleave", POINT_LAYER_ID, () => {
         map.getCanvas().style.cursor = "";
-      });
-
-      map.on("click", CLUSTER_LAYER_ID, async (e: maplibregl.MapLayerMouseEvent) => {
-        const feature = e.features?.[0];
-        if (!feature || feature.geometry.type !== "Point") return;
-
-        const clusterId = feature.properties?.cluster_id;
-        const source = map.getSource(SOURCE_ID) as maplibregl.GeoJSONSource;
-        const zoom = await source.getClusterExpansionZoom(clusterId);
-        map.easeTo({ center: feature.geometry.coordinates as [number, number], zoom });
       });
 
       map.on("click", POINT_LAYER_ID, (e: maplibregl.MapLayerMouseEvent) => {
@@ -167,9 +123,7 @@ export default function BusStopLayer({ map, visible, onSelect, conditionFilter =
   useEffect(() => {
     visibleRef.current = visible;
     if (!map.getLayer(POINT_LAYER_ID)) return;
-    for (const id of ALL_LAYER_IDS) {
-      map.setLayoutProperty(id, "visibility", visible ? "visible" : "none");
-    }
+    map.setLayoutProperty(POINT_LAYER_ID, "visibility", visible ? "visible" : "none");
   }, [map, visible]);
 
   useEffect(() => {
