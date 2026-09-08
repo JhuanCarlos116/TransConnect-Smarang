@@ -12,3 +12,4 @@ osmnx
 networkx
 scikit-learn
 httpx
+python-multipart
