@@ -1,0 +1,37 @@
+import type { CitizenReport, CitizenReportCreateInput } from "@/types/citizenReport";
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+/**
+ * Real citizen-submitted reports -- see backend/app/routers/citizen_report.py.
+ * No static-file fallback: submitting (and listing what's been submitted) is
+ * inherently live, mutable data, not something precomputable.
+ */
+function requireApiBase(): string {
+  if (!API_BASE_URL) {
+    throw new Error(
+      "Fitur laporan butuh backend lokal aktif. Set NEXT_PUBLIC_API_BASE_URL di frontend/.env.local, lalu jalankan `uvicorn app.main:app` di backend.",
+    );
+  }
+  return API_BASE_URL;
+}
+
+export async function createCitizenReport(input: CitizenReportCreateInput): Promise<CitizenReport> {
+  const formData = new FormData();
+  formData.append("lat", String(input.lat));
+  formData.append("lon", String(input.lon));
+  formData.append("description", input.description);
+  if (input.photo) formData.append("photo", input.photo);
+
+  const res = await fetch(`${requireApiBase()}/api/v1/citizen-reports`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const body = (await res.json().catch(() => null)) as { detail?: string } | null;
+    throw new Error(body?.detail ?? `Backend merespons status ${res.status}`);
+  }
+
+  return (await res.json()) as CitizenReport;
+}

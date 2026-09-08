@@ -15,6 +15,9 @@ backend/.env
 # Data (raw/unprocessed exports; keep the cleaned static GeoJSON in frontend/public/data)
 backend/data/raw/
 
+# Citizen-submitted report photos (user content, not code)
+backend/uploads/
+
 # OS / editor
 .DS_Store
 Thumbs.db
