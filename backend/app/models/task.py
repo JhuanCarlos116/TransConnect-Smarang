@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, String, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -19,6 +19,17 @@ class MaintenanceTask(Base):
     # would just be a different-shaped version of the same fabrication.
     assigned_to: Mapped[str | None] = mapped_column(String, nullable=True)
     status: Mapped[str] = mapped_column(String, default="belum_dikerjakan")  # belum_dikerjakan | proses | selesai
+
+    # Submitted by whoever's doing the repair once they're in progress/done --
+    # see PATCH /tasks/{task_id}/report. Separate from the DISHUB dispatcher's
+    # own description above (what needs fixing) vs. what the technician
+    # actually reports back (what was done, with proof).
+    technician_report: Mapped[str | None] = mapped_column(String, nullable=True)
+    technician_photo_url: Mapped[str | None] = mapped_column(String, nullable=True)
+    # True only after DISHUB explicitly approves showing the technician's
+    # photo on the public map (HaltePublicModal) -- set via a separate
+    # approval action, not automatically when status becomes "selesai".
+    approved_for_public: Mapped[bool] = mapped_column(Boolean, default=False)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(

@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+
+import { useDishubAuth } from "@/lib/useDishubAuth";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Map View (DISHUB)", icon: "map" },
@@ -17,6 +19,13 @@ const NAV_ITEMS = [
  */
 export default function DashboardNav() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { logout } = useDishubAuth();
+
+  function handleLogout() {
+    logout();
+    router.push("/login");
+  }
 
   return (
     <>
@@ -33,7 +42,7 @@ export default function DashboardNav() {
         </h2>
       </div>
 
-      <div className="flex flex-col gap-2 p-gutter">
+      <div className="flex flex-1 flex-col gap-2 p-gutter">
         {NAV_ITEMS.map((item) => (
           <Link
             key={item.href}
@@ -48,6 +57,16 @@ export default function DashboardNav() {
             {item.label}
           </Link>
         ))}
+      </div>
+
+      <div className="border-t border-border-low p-gutter">
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-lg px-4 py-3 font-label-md text-label-md font-bold text-alert-red transition-colors hover:bg-red-50"
+        >
+          <span className="material-symbols-outlined text-[20px]">logout</span>
+          Keluar
+        </button>
       </div>
     </>
   );

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { conditionColor, conditionLabelText } from "@/lib/conditionScore";
 import { createTask } from "@/lib/fetchTasks";
 import MediaCarousel from "@/components/map/MediaCarousel";
+import CitizenReportSection from "@/components/dashboard/CitizenReportSection";
 import type { HalteFeature, HalteProperties } from "@/types/halte";
 
 interface HalteDetailModalProps {
@@ -25,6 +26,41 @@ function formatState(value: string): { text: string; colorClass: string } {
   if (value === "ada") return { text: "Tersedia & Baik", colorClass: "text-safety-green bg-green-50" };
   if (value === "tidak") return { text: "Tidak Ada / Rusak", colorClass: "text-alert-red bg-red-50" };
   return { text: "Tidak Disebutkan", colorClass: "text-on-surface-variant bg-surface-container" };
+}
+
+interface FieldNoteSectionProps {
+  note: string;
+}
+
+/** Collapsible like TaskCreateSection/CitizenReportSection below -- this is
+ * the team's own field survey note (HalteProperties.catatan_lapangan),
+ * distinct from CitizenReportSection's real citizen-submitted reports. */
+function FieldNoteSection({ note }: FieldNoteSectionProps) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="rounded-lg border border-border-low bg-surface p-3">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between font-label-md text-[13px] font-bold text-on-surface"
+      >
+        <span className="flex items-center gap-2">
+          <span className="material-symbols-outlined text-transport-blue text-[18px]">edit_note</span>
+          Catatan Survei Lapangan (#timGOPEK)
+        </span>
+        <span className="material-symbols-outlined text-[18px] text-on-surface-variant">
+          {open ? "expand_less" : "expand_more"}
+        </span>
+      </button>
+
+      {open && (
+        <p className="mt-3 font-body-md text-[13px] text-on-surface-variant leading-relaxed italic bg-surface-container-low p-2.5 rounded">
+          &ldquo;{note}&rdquo;
+        </p>
+      )}
+    </div>
+  );
 }
 
 interface TaskCreateSectionProps {
@@ -209,18 +245,9 @@ export default function HalteDetailModal({ feature, onClose }: HalteDetailModalP
             </div>
           </div>
 
-          {/* Field Notes (Catatan Lapangan) */}
-          {p.catatan_lapangan && (
-            <div className="rounded-lg border border-border-low bg-surface p-3">
-              <div className="flex items-center gap-2 mb-1.5 font-label-md text-[13px] font-bold text-on-surface">
-                <span className="material-symbols-outlined text-transport-blue text-[18px]">edit_note</span>
-                Catatan Survei Lapangan (#timGOPEK)
-              </div>
-              <p className="font-body-md text-[13px] text-on-surface-variant leading-relaxed italic bg-surface-container-low p-2.5 rounded">
-                &ldquo;{p.catatan_lapangan}&rdquo;
-              </p>
-            </div>
-          )}
+          <CitizenReportSection halteId={p.halte_id} />
+
+          {p.catatan_lapangan && <FieldNoteSection note={p.catatan_lapangan} />}
 
           <TaskCreateSection key={p.halte_id} halteId={p.halte_id} />
         </div>

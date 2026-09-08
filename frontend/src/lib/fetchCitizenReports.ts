@@ -20,8 +20,11 @@ export async function createCitizenReport(input: CitizenReportCreateInput): Prom
   const formData = new FormData();
   formData.append("lat", String(input.lat));
   formData.append("lon", String(input.lon));
+  formData.append("halte_id", input.halteId);
+  formData.append("reporter_name", input.reporterName);
   formData.append("description", input.description);
   if (input.photo) formData.append("photo", input.photo);
+  if (input.video) formData.append("video", input.video);
 
   const res = await fetch(`${requireApiBase()}/api/v1/citizen-reports`, {
     method: "POST",
@@ -34,4 +37,13 @@ export async function createCitizenReport(input: CitizenReportCreateInput): Prom
   }
 
   return (await res.json()) as CitizenReport;
+}
+
+export async function fetchCitizenReportsByHalte(halteId: string): Promise<CitizenReport[]> {
+  const res = await fetch(`${requireApiBase()}/api/v1/citizen-reports?halte_id=${encodeURIComponent(halteId)}`);
+  if (!res.ok) {
+    const body = (await res.json().catch(() => null)) as { detail?: string } | null;
+    throw new Error(body?.detail ?? `Backend merespons status ${res.status}`);
+  }
+  return (await res.json()) as CitizenReport[];
 }
