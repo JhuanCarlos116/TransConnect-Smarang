@@ -27,7 +27,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import get_session
 from app.models.halte import HalteSurvey
-from app.schemas.route import RouteOption, RouteRequest, SafeHalteRouteResponse
+from app.schemas.route import RouteOption, RouteRequest, RouteToHalteRequest, SafeHalteRouteResponse
 from app.services.pedestrian_graph import get_graph
 
 router = APIRouter()
@@ -117,3 +117,31 @@ async def safe_halte_route(
         budget_minutes=WALK_BUDGET_MIN,
         within_budget_count=len(within_budget),
     )
+
+
+@router.post("/route/to-halte", response_model=RouteOption)
+async def route_to_halte(
+    body: RouteToHalteRequest, session: AsyncSession = Depends(get_session)
+) -> RouteOption:
+    """Walking directions to one specific halte the citizen already picked
+    (e.g. from HaltePublicModal) -- unlike /route/safe-halte, there's no
+    destination choice to make here, just the shortest path to it.
+    """
+    graph = get_graph()
+
+    halte = await session.get(HalteSurvey, body.halte_id)
+    if halte is None:
+        raise HTTPException(status_code=404, detail="Halte tidak ditemukan.")
+
+    user_node = ox.distance.nearest_nodes(graph, X=body.lon, Y=body.lat)
+    halte_point = to_shape(halte.geom)
+    halte_node = ox.distance.nearest_nodes(graph, X=halte_point.x, Y=halte_point.y)
+
+    try:
+        distance_m = nx.shortest_path_length(graph, user_node, halte_node, weight="length")
+    except nx.NetworkXNoPath as exc:
+        raise HTTPException(
+            status_code=404, detail="Halte ini tidak bisa dijangkau lewat jaringan jalan dari titik ini."
+        ) from exc
+
+    return _to_option(graph, user_node, halte, halte_node, distance_m)
