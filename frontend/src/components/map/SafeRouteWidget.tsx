@@ -29,10 +29,8 @@ type Status = "idle" | "locating" | "loading" | "error";
  * walking budget, not a segment-weighted route -- we don't have per-segment
  * condition data to weight a path with).
  *
- * Positioned to clear PublicMobileSheet's collapsed peek bar (~64px) on
- * mobile with a bit of margin; when that sheet is expanded it covers this
- * widget entirely, same as it covers the zoom controls -- expected, since
- * the sheet becomes the focus at that point.
+ * Bottom-left on both pages that use this (public map, dashboard) --
+ * ReportFormWidget owns the bottom-right on the public map instead.
  */
 export default function SafeRouteWidget({ map }: SafeRouteWidgetProps) {
   const [status, setStatus] = useState<Status>("idle");
@@ -157,7 +155,7 @@ export default function SafeRouteWidget({ map }: SafeRouteWidgetProps) {
   const busy = status === "locating" || status === "loading";
 
   return (
-    <div className="absolute bottom-[72px] left-margin-page z-20 flex max-w-xs flex-col-reverse gap-2 md:bottom-margin-page">
+    <div className="absolute bottom-margin-page left-margin-page z-20 flex max-w-xs flex-col-reverse gap-2">
       <button
         onClick={handleClick}
         disabled={busy}
