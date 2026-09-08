@@ -51,7 +51,7 @@ export default function MapView() {
   }, []);
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden font-sans">
+    <div className="flex h-dvh flex-col overflow-hidden font-sans">
       <AppHeader />
 
       <main className="relative flex-1">
