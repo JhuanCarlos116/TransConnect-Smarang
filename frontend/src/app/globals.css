@@ -254,6 +254,17 @@ body {
     color: inherit;
     text-decoration: none;
   }
+
+  /* MapLibre's own zoom +/- control (MapView.tsx's NavigationControl),
+     hidden below md -- a touchscreen already pinch-zooms, and the buttons
+     ate visible map space at phone width for no benefit there. Targets its
+     library-generated markup directly since NavigationControl has no
+     per-breakpoint option to pass instead. */
+  @media (max-width: 767px) {
+    .maplibregl-ctrl-top-right {
+      display: none;
+    }
+  }
 }
 
 @media (prefers-color-scheme: dark) {

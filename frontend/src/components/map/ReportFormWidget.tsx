@@ -141,23 +141,23 @@ export default function ReportFormWidget({ map }: ReportFormWidgetProps) {
     // buttons are wider than half the viewport at phone widths, so side by
     // side they overlap/clip) -- side by side again from md up, where
     // there's room.
-    <div className="absolute bottom-[76px] right-margin-page z-20 flex max-w-xs flex-col-reverse gap-2 md:bottom-margin-page">
+    <div className="absolute bottom-[60px] right-margin-page z-20 flex max-w-xs flex-col-reverse gap-2 md:bottom-margin-page">
       {status === "idle" && (
         <button
           onClick={startPicking}
-          className="flex items-center gap-2 self-end rounded-full bg-transport-blue px-4 py-2.5 font-label-md text-label-md font-bold text-on-primary shadow-lg transition-colors hover:bg-primary"
+          className="flex items-center gap-1.5 self-end rounded-full bg-transport-blue px-3 py-2 text-[12px] font-label-md font-bold text-on-primary shadow-lg transition-colors hover:bg-primary md:gap-2 md:px-4 md:py-2.5 md:text-label-md"
         >
-          <span className="material-symbols-outlined text-[20px]">add_location_alt</span>
+          <span className="material-symbols-outlined text-[16px] md:text-[20px]">add_location_alt</span>
           Buat Laporan
         </button>
       )}
 
       {status === "picking" && (
-        <div className="flex items-center gap-2 self-end rounded-full bg-transport-blue px-4 py-2.5 font-label-md text-label-md font-bold text-on-primary shadow-lg">
-          <span className="material-symbols-outlined text-[20px]">touch_app</span>
+        <div className="flex items-center gap-1.5 self-end rounded-full bg-transport-blue px-3 py-2 text-[12px] font-label-md font-bold text-on-primary shadow-lg md:gap-2 md:px-4 md:py-2.5 md:text-label-md">
+          <span className="material-symbols-outlined text-[16px] md:text-[20px]">touch_app</span>
           Klik titik di peta
           <button onClick={reset} aria-label="Batal" className="ml-1 opacity-80 hover:opacity-100">
-            <span className="material-symbols-outlined text-[18px]">close</span>
+            <span className="material-symbols-outlined text-[16px] md:text-[18px]">close</span>
           </button>
         </div>
       )}
