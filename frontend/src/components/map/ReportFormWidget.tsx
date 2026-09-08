@@ -147,7 +147,10 @@ export default function ReportFormWidget({ map }: ReportFormWidgetProps) {
           onClick={startPicking}
           className="flex items-center gap-1.5 self-end rounded-full bg-transport-blue px-3 py-2 text-[12px] font-label-md font-bold text-on-primary shadow-lg transition-colors hover:bg-primary md:gap-2 md:px-4 md:py-2.5 md:text-label-md"
         >
-          <span className="material-symbols-outlined text-[16px] md:text-[20px]">add_location_alt</span>
+          <span className="flex items-center -space-x-1">
+            <span className="material-symbols-outlined text-[16px] md:text-[20px]">directions_bus</span>
+            <span className="material-symbols-outlined text-[12px] md:text-[14px]">edit</span>
+          </span>
           Buat Laporan
         </button>
       )}
@@ -166,7 +169,10 @@ export default function ReportFormWidget({ map }: ReportFormWidgetProps) {
         <div className="overflow-hidden rounded-lg border border-border-low bg-surface shadow-lg">
           <div className="flex items-center justify-between gap-2 border-b border-border-low bg-surface-container-low px-3 py-2">
             <span className="flex items-center gap-1.5 font-label-sm text-label-sm font-bold text-on-surface">
-              <span className="material-symbols-outlined text-[16px] text-transport-blue">add_location_alt</span>
+              <span className="flex items-center -space-x-0.5 text-transport-blue">
+                <span className="material-symbols-outlined text-[16px]">directions_bus</span>
+                <span className="material-symbols-outlined text-[12px]">edit</span>
+              </span>
               Buat Laporan
             </span>
             <button

@@ -161,10 +161,21 @@ export default function SafeRouteWidget({ map }: SafeRouteWidgetProps) {
         disabled={busy}
         className="flex items-center gap-1.5 self-start rounded-full bg-transport-blue px-3 py-2 text-[12px] font-label-md font-bold text-on-primary shadow-lg transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-70 md:gap-2 md:px-4 md:py-2.5 md:text-label-md"
       >
-        <span className={`material-symbols-outlined text-[16px] md:text-[20px] ${busy ? "animate-spin" : ""}`}>
-          {busy ? "progress_activity" : "my_location"}
-        </span>
-        {status === "locating" ? "Mencari lokasi..." : status === "loading" ? "Menghitung rute..." : "Cari Halte Teraman"}
+        {busy ? (
+          <span className="material-symbols-outlined animate-spin text-[16px] md:text-[20px]">progress_activity</span>
+        ) : (
+          // Search glass with a small bus badge -- "find a nearby stop", not
+          // just a generic location pin.
+          <span className="relative inline-flex h-4 w-4 shrink-0 items-center justify-center md:h-5 md:w-5">
+            <span className="material-symbols-outlined text-[16px] leading-none md:text-[20px]">search</span>
+            <span className="absolute -bottom-1 -right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-on-primary md:h-3 md:w-3">
+              <span className="material-symbols-outlined leading-none text-transport-blue" style={{ fontSize: "7px" }}>
+                directions_bus
+              </span>
+            </span>
+          </span>
+        )}
+        {status === "locating" ? "Mencari lokasi..." : status === "loading" ? "Menghitung rute..." : "Cari Halte"}
       </button>
 
       {error && (

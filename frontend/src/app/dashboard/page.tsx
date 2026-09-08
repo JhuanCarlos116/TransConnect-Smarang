@@ -78,7 +78,7 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden font-sans">
+    <div className="flex h-dvh flex-col overflow-hidden font-sans">
       <AppHeader searchFeatures={halteFeatures} onSearchSelect={flyToHalte} />
 
       <div className="relative flex flex-1 overflow-hidden">

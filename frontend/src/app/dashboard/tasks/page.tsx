@@ -4,7 +4,7 @@ import TaskBoard from "@/components/dashboard/TaskBoard";
 
 export default function TasksPage() {
   return (
-    <div className="flex h-screen flex-col overflow-hidden font-sans">
+    <div className="flex h-dvh flex-col overflow-hidden font-sans">
       <AppHeader />
 
       <div className="relative flex flex-1 overflow-hidden">
