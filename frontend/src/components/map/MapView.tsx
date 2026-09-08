@@ -10,6 +10,8 @@ import ConditionLegend from "@/components/map/ConditionLegend";
 import AppHeader from "@/components/ui/AppHeader";
 import SafeRouteWidget from "@/components/map/SafeRouteWidget";
 import ReportFormWidget from "@/components/map/ReportFormWidget";
+import HaltePublicModal from "@/components/map/HaltePublicModal";
+import type { HalteFeature } from "@/types/halte";
 
 /**
  * Public map, pared down to the two things the team asked to keep front and
@@ -25,6 +27,7 @@ import ReportFormWidget from "@/components/map/ReportFormWidget";
 export default function MapView() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [map, setMap] = useState<maplibregl.Map | null>(null);
+  const [detailTarget, setDetailTarget] = useState<HalteFeature | null>(null);
 
   useEffect(() => {
     if (!containerRef.current || !MAPID_API_KEY) return;
@@ -56,13 +59,15 @@ export default function MapView() {
 
       <main className="relative flex-1">
         <div ref={containerRef} className="h-full w-full" />
+        {map && <HalteLayer map={map} visible onSelect={setDetailTarget} />}
+
         {map && (
-          <>
-            <HalteLayer map={map} visible />
+          <div className="absolute bottom-margin-page left-1/2 z-20 flex w-full max-w-md -translate-x-1/2 gap-3 px-margin-page">
             <SafeRouteWidget map={map} />
             <ReportFormWidget map={map} />
-          </>
+          </div>
         )}
+
         {!MAPID_API_KEY && (
           <div className="absolute left-margin-page top-margin-page z-20 rounded-lg bg-error-container px-stack-md py-stack-sm text-label-md text-on-error-container">
             NEXT_PUBLIC_MAPID_API_KEY belum diisi di frontend/.env.local
@@ -73,6 +78,8 @@ export default function MapView() {
           <ConditionLegend />
         </div>
       </main>
+
+      <HaltePublicModal feature={detailTarget} onClose={() => setDetailTarget(null)} />
     </div>
   );
 }

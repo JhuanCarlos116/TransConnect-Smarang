@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { createRoot } from "react-dom/client";
 import * as maplibregl from "maplibre-gl";
 
 import { fetchHalteData } from "@/lib/fetchHalteData";
-import HaltePopup from "@/components/map/HaltePopup";
 import type { HalteFeature, HalteFeatureCollection } from "@/types/halte";
 
 export const HALTE_POINT_LAYER_ID = "halte-survey-points";
@@ -15,11 +13,11 @@ interface HalteLayerProps {
   map: maplibregl.Map;
   visible: boolean;
   /**
-   * When provided, a marker click calls this instead of opening the small
-   * inline MapLibre popup -- used on the dashboard to open HalteDetailModal.
-   * Left unset on the public map, which keeps the popup.
+   * Called on marker click with the full feature -- the dashboard opens
+   * HalteDetailModal with it, the public map opens HaltePublicModal. Both
+   * pages own that modal's state themselves; this layer only reports clicks.
    */
-  onSelect?: (feature: HalteFeature) => void;
+  onSelect: (feature: HalteFeature) => void;
 }
 
 export default function HalteLayer({ map, visible, onSelect }: HalteLayerProps) {
@@ -81,16 +79,7 @@ export default function HalteLayer({ map, visible, onSelect }: HalteLayerProps) 
         const feature = featuresRef.current.find((f) => f.properties.halte_id === halteId);
         if (!feature) return;
 
-        if (onSelectRef.current) {
-          onSelectRef.current(feature);
-          return;
-        }
-
-        const coordinates = clicked.geometry.coordinates.slice() as [number, number];
-        const container = document.createElement("div");
-        createRoot(container).render(<HaltePopup properties={feature.properties} />);
-
-        new maplibregl.Popup({ offset: 12 }).setLngLat(coordinates).setDOMContent(container).addTo(map);
+        onSelectRef.current(feature);
       });
     });
   }, [map]);

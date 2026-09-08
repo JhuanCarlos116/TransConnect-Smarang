@@ -58,6 +58,20 @@ export default function AppHeader({ searchFeatures, onSearchSelect }: AppHeaderP
     );
   }
 
+  // No search on this page (the public map, and the tasks board) -- nothing
+  // competes for header space, so the brand can sit small and centered
+  // instead of pinned left the way it has to when a search bar shares the row.
+  if (!showSearch) {
+    return (
+      <header className="z-50 flex h-12 w-full shrink-0 items-center justify-center border-b border-border-low bg-surface px-gutter">
+        <Link href="/" className="flex shrink-0 items-center gap-1.5">
+          <Image src="/logo-icon.png" alt="" width={128} height={128} className="h-6 w-6" priority />
+          <span className="font-headline-md text-[15px] font-bold text-transport-blue">TransConnect</span>
+        </Link>
+      </header>
+    );
+  }
+
   return (
     <header className="z-50 flex h-16 w-full shrink-0 items-center justify-between gap-6 border-b border-border-low bg-surface px-gutter">
       <Link href="/" className="flex shrink-0 items-center gap-2">
@@ -65,20 +79,18 @@ export default function AppHeader({ searchFeatures, onSearchSelect }: AppHeaderP
         <span className="font-headline-md text-headline-md font-bold text-transport-blue">TransConnect</span>
       </Link>
 
-      {showSearch && <div className="hidden w-full max-w-md md:block">
+      <div className="hidden w-full max-w-md md:block">
         <HalteSearch features={searchFeatures!} onSelect={onSearchSelect!} />
-      </div>}
+      </div>
 
       <div className="flex items-center gap-3">
-        {showSearch && (
-          <button
-            onClick={() => setMobileSearchOpen(true)}
-            aria-label="Cari halte"
-            className="flex h-9 w-9 items-center justify-center text-on-surface-variant md:hidden"
-          >
-            <span className="material-symbols-outlined text-[22px]">search</span>
-          </button>
-        )}
+        <button
+          onClick={() => setMobileSearchOpen(true)}
+          aria-label="Cari halte"
+          className="flex h-9 w-9 items-center justify-center text-on-surface-variant md:hidden"
+        >
+          <span className="material-symbols-outlined text-[22px]">search</span>
+        </button>
         <span className="hidden whitespace-nowrap rounded-full border border-transport-blue px-3 py-1 font-label-sm text-label-sm text-on-surface-variant lg:block">
           Kec. Tembalang, Kota Semarang
         </span>
