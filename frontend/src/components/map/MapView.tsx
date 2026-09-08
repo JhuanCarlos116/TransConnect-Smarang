@@ -63,9 +63,9 @@ export default function MapView() {
         {map && <HalteLayer map={map} visible onSelect={setDetailTarget} />}
 
         {map && (
-          <div className="absolute bottom-margin-page left-1/2 z-20 flex w-full max-w-md -translate-x-1/2 gap-3 px-margin-page">
+          <div className="absolute right-margin-page top-1/2 z-20 flex -translate-y-1/2 flex-col gap-3">
+            <ReportFormWidget />
             <SafeRouteWidget map={map} />
-            <ReportFormWidget map={map} />
           </div>
         )}
 

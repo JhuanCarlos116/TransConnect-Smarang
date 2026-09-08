@@ -10,6 +10,14 @@ import type { HalteFeature } from "@/types/halte";
 interface AppHeaderProps {
   searchFeatures?: HalteFeature[];
   onSearchSelect?: (feature: HalteFeature) => void;
+  /**
+   * Where the brand/logo links to. Defaults to /map (the public map) --
+   * that's the right "home" for both the public map itself and the tasks
+   * board, since neither should route out to the Penumpang/DISHUB chooser at
+   * "/". The dashboard passes "/dashboard" instead so its logo stays inside
+   * the staff app rather than leaving it for the public map.
+   */
+  homeHref?: string;
 }
 
 /**
@@ -34,7 +42,7 @@ interface AppHeaderProps {
  * accordingly no longer exists as a prop -- nothing here depends on which
  * page rendered it anymore.
  */
-export default function AppHeader({ searchFeatures, onSearchSelect }: AppHeaderProps) {
+export default function AppHeader({ searchFeatures, onSearchSelect, homeHref = "/map" }: AppHeaderProps) {
   const showSearch = Boolean(searchFeatures && onSearchSelect);
   // The full search + region badge don't fit a phone screen at once --
   // search collapses to this icon below md, expanding over the rest of the
@@ -64,7 +72,7 @@ export default function AppHeader({ searchFeatures, onSearchSelect }: AppHeaderP
   if (!showSearch) {
     return (
       <header className="z-50 flex h-12 w-full shrink-0 items-center justify-center border-b border-border-low bg-surface px-gutter">
-        <Link href="/" className="flex shrink-0 items-center gap-1.5">
+        <Link href={homeHref} className="flex shrink-0 items-center gap-1.5">
           <Image src="/logo-icon.png" alt="" width={128} height={128} className="h-6 w-6" priority />
           <span className="font-headline-md text-[15px] font-bold text-transport-blue">TransConnect</span>
         </Link>
@@ -74,7 +82,7 @@ export default function AppHeader({ searchFeatures, onSearchSelect }: AppHeaderP
 
   return (
     <header className="z-50 flex h-16 w-full shrink-0 items-center justify-between gap-6 border-b border-border-low bg-surface px-gutter">
-      <Link href="/" className="flex shrink-0 items-center gap-2">
+      <Link href={homeHref} className="flex shrink-0 items-center gap-2">
         <Image src="/logo-icon.png" alt="" width={128} height={128} className="h-9 w-9" priority />
         <span className="font-headline-md text-headline-md font-bold text-transport-blue">TransConnect</span>
       </Link>

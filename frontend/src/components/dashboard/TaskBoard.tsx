@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { fetchTasks, updateTaskStatus } from "@/lib/fetchTasks";
 import { conditionColor } from "@/lib/conditionScore";
+import TaskDetailModal from "@/components/dashboard/TaskDetailModal";
 import type { Task, TaskStatus } from "@/types/task";
 
 const COLUMNS: { status: TaskStatus; label: string }[] = [
@@ -28,20 +29,36 @@ const PREV_STATUS: Record<TaskStatus, TaskStatus | null> = {
 interface TaskCardProps {
   task: Task;
   onMove: (taskId: string, status: TaskStatus) => void;
+  onOpenDetail: (task: Task) => void;
 }
 
-function TaskCard({ task, onMove }: TaskCardProps) {
+// Detail (technician report + photo, admin approval) only makes sense once
+// work has actually started -- nothing to report on a task still in
+// "belum_dikerjakan".
+function TaskCard({ task, onMove, onOpenDetail }: TaskCardProps) {
   const next = NEXT_STATUS[task.status];
   const prev = PREV_STATUS[task.status];
+  const canOpenDetail = task.status === "proses" || task.status === "selesai";
 
   return (
-    <div className="rounded-lg border border-border-low bg-surface p-3 shadow-sm">
+    <div
+      onClick={canOpenDetail ? () => onOpenDetail(task) : undefined}
+      className={`rounded-lg border border-border-low bg-surface p-3 shadow-sm ${canOpenDetail ? "cursor-pointer transition-colors hover:border-transport-blue" : ""}`}
+    >
       <div className="mb-1.5 flex items-center gap-2">
         <span
           className="inline-block h-2.5 w-2.5 shrink-0 rounded-full"
           style={{ backgroundColor: conditionColor(task.condition_label) }}
         />
         <span className="font-label-md text-label-md font-bold text-on-surface">{task.nama_halte}</span>
+        {task.technician_photo_url && (
+          <span
+            className="material-symbols-outlined ml-auto text-[16px] text-on-surface-variant"
+            title="Ada laporan petugas"
+          >
+            photo_camera
+          </span>
+        )}
       </div>
       <div className="mb-2 text-label-sm text-on-surface-variant">{task.kelurahan}</div>
       <p className="mb-2 text-body-md text-[13px] leading-relaxed text-on-surface">{task.description}</p>
@@ -55,7 +72,7 @@ function TaskCard({ task, onMove }: TaskCardProps) {
         <span className="text-[11px] text-on-surface-variant">
           {new Date(task.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}
         </span>
-        <div className="flex gap-1.5">
+        <div className="flex gap-1.5" onClick={(e) => e.stopPropagation()}>
           {prev && (
             <button
               onClick={() => onMove(task.task_id, prev)}
@@ -87,6 +104,7 @@ export default function TaskBoard() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [error, setError] = useState<string | null>(null);
+  const [detailTask, setDetailTask] = useState<Task | null>(null);
 
   useEffect(() => {
     fetchTasks()
@@ -109,6 +127,11 @@ export default function TaskBoard() {
       setTasks(previous); // revert the optimistic move
       setError(err instanceof Error ? err.message : "Gagal memperbarui status tugas.");
     }
+  }
+
+  function handleTaskUpdated(updated: Task) {
+    setTasks((cur) => cur.map((t) => (t.task_id === updated.task_id ? updated : t)));
+    setDetailTask(updated);
   }
 
   if (status === "loading") {
@@ -146,13 +169,15 @@ export default function TaskBoard() {
                   <p className="mt-2 text-center text-label-sm text-on-surface-variant">Tidak ada tugas.</p>
                 )}
                 {colTasks.map((task) => (
-                  <TaskCard key={task.task_id} task={task} onMove={handleMove} />
+                  <TaskCard key={task.task_id} task={task} onMove={handleMove} onOpenDetail={setDetailTask} />
                 ))}
               </div>
             </div>
           );
         })}
       </div>
+
+      <TaskDetailModal task={detailTask} onClose={() => setDetailTask(null)} onUpdated={handleTaskUpdated} />
     </div>
   );
 }

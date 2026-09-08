@@ -7,6 +7,7 @@ import { conditionColor, conditionLabelText } from "@/lib/conditionScore";
 import { fetchRouteToHalte } from "@/lib/fetchSafeRoute";
 import CommentSection from "@/components/map/CommentSection";
 import MediaCarousel from "@/components/map/MediaCarousel";
+import RepairPhotoSection from "@/components/map/RepairPhotoSection";
 import type { HalteFeature, HalteProperties } from "@/types/halte";
 
 interface HaltePublicModalProps {
@@ -28,12 +29,15 @@ const ATTRIBUTE_ROWS: Array<{ key: keyof HalteProperties; label: string; icon: s
   { key: "canopy", label: "Kanopi / Peneduh", icon: "roofing" },
 ];
 
-// Dot-only indicator (green/red/grey) -- no "Tersedia"/"Tidak Ada"/"Tidak
-// Disebutkan" text label anymore, the color alone carries the meaning here.
-function stateColor(value: string): string {
-  if (value === "ada") return "bg-safety-green";
-  if (value === "tidak") return "bg-alert-red";
-  return "bg-outline-variant";
+// A full colored chip (not just a small dot) -- green/red/grey, no
+// "Tersedia"/"Tidak Ada"/"Tidak Disebutkan" text, the color alone carries
+// the meaning, but as a whole badge rather than a subtle corner dot. The
+// grey ("tidak disebutkan"/unknown) variant is light, so it pairs with dark
+// text instead of the white that fits the two saturated colors.
+function stateChipClasses(value: string): string {
+  if (value === "ada") return "bg-safety-green text-on-primary";
+  if (value === "tidak") return "bg-alert-red text-on-primary";
+  return "bg-outline-variant text-on-surface";
 }
 
 /**
@@ -117,8 +121,12 @@ export default function HaltePublicModal({ feature, onClose, map }: HaltePublicM
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-      <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto scrollbar-hide rounded-xl border border-border-low bg-surface p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between border-b border-border-low pb-4">
+      <div className="flex w-full max-w-xl max-h-[90vh] flex-col overflow-hidden rounded-xl border border-border-low bg-surface shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+        {/* Sticky header -- stays visible while the body below scrolls, so
+            the halte name is never scrolled out of view. A solid bg-surface
+            here (matching the modal's own background) is what masks the
+            body's content passing underneath it. */}
+        <div className="flex shrink-0 items-center justify-between border-b border-border-low bg-surface px-6 py-4">
           <div>
             <h3 className="font-headline-md text-[20px] font-bold text-on-surface">{p.nama_halte}</h3>
             <p className="font-label-sm text-[12px] text-on-surface-variant">
@@ -133,51 +141,57 @@ export default function HaltePublicModal({ feature, onClose, map }: HaltePublicM
           </button>
         </div>
 
-        <div className="mt-4 flex flex-col gap-4">
-          <div className="relative h-56 w-full rounded-lg overflow-hidden bg-surface-container border border-border-low">
-            <MediaCarousel key={p.halte_id} media={p.media} alt={p.nama_halte} />
-            <div className="pointer-events-none absolute top-3 left-3 bg-surface/90 backdrop-blur-sm px-3 py-1 rounded-lg border border-border-low shadow-sm flex items-center gap-2">
-              <span className="h-3 w-3 rounded-full" style={{ backgroundColor: conditionColor(p.condition_label) }} />
-              <span className="font-label-md text-[13px] font-bold text-on-surface">
-                {conditionLabelText(p.condition_label)}
-              </span>
-            </div>
-          </div>
-
-          <div>
-            <h4 className="font-label-md text-[13px] font-bold text-on-surface mb-2">Ketersediaan Fasilitas</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {ATTRIBUTE_ROWS.map(({ key, label, icon }) => (
-                <div key={key} className="flex items-center gap-2 p-2.5 rounded-lg border border-border-low bg-surface">
-                  <span className="material-symbols-outlined text-outline text-[18px]">{icon}</span>
-                  <span className="font-label-sm text-[12px] text-on-surface font-medium">{label}</span>
-                  <span className={`ml-auto h-2.5 w-2.5 shrink-0 rounded-full ${stateColor(p[key] as string)}`} />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {map && (
-            <div>
-              <button
-                onClick={handleNavigate}
-                disabled={navBusy}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-transport-blue px-4 py-2.5 font-label-md text-label-md font-bold text-on-primary transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                <span className="material-symbols-outlined text-[18px]">
-                  {navBusy ? "progress_activity" : "directions_walk"}
+        <div className="overflow-y-auto scrollbar-hide px-6 py-4">
+          <div className="flex flex-col gap-4">
+            <div className="relative h-56 w-full rounded-lg overflow-hidden bg-surface-container border border-border-low">
+              <MediaCarousel key={p.halte_id} media={p.media} alt={p.nama_halte} />
+              <div className="pointer-events-none absolute top-3 left-3 bg-surface/90 backdrop-blur-sm px-3 py-1 rounded-lg border border-border-low shadow-sm flex items-center gap-2">
+                <span className="h-3 w-3 rounded-full" style={{ backgroundColor: conditionColor(p.condition_label) }} />
+                <span className="font-label-md text-[13px] font-bold text-on-surface">
+                  {conditionLabelText(p.condition_label)}
                 </span>
-                {navStatus === "locating"
-                  ? "Mencari lokasi..."
-                  : navStatus === "loading"
-                    ? "Menghitung rute..."
-                    : "Navigasi ke Halte Ini"}
-              </button>
-              {navError && <p className="mt-1.5 text-label-sm text-alert-red">{navError}</p>}
+              </div>
             </div>
-          )}
 
-          <CommentSection key={p.halte_id} halteId={p.halte_id} />
+            <div>
+              <h4 className="font-label-md text-[13px] font-bold text-on-surface mb-2">Ketersediaan Fasilitas</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {ATTRIBUTE_ROWS.map(({ key, label, icon }) => (
+                  <div
+                    key={key}
+                    className={`flex items-center gap-2 rounded-lg p-2.5 ${stateChipClasses(p[key] as string)}`}
+                  >
+                    <span className="material-symbols-outlined text-[18px]">{icon}</span>
+                    <span className="font-label-sm text-[12px] font-medium">{label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {map && (
+              <div>
+                <button
+                  onClick={handleNavigate}
+                  disabled={navBusy}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-transport-blue px-4 py-2.5 font-label-md text-label-md font-bold text-on-primary transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  <span className="material-symbols-outlined text-[18px]">
+                    {navBusy ? "progress_activity" : "directions_walk"}
+                  </span>
+                  {navStatus === "locating"
+                    ? "Mencari lokasi..."
+                    : navStatus === "loading"
+                      ? "Menghitung rute..."
+                      : "Navigasi ke Halte Ini"}
+                </button>
+                {navError && <p className="mt-1.5 text-label-sm text-alert-red">{navError}</p>}
+              </div>
+            )}
+
+            <RepairPhotoSection key={p.halte_id} halteId={p.halte_id} />
+
+            <CommentSection key={p.halte_id} halteId={p.halte_id} />
+          </div>
         </div>
       </div>
     </div>

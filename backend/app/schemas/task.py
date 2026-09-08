@@ -25,5 +25,18 @@ class TaskOut(BaseModel):
     description: str
     assigned_to: str | None
     status: TaskStatus
+    technician_report: str | None
+    technician_photo_url: str | None
+    approved_for_public: bool
     created_at: datetime
+    updated_at: datetime
+
+
+class ApprovedRepairPhoto(BaseModel):
+    """Public-safe subset for HaltePublicModal -- just the approved photo and
+    when it was reported, none of the internal task fields (description,
+    assigned_to, status) a citizen has no reason to see."""
+
+    technician_report: str
+    technician_photo_url: str
     updated_at: datetime

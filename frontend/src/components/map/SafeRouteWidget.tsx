@@ -29,8 +29,9 @@ type Status = "idle" | "locating" | "loading" | "error";
  * walking budget, not a segment-weighted route -- we don't have per-segment
  * condition data to weight a path with).
  *
- * Bottom-left on both pages that use this (public map, dashboard) --
- * ReportFormWidget owns the bottom-right on the public map instead.
+ * Icon-only button, stacked with ReportFormWidget in a vertical column on
+ * the right edge of the public map (see MapView.tsx) -- below it, since
+ * "Buat Laporan" is the one the team wants first.
  */
 export default function SafeRouteWidget({ map }: SafeRouteWidgetProps) {
   const [status, setStatus] = useState<Status>("idle");
@@ -155,31 +156,32 @@ export default function SafeRouteWidget({ map }: SafeRouteWidgetProps) {
   const busy = status === "locating" || status === "loading";
 
   return (
-    <div className="relative w-full">
+    <div className="relative">
       <button
         onClick={handleClick}
         disabled={busy}
-        className="flex w-full items-center justify-center gap-1.5 rounded-full bg-transport-blue px-3 py-2.5 text-[12px] font-label-md font-bold text-on-primary shadow-lg transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-70 md:gap-2 md:px-4 md:text-label-md"
+        aria-label="Cari Halte Teraman"
+        title="Cari Halte Teraman"
+        className="flex h-12 w-12 items-center justify-center rounded-full bg-transport-blue text-on-primary shadow-lg transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-70"
       >
         {busy ? (
-          <span className="material-symbols-outlined animate-spin text-[16px] md:text-[20px]">progress_activity</span>
+          <span className="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
         ) : (
           // Search glass with a small bus badge -- "find a nearby stop", not
           // just a generic location pin.
-          <span className="relative inline-flex h-4 w-4 shrink-0 items-center justify-center md:h-5 md:w-5">
-            <span className="material-symbols-outlined text-[16px] leading-none md:text-[20px]">search</span>
-            <span className="absolute -bottom-1 -right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-on-primary md:h-3 md:w-3">
+          <span className="relative inline-flex h-5 w-5 shrink-0 items-center justify-center">
+            <span className="material-symbols-outlined text-[20px] leading-none">search</span>
+            <span className="absolute -bottom-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-on-primary">
               <span className="material-symbols-outlined leading-none text-transport-blue" style={{ fontSize: "7px" }}>
                 directions_bus
               </span>
             </span>
           </span>
         )}
-        {status === "locating" ? "Mencari lokasi..." : status === "loading" ? "Menghitung rute..." : "Cari Halte"}
       </button>
 
       {error && (
-        <div className="absolute bottom-full left-0 mb-2 flex w-72 max-w-[calc(100vw-2rem)] items-start gap-2 rounded-lg bg-error-container px-3 py-2 text-label-sm text-on-error-container shadow-lg">
+        <div className="absolute right-full top-0 mr-2 flex w-72 max-w-[calc(100vw-2rem)] items-start gap-2 rounded-lg bg-error-container px-3 py-2 text-label-sm text-on-error-container shadow-lg">
           <span className="material-symbols-outlined shrink-0 text-[18px]">error</span>
           <span className="flex-1">{error}</span>
           <button onClick={clearRoute} aria-label="Tutup" className="shrink-0 opacity-80 hover:opacity-100">
@@ -189,7 +191,7 @@ export default function SafeRouteWidget({ map }: SafeRouteWidgetProps) {
       )}
 
       {result && (
-        <div className="absolute bottom-full left-0 mb-2 w-72 max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-border-low bg-surface shadow-lg">
+        <div className="absolute right-full top-0 mr-2 w-72 max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-border-low bg-surface shadow-lg">
           <div className="flex items-center justify-between gap-2 border-b border-border-low bg-surface-container-low px-3 py-2">
             <span className="flex items-center gap-1.5 font-label-sm text-label-sm font-bold text-on-surface">
               <span className="material-symbols-outlined text-[16px] text-transport-blue">alt_route</span>

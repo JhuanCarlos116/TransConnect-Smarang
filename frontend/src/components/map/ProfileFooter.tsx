@@ -56,9 +56,9 @@ export default function ProfileFooter() {
 
   return (
     <>
-      <footer className="z-40 flex h-14 w-full shrink-0 items-center justify-between border-t border-border-low bg-surface px-margin-page">
+      <footer className="z-40 flex h-14 w-full shrink-0 items-center justify-center gap-10 border-t border-border-low bg-surface px-margin-page">
         <Link
-          href="/"
+          href="/map"
           aria-label="Beranda"
           className="flex h-10 w-10 items-center justify-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-container-low"
         >

@@ -12,16 +12,19 @@ would just be a differently-shaped version of the same fabrication.
 
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import get_session
 from app.models.halte import HalteSurvey
 from app.models.task import MaintenanceTask
-from app.schemas.task import TaskCreate, TaskOut, TaskStatusUpdate
+from app.routers.citizen_report import PHOTO_CONTENT_TYPE_TO_EXT, _save_upload
+from app.schemas.task import ApprovedRepairPhoto, TaskCreate, TaskOut, TaskStatusUpdate
 
 router = APIRouter()
+
+MAX_TECHNICIAN_PHOTO_BYTES = 5 * 1024 * 1024  # 5 MB, same cap as citizen_report's photo
 
 
 def _to_out(task: MaintenanceTask, halte: HalteSurvey) -> TaskOut:
@@ -34,6 +37,9 @@ def _to_out(task: MaintenanceTask, halte: HalteSurvey) -> TaskOut:
         description=task.description,
         assigned_to=task.assigned_to,
         status=task.status,
+        technician_report=task.technician_report,
+        technician_photo_url=task.technician_photo_url,
+        approved_for_public=task.approved_for_public,
         created_at=task.created_at,
         updated_at=task.updated_at,
     )
@@ -47,6 +53,28 @@ async def list_tasks(session: AsyncSession = Depends(get_session)) -> list[TaskO
         .order_by(MaintenanceTask.created_at.desc())
     )
     return [_to_out(task, halte) for task, halte in result.all()]
+
+
+@router.get("/halte/{halte_id}/repair-photos", response_model=list[ApprovedRepairPhoto])
+async def list_approved_repair_photos(
+    halte_id: str, session: AsyncSession = Depends(get_session)
+) -> list[ApprovedRepairPhoto]:
+    """Public-facing (HaltePublicModal) -- only DISHUB-approved technician
+    photos for this halte, none of the surrounding task/dispatch detail."""
+    result = await session.execute(
+        select(MaintenanceTask)
+        .where(MaintenanceTask.halte_id == halte_id, MaintenanceTask.approved_for_public.is_(True))
+        .order_by(MaintenanceTask.updated_at.desc())
+    )
+    return [
+        ApprovedRepairPhoto(
+            technician_report=task.technician_report or "",
+            technician_photo_url=task.technician_photo_url,
+            updated_at=task.updated_at,
+        )
+        for task in result.scalars().all()
+        if task.technician_photo_url
+    ]
 
 
 @router.post("/tasks", response_model=TaskOut, status_code=201)
@@ -76,6 +104,64 @@ async def update_task_status(
         raise HTTPException(status_code=404, detail="Tugas tidak ditemukan.")
 
     task.status = body.status
+    await session.commit()
+    await session.refresh(task)
+
+    halte = await session.get(HalteSurvey, task.halte_id)
+    return _to_out(task, halte)
+
+
+@router.patch("/tasks/{task_id}/report", response_model=TaskOut)
+async def submit_technician_report(
+    task_id: str,
+    report: str = Form(...),
+    photo: UploadFile | None = File(None),
+    session: AsyncSession = Depends(get_session),
+) -> TaskOut:
+    """Technician's own report on a task in progress/done -- separate from
+    the dispatcher's original description (what needs fixing). Submitting a
+    new photo here does NOT make it public on its own; see /approve below.
+    """
+    task = await session.get(MaintenanceTask, task_id)
+    if task is None:
+        raise HTTPException(status_code=404, detail="Tugas tidak ditemukan.")
+    if not report.strip():
+        raise HTTPException(status_code=400, detail="Laporan petugas tidak boleh kosong.")
+
+    task.technician_report = report.strip()
+    if photo is not None and photo.filename:
+        task.technician_photo_url = await _save_upload(
+            photo,
+            PHOTO_CONTENT_TYPE_TO_EXT,
+            MAX_TECHNICIAN_PHOTO_BYTES,
+            "Format foto harus JPEG, PNG, atau WebP.",
+            "Ukuran foto maksimal 5 MB.",
+        )
+        # A newly submitted photo needs re-approval before it goes public --
+        # otherwise a technician could quietly swap the photo an admin
+        # already approved.
+        task.approved_for_public = False
+
+    await session.commit()
+    await session.refresh(task)
+
+    halte = await session.get(HalteSurvey, task.halte_id)
+    return _to_out(task, halte)
+
+
+@router.patch("/tasks/{task_id}/approve", response_model=TaskOut)
+async def approve_technician_photo(task_id: str, session: AsyncSession = Depends(get_session)) -> TaskOut:
+    """DISHUB's explicit approval step -- only after this does the
+    technician's photo appear on the public map (HaltePublicModal shows
+    approved_for_public photos alongside the halte's own survey media).
+    """
+    task = await session.get(MaintenanceTask, task_id)
+    if task is None:
+        raise HTTPException(status_code=404, detail="Tugas tidak ditemukan.")
+    if not task.technician_photo_url:
+        raise HTTPException(status_code=400, detail="Tugas ini belum punya foto laporan petugas.")
+
+    task.approved_for_public = True
     await session.commit()
     await session.refresh(task)
 

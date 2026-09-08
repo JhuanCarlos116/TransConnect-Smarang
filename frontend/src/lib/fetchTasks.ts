@@ -1,4 +1,4 @@
-import type { Task, TaskCreateInput, TaskStatus } from "@/types/task";
+import type { ApprovedRepairPhoto, Task, TaskCreateInput, TaskStatus } from "@/types/task";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -45,4 +45,26 @@ export async function updateTaskStatus(taskId: string, status: TaskStatus): Prom
     body: JSON.stringify({ status }),
   });
   return parseOrThrow<Task>(res);
+}
+
+export async function submitTechnicianReport(taskId: string, report: string, photo?: File): Promise<Task> {
+  const formData = new FormData();
+  formData.append("report", report);
+  if (photo) formData.append("photo", photo);
+
+  const res = await fetch(`${requireApiBase()}/api/v1/tasks/${taskId}/report`, {
+    method: "PATCH",
+    body: formData,
+  });
+  return parseOrThrow<Task>(res);
+}
+
+export async function approveTechnicianPhoto(taskId: string): Promise<Task> {
+  const res = await fetch(`${requireApiBase()}/api/v1/tasks/${taskId}/approve`, { method: "PATCH" });
+  return parseOrThrow<Task>(res);
+}
+
+export async function fetchApprovedRepairPhotos(halteId: string): Promise<ApprovedRepairPhoto[]> {
+  const res = await fetch(`${requireApiBase()}/api/v1/halte/${halteId}/repair-photos`);
+  return parseOrThrow<ApprovedRepairPhoto[]>(res);
 }
