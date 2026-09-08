@@ -6,6 +6,12 @@ class RouteRequest(BaseModel):
     lon: float
 
 
+class RouteToHalteRequest(BaseModel):
+    lat: float
+    lon: float
+    halte_id: str
+
+
 class RouteOption(BaseModel):
     halte_id: str
     nama_halte: str

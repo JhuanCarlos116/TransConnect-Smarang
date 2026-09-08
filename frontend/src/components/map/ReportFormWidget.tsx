@@ -141,7 +141,7 @@ export default function ReportFormWidget({ map }: ReportFormWidgetProps) {
     // MapView.tsx) -- both buttons are the same width there, so this no
     // longer needs its own absolute corner position.
     <div className="relative w-full">
-      {status === "idle" && (
+      {status === "idle" ? (
         <button
           onClick={startPicking}
           className="flex w-full items-center justify-center gap-1.5 rounded-full bg-transport-blue px-3 py-2.5 text-[12px] font-label-md font-bold text-on-primary shadow-lg transition-colors hover:bg-primary md:gap-2 md:px-4 md:text-label-md"
@@ -152,10 +152,19 @@ export default function ReportFormWidget({ map }: ReportFormWidgetProps) {
           </span>
           Buat Laporan
         </button>
+      ) : (
+        // Keeps this column's width in the shared bottom bar (see
+        // MapView.tsx) equal to SafeRouteWidget's even while the real button
+        // above is replaced by a floating panel -- without this, the row
+        // loses one w-full child and the other button visibly stretches/
+        // shifts to fill the gap.
+        <div aria-hidden className="invisible flex w-full items-center gap-1.5 rounded-full px-3 py-2.5 text-[12px] font-label-md md:gap-2 md:px-4 md:text-label-md">
+          Buat Laporan
+        </div>
       )}
 
       {status === "picking" && (
-        <div className="absolute bottom-full left-1/2 mb-2 flex w-max -translate-x-1/2 items-center gap-1.5 rounded-full bg-transport-blue px-3 py-2 text-[12px] font-label-md font-bold text-on-primary shadow-lg md:gap-2 md:px-4 md:py-2.5 md:text-label-md">
+        <div className="absolute bottom-full right-0 mb-2 flex w-max items-center gap-1.5 rounded-full bg-transport-blue px-3 py-2 text-[12px] font-label-md font-bold text-on-primary shadow-lg md:gap-2 md:px-4 md:py-2.5 md:text-label-md">
           <span className="material-symbols-outlined text-[16px] md:text-[20px]">touch_app</span>
           Klik titik di peta
           <button onClick={reset} aria-label="Batal" className="ml-1 opacity-80 hover:opacity-100">
@@ -165,7 +174,7 @@ export default function ReportFormWidget({ map }: ReportFormWidgetProps) {
       )}
 
       {(status === "form" || status === "submitting" || status === "error") && (
-        <div className="absolute bottom-full left-1/2 mb-2 w-80 max-w-[calc(100vw-2rem)] -translate-x-1/2 overflow-hidden rounded-lg border border-border-low bg-surface shadow-lg">
+        <div className="absolute bottom-full right-0 mb-2 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-border-low bg-surface shadow-lg">
           <div className="flex items-center justify-between gap-2 border-b border-border-low bg-surface-container-low px-3 py-2">
             <span className="flex items-center gap-1.5 font-label-sm text-label-sm font-bold text-on-surface">
               <span className="flex items-center -space-x-0.5 text-transport-blue">
@@ -209,7 +218,7 @@ export default function ReportFormWidget({ map }: ReportFormWidgetProps) {
       )}
 
       {status === "done" && (
-        <div className="absolute bottom-full left-1/2 mb-2 w-72 max-w-[calc(100vw-2rem)] -translate-x-1/2 flex items-center gap-2 rounded-lg border border-safety-green/30 bg-green-50 p-3 shadow-lg">
+        <div className="absolute bottom-full right-0 mb-2 w-72 max-w-[calc(100vw-2rem)] flex items-center gap-2 rounded-lg border border-safety-green/30 bg-green-50 p-3 shadow-lg">
           <span className="material-symbols-outlined text-[18px] text-safety-green">check_circle</span>
           <span className="flex-1 text-label-sm text-on-surface">Laporan terkirim, terima kasih!</span>
           <button onClick={reset} aria-label="Tutup" className="opacity-70 hover:opacity-100">

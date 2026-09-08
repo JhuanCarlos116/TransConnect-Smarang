@@ -11,6 +11,7 @@ import AppHeader from "@/components/ui/AppHeader";
 import SafeRouteWidget from "@/components/map/SafeRouteWidget";
 import ReportFormWidget from "@/components/map/ReportFormWidget";
 import HaltePublicModal from "@/components/map/HaltePublicModal";
+import ProfileFooter from "@/components/map/ProfileFooter";
 import type { HalteFeature } from "@/types/halte";
 
 /**
@@ -79,7 +80,9 @@ export default function MapView() {
         </div>
       </main>
 
-      <HaltePublicModal feature={detailTarget} onClose={() => setDetailTarget(null)} />
+      <ProfileFooter />
+
+      <HaltePublicModal feature={detailTarget} onClose={() => setDetailTarget(null)} map={map ?? undefined} />
     </div>
   );
 }

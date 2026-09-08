@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { createComment, fetchComments } from "@/lib/fetchComments";
+import { useLocalProfile } from "@/lib/useLocalProfile";
 import type { HalteComment } from "@/types/comment";
 
 interface CommentSectionProps {
@@ -27,11 +28,11 @@ function timeAgo(iso: string): string {
  * here is seeded or sample data.
  */
 export default function CommentSection({ halteId }: CommentSectionProps) {
+  const { profile } = useLocalProfile();
   const [comments, setComments] = useState<HalteComment[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const [authorName, setAuthorName] = useState("");
   const [body, setBody] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -55,11 +56,11 @@ export default function CommentSection({ halteId }: CommentSectionProps) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!authorName.trim() || !body.trim()) return;
+    if (!profile.name.trim() || !body.trim()) return;
     setSubmitting(true);
     setSubmitError(null);
     try {
-      const created = await createComment(halteId, { author_name: authorName.trim(), body: body.trim() });
+      const created = await createComment(halteId, { author_name: profile.name.trim(), body: body.trim() });
       setComments((prev) => [created, ...prev]);
       setBody("");
     } catch (err) {
@@ -76,34 +77,36 @@ export default function CommentSection({ halteId }: CommentSectionProps) {
         Komentar
       </h4>
 
-      <form onSubmit={handleSubmit} className="mb-3 flex flex-col gap-2 rounded-lg border border-border-low bg-surface p-3">
-        <input
-          type="text"
-          value={authorName}
-          onChange={(e) => setAuthorName(e.target.value)}
-          placeholder="Nama kamu"
-          maxLength={60}
-          required
-          className="w-full rounded-lg border border-border-low bg-surface-container-low p-2 font-body-md text-[13px] text-on-surface focus:border-transport-blue focus:outline-none focus:ring-1 focus:ring-transport-blue"
-        />
-        <textarea
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          placeholder="Tulis komentar tentang halte ini..."
-          maxLength={1000}
-          required
-          rows={2}
-          className="w-full rounded-lg border border-border-low bg-surface-container-low p-2 font-body-md text-[13px] text-on-surface focus:border-transport-blue focus:outline-none focus:ring-1 focus:ring-transport-blue"
-        />
-        {submitError && <p className="text-label-sm text-alert-red">{submitError}</p>}
-        <button
-          type="submit"
-          disabled={submitting || !authorName.trim() || !body.trim()}
-          className="self-start rounded-lg bg-transport-blue px-3 py-1.5 font-label-sm text-label-sm font-bold text-on-primary transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-70"
-        >
-          {submitting ? "Mengirim..." : "Kirim Komentar"}
-        </button>
-      </form>
+      {profile.name.trim() ? (
+        <form onSubmit={handleSubmit} className="mb-3 flex flex-col gap-2 rounded-lg border border-border-low bg-surface p-3">
+          <div className="flex items-center gap-1.5 text-label-sm text-on-surface-variant">
+            <span className="material-symbols-outlined text-[15px]">account_circle</span>
+            Berkomentar sebagai <span className="font-bold text-on-surface">{profile.name}</span>
+          </div>
+          <textarea
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            placeholder="Tulis komentar tentang halte ini..."
+            maxLength={1000}
+            required
+            rows={2}
+            className="w-full rounded-lg border border-border-low bg-surface-container-low p-2 font-body-md text-[13px] text-on-surface focus:border-transport-blue focus:outline-none focus:ring-1 focus:ring-transport-blue"
+          />
+          {submitError && <p className="text-label-sm text-alert-red">{submitError}</p>}
+          <button
+            type="submit"
+            disabled={submitting || !body.trim()}
+            className="self-start rounded-lg bg-transport-blue px-3 py-1.5 font-label-sm text-label-sm font-bold text-on-primary transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            {submitting ? "Mengirim..." : "Kirim Komentar"}
+          </button>
+        </form>
+      ) : (
+        <div className="mb-3 flex items-center gap-2 rounded-lg border border-border-low bg-surface-container-low p-3 text-label-sm text-on-surface-variant">
+          <span className="material-symbols-outlined text-[18px] text-outline">account_circle</span>
+          Isi nama di profil (tombol di footer) dulu untuk bisa berkomentar.
+        </div>
+      )}
 
       {loading && <p className="text-label-sm text-on-surface-variant">Memuat komentar...</p>}
       {loadError && <p className="text-label-sm text-alert-red">{loadError}</p>}
