@@ -1,36 +1,30 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { DEFAULT_CENTER, DEFAULT_ZOOM, MAPID_API_KEY, mapStyleUrl } from "@/lib/maplibre";
-import { fetchHalteData } from "@/lib/fetchHalteData";
-import { fetchCommunityReports } from "@/lib/fetchCommunityReports";
 import HalteLayer from "@/components/map/HalteLayer";
-import CommunityMapsLayer from "@/components/map/CommunityMapsLayer";
 import ConditionLegend from "@/components/map/ConditionLegend";
 import AppHeader from "@/components/ui/AppHeader";
-import PublicSidePanel from "@/components/map/PublicSidePanel";
-import PublicMobileSheet from "@/components/map/PublicMobileSheet";
 import SafeRouteWidget from "@/components/map/SafeRouteWidget";
-import type { HalteFeature } from "@/types/halte";
+import ReportFormWidget from "@/components/map/ReportFormWidget";
 
+/**
+ * Public map, pared down to the two things the team asked to keep front and
+ * center: seeing halte condition and the two action widgets (Safe Transit
+ * Navigator, citizen report submission). The search bar, the public/dashboard
+ * nav tabs, and the whole sidebar/mobile-sheet info panel (condition summary
+ * cards, layer toggles, "Buka Dashboard DISHUB") are gone from this page --
+ * DISHUB staff have their own dashboard at /dashboard; this page is citizen-
+ * facing only now, so it doesn't need a way to route out to that internal
+ * tool, and the halte layer has no toggle since there's nothing else to
+ * choose between here.
+ */
 export default function MapView() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [map, setMap] = useState<maplibregl.Map | null>(null);
-  const [halteVisible, setHalteVisible] = useState(true);
-  const [communityVisible, setCommunityVisible] = useState(false);
-
-  const [halteFeatures, setHalteFeatures] = useState<HalteFeature[]>([]);
-  const [verifiedCount, setVerifiedCount] = useState<number | null>(null);
-
-  useEffect(() => {
-    fetchHalteData().then((data) => setHalteFeatures(data.features));
-    fetchCommunityReports().then((data) =>
-      setVerifiedCount(data.features.filter((f) => f.properties.verification_status === "verified").length),
-    );
-  }, []);
 
   useEffect(() => {
     if (!containerRef.current || !MAPID_API_KEY) return;
@@ -56,60 +50,29 @@ export default function MapView() {
     };
   }, []);
 
-  const flyToHalte = useCallback(
-    (feature: HalteFeature) => {
-      map?.flyTo({ center: feature.geometry.coordinates, zoom: 16 });
-    },
-    [map],
-  );
-
   return (
     <div className="flex h-screen flex-col overflow-hidden font-sans">
-      <AppHeader active="public" searchFeatures={halteFeatures} onSearchSelect={flyToHalte} />
+      <AppHeader />
 
-      <div className="relative flex flex-1 overflow-hidden">
-        <PublicSidePanel
-          features={halteFeatures}
-          verifiedReportCount={verifiedCount}
-          halteVisible={halteVisible}
-          onHalteChange={setHalteVisible}
-          communityVisible={communityVisible}
-          onCommunityChange={setCommunityVisible}
-        />
-
-        <main className="relative flex-1">
-          <div ref={containerRef} className="h-full w-full" />
-          {map && (
-            <>
-              <HalteLayer map={map} visible={halteVisible} />
-              <CommunityMapsLayer map={map} visible={communityVisible} />
-              <SafeRouteWidget map={map} />
-            </>
-          )}
-          {!MAPID_API_KEY && (
-            <div className="absolute left-margin-page top-margin-page z-20 rounded-lg bg-error-container px-stack-md py-stack-sm text-label-md text-on-error-container">
-              NEXT_PUBLIC_MAPID_API_KEY belum diisi di frontend/.env.local
-            </div>
-          )}
-
-          {/* Below md, PublicMobileSheet's peek bar already surfaces this same
-              condition breakdown -- a second floating copy would duplicate it
-              and collide with the sheet, so the standalone legend is
-              desktop-only here. */}
-          <div className="absolute bottom-margin-page right-margin-page z-20 hidden md:block">
-            <ConditionLegend />
+      <main className="relative flex-1">
+        <div ref={containerRef} className="h-full w-full" />
+        {map && (
+          <>
+            <HalteLayer map={map} visible />
+            <SafeRouteWidget map={map} />
+            <ReportFormWidget map={map} />
+          </>
+        )}
+        {!MAPID_API_KEY && (
+          <div className="absolute left-margin-page top-margin-page z-20 rounded-lg bg-error-container px-stack-md py-stack-sm text-label-md text-on-error-container">
+            NEXT_PUBLIC_MAPID_API_KEY belum diisi di frontend/.env.local
           </div>
-        </main>
+        )}
 
-        <PublicMobileSheet
-          features={halteFeatures}
-          verifiedReportCount={verifiedCount}
-          halteVisible={halteVisible}
-          onHalteChange={setHalteVisible}
-          communityVisible={communityVisible}
-          onCommunityChange={setCommunityVisible}
-        />
-      </div>
+        <div className="absolute left-margin-page top-margin-page z-20">
+          <ConditionLegend />
+        </div>
+      </main>
     </div>
   );
 }
