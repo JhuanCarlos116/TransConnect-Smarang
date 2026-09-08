@@ -159,9 +159,9 @@ export default function SafeRouteWidget({ map }: SafeRouteWidgetProps) {
       <button
         onClick={handleClick}
         disabled={busy}
-        className="flex items-center gap-2 self-start rounded-full bg-transport-blue px-4 py-2.5 font-label-md text-label-md font-bold text-on-primary shadow-lg transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-70"
+        className="flex items-center gap-1.5 self-start rounded-full bg-transport-blue px-3 py-2 text-[12px] font-label-md font-bold text-on-primary shadow-lg transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-70 md:gap-2 md:px-4 md:py-2.5 md:text-label-md"
       >
-        <span className={`material-symbols-outlined text-[20px] ${busy ? "animate-spin" : ""}`}>
+        <span className={`material-symbols-outlined text-[16px] md:text-[20px] ${busy ? "animate-spin" : ""}`}>
           {busy ? "progress_activity" : "my_location"}
         </span>
         {status === "locating" ? "Mencari lokasi..." : status === "loading" ? "Menghitung rute..." : "Cari Halte Teraman"}
