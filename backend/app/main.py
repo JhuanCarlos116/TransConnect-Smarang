@@ -8,6 +8,7 @@ from app.config import settings
 from app.db import Base, engine
 from app.routers.chat import router as chat_router
 from app.routers.citizen_report import UPLOAD_DIR, router as citizen_report_router
+from app.routers.comment import router as comment_router
 from app.routers.halte import router as halte_router
 from app.routers.route import router as route_router
 from app.routers.task import router as task_router
@@ -44,6 +45,7 @@ app.include_router(chat_router, prefix="/api/v1")
 app.include_router(route_router, prefix="/api/v1")
 app.include_router(task_router, prefix="/api/v1")
 app.include_router(citizen_report_router, prefix="/api/v1")
+app.include_router(comment_router, prefix="/api/v1")
 
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 

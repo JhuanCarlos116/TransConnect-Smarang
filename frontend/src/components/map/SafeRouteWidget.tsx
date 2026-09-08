@@ -155,11 +155,11 @@ export default function SafeRouteWidget({ map }: SafeRouteWidgetProps) {
   const busy = status === "locating" || status === "loading";
 
   return (
-    <div className="absolute bottom-margin-page left-margin-page z-20 flex max-w-xs flex-col-reverse gap-2">
+    <div className="relative w-full">
       <button
         onClick={handleClick}
         disabled={busy}
-        className="flex items-center gap-1.5 self-start rounded-full bg-transport-blue px-3 py-2 text-[12px] font-label-md font-bold text-on-primary shadow-lg transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-70 md:gap-2 md:px-4 md:py-2.5 md:text-label-md"
+        className="flex w-full items-center justify-center gap-1.5 rounded-full bg-transport-blue px-3 py-2.5 text-[12px] font-label-md font-bold text-on-primary shadow-lg transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-70 md:gap-2 md:px-4 md:text-label-md"
       >
         {busy ? (
           <span className="material-symbols-outlined animate-spin text-[16px] md:text-[20px]">progress_activity</span>
@@ -179,7 +179,7 @@ export default function SafeRouteWidget({ map }: SafeRouteWidgetProps) {
       </button>
 
       {error && (
-        <div className="flex items-start gap-2 rounded-lg bg-error-container px-3 py-2 text-label-sm text-on-error-container shadow-lg">
+        <div className="absolute bottom-full left-0 mb-2 flex w-72 max-w-[calc(100vw-2rem)] items-start gap-2 rounded-lg bg-error-container px-3 py-2 text-label-sm text-on-error-container shadow-lg">
           <span className="material-symbols-outlined shrink-0 text-[18px]">error</span>
           <span className="flex-1">{error}</span>
           <button onClick={clearRoute} aria-label="Tutup" className="shrink-0 opacity-80 hover:opacity-100">
@@ -189,7 +189,7 @@ export default function SafeRouteWidget({ map }: SafeRouteWidgetProps) {
       )}
 
       {result && (
-        <div className="overflow-hidden rounded-lg border border-border-low bg-surface shadow-lg">
+        <div className="absolute bottom-full left-0 mb-2 w-72 max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-border-low bg-surface shadow-lg">
           <div className="flex items-center justify-between gap-2 border-b border-border-low bg-surface-container-low px-3 py-2">
             <span className="flex items-center gap-1.5 font-label-sm text-label-sm font-bold text-on-surface">
               <span className="material-symbols-outlined text-[16px] text-transport-blue">alt_route</span>
