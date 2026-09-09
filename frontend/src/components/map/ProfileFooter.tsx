@@ -6,13 +6,43 @@ import Link from "next/link";
 import { useLocalProfile } from "@/lib/useLocalProfile";
 
 const MAX_PHOTO_BYTES = 2 * 1024 * 1024;
+const AVATAR_SIZE = 128;
 
-function readAsDataUrl(file: File): Promise<string> {
+/**
+ * Profile photos go into localStorage as a data URL (see useLocalProfile),
+ * which has a ~5-10MB per-origin quota shared with everything else stored
+ * there. Saving a phone-camera photo's full base64 (a 2MB JPEG becomes
+ * ~2.7MB as base64) blew through that budget -- setProfile's setItem failed
+ * silently (caught and swallowed) or, on some mobile WebViews, decoding +
+ * repeatedly JSON-parsing a string that large crashed the tab outright. This
+ * downscales to a small square avatar and re-encodes at moderate JPEG
+ * quality first, landing well under a few KB regardless of the source photo.
+ */
+function readAsAvatarDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      const canvas = document.createElement("canvas");
+      canvas.width = AVATAR_SIZE;
+      canvas.height = AVATAR_SIZE;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        reject(new Error("Canvas tidak didukung"));
+        return;
+      }
+      const side = Math.min(img.width, img.height);
+      const sx = (img.width - side) / 2;
+      const sy = (img.height - side) / 2;
+      ctx.drawImage(img, sx, sy, side, side, 0, 0, AVATAR_SIZE, AVATAR_SIZE);
+      resolve(canvas.toDataURL("image/jpeg", 0.8));
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("Gagal membaca gambar"));
+    };
+    img.src = objectUrl;
   });
 }
 
@@ -46,7 +76,11 @@ export default function ProfileFooter() {
       return;
     }
     setError(null);
-    setPhotoDraft(await readAsDataUrl(file));
+    try {
+      setPhotoDraft(await readAsAvatarDataUrl(file));
+    } catch {
+      setError("Gagal memproses foto, coba foto lain.");
+    }
   }
 
   function handleSave() {
