@@ -121,7 +121,21 @@ export default function DashboardSidebar({
 
   return (
     <nav className="z-40 hidden h-full w-panel-width shrink-0 flex-col overflow-y-auto scrollbar-hide border-r border-border-low bg-surface md:flex">
-      <DashboardNav />
+      {/* DashboardNav's own nav-items div is flex-1 -- correct on its own
+          (e.g. /dashboard/tasks, where DashboardNav is <nav>'s only
+          content and that flex-1 is what pushes its "Keluar" footer to the
+          bottom of the sidebar). Here, though, Layer Peta and the legend
+          come after DashboardNav in the same flex-col <nav>, so that same
+          flex-1 was reaching past "Keluar" and eating all the space in
+          *this* <nav> instead, pushing Layer Peta/the legend down to
+          whatever was left over -- which shifted every time the legend's
+          height changed (e.g. toggling a layer off). shrink-0 on this
+          wrapper caps DashboardNav (nav items + Keluar) to its natural
+          content height, so Layer Peta/the legend sit directly under it,
+          unaffected by how tall the legend currently is. */}
+      <div className="flex shrink-0 flex-col">
+        <DashboardNav />
+      </div>
 
       <div className="border-t border-border-low p-gutter">
         <button

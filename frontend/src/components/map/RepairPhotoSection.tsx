@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { fetchApprovedRepairPhotos } from "@/lib/fetchTasks";
+import { resolveUploadUrl } from "@/lib/resolveUploadUrl";
 import type { ApprovedRepairPhoto } from "@/types/task";
 
 interface RepairPhotoSectionProps {
@@ -47,7 +48,7 @@ export default function RepairPhotoSection({ halteId }: RepairPhotoSectionProps)
         {photos.map((p) => (
           <div key={p.updated_at} className="overflow-hidden rounded-lg border border-border-low bg-surface">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={p.technician_photo_url} alt="" className="h-40 w-full object-cover" />
+            <img src={resolveUploadUrl(p.technician_photo_url) ?? undefined} alt="" className="h-40 w-full object-cover" />
             <p className="p-2.5 text-[13px] leading-relaxed text-on-surface-variant">{p.technician_report}</p>
           </div>
         ))}

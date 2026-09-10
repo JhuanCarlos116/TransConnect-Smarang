@@ -47,3 +47,18 @@ export async function fetchCitizenReportsByHalte(halteId: string): Promise<Citiz
   }
   return (await res.json()) as CitizenReport[];
 }
+
+/**
+ * Every citizen report across all halte, unfiltered -- used by the dashboard
+ * map (BusStopLayer) to mark which halte have an unactioned ("baru") report,
+ * so a dispatcher sees it on the map itself rather than having to open every
+ * halte's detail panel to check.
+ */
+export async function fetchAllCitizenReports(): Promise<CitizenReport[]> {
+  const res = await fetch(`${requireApiBase()}/api/v1/citizen-reports`);
+  if (!res.ok) {
+    const body = (await res.json().catch(() => null)) as { detail?: string } | null;
+    throw new Error(body?.detail ?? `Backend merespons status ${res.status}`);
+  }
+  return (await res.json()) as CitizenReport[];
+}

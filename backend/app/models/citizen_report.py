@@ -34,6 +34,12 @@ class CitizenReport(Base):
     # reporter didn't attach that media type.
     photo_url: Mapped[str | None] = mapped_column(String, nullable=True)
     video_url: Mapped[str | None] = mapped_column(String, nullable=True)
+    # "baru" (not yet dispatched -- shown on the dashboard map as a marker
+    # needing attention) -> "diproses" (a MaintenanceTask now exists for it,
+    # see POST /citizen-reports/{id}/dispatch). There is no "selesai" status:
+    # once the dispatched task reaches "selesai" the row is deleted outright
+    # (see update_task_status in routers/task.py) rather than kept around in
+    # a third state, per the dispatcher workflow this models.
     status: Mapped[str] = mapped_column(String, default="baru")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 

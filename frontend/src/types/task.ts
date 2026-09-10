@@ -5,6 +5,7 @@ export type TaskStatus = "belum_dikerjakan" | "proses" | "selesai";
 export interface Task {
   task_id: string;
   halte_id: string;
+  citizen_report_id: string | null;
   nama_halte: string;
   kelurahan: string;
   condition_label: ConditionLabel;
@@ -22,6 +23,7 @@ export interface TaskCreateInput {
   halte_id: string;
   description: string;
   assigned_to?: string;
+  citizen_report_id?: string;
 }
 
 export interface ApprovedRepairPhoto {

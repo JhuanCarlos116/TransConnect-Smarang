@@ -10,6 +10,10 @@ class TaskCreate(BaseModel):
     halte_id: str
     description: str
     assigned_to: str | None = None
+    # Set when this task is dispatched straight from a citizen report
+    # (CitizenReportSection's "Dispatch ke Tugas" button) rather than typed
+    # up from scratch in TaskCreateSection -- see POST /tasks.
+    citizen_report_id: str | None = None
 
 
 class TaskStatusUpdate(BaseModel):
@@ -19,6 +23,7 @@ class TaskStatusUpdate(BaseModel):
 class TaskOut(BaseModel):
     task_id: str
     halte_id: str
+    citizen_report_id: str | None
     nama_halte: str
     kelurahan: str
     condition_label: str

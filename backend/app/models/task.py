@@ -11,6 +11,15 @@ class MaintenanceTask(Base):
 
     task_id: Mapped[str] = mapped_column(String, primary_key=True)
     halte_id: Mapped[str] = mapped_column(String, ForeignKey("halte_survey.halte_id"))
+    # Set only when this task was dispatched directly from a citizen report
+    # (POST /citizen-reports/{id}/dispatch) rather than typed up from scratch
+    # by DISHUB -- lets the dashboard mark the halte on the map and, once
+    # this task reaches "selesai", delete that report (see update_task_status
+    # in routers/task.py). A task created the old way (TaskCreateSection)
+    # has no citizen report behind it, so this stays None.
+    citizen_report_id: Mapped[str | None] = mapped_column(
+        String, ForeignKey("citizen_report.report_id"), nullable=True
+    )
 
     description: Mapped[str] = mapped_column(String)
     # Plain text, not a foreign key to a staff account -- there is no

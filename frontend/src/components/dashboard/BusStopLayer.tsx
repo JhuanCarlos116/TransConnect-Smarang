@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import * as maplibregl from "maplibre-gl";
 
 import { fetchHalteData } from "@/lib/fetchHalteData";
@@ -8,9 +8,22 @@ import type { ConditionLabel, HalteFeature, HalteFeatureCollection } from "@/typ
 
 export type HalteConditionFilter = ConditionLabel | "all";
 
+/** "baru" = a citizen report with no task yet, or a task that hasn't been
+ * started ("belum_dikerjakan") -- still needs attention, drawn red.
+ * "proses" = the dispatched task is actively being worked on -- drawn
+ * orange. There is no "selesai" status: a task reaching "selesai" deletes
+ * its citizen_report row server-side (see update_task_status in
+ * routers/task.py), so that halte simply stops appearing in the map passed
+ * in here and its ring disappears on its own. */
+export type ReportMarkerStatus = "baru" | "proses";
+
 const SOURCE_ID = "bus-stops";
 export const BUS_STOP_POINT_LAYER_ID = "bus-stops-points";
 const POINT_LAYER_ID = BUS_STOP_POINT_LAYER_ID;
+
+const REPORT_MARKER_SOURCE_ID = "bus-stops-reported";
+const REPORT_MARKER_LAYER_ID = "bus-stops-reported-ring";
+const REPORT_STATUS_PROPERTY = "_report_status";
 
 interface BusStopLayerProps {
   map: maplibregl.Map;
@@ -18,6 +31,15 @@ interface BusStopLayerProps {
   onSelect?: (feature: HalteFeature) => void;
   /** Which condition to show. Defaults to "all". See DashboardSidebar's filter button. */
   conditionFilter?: HalteConditionFilter;
+  /**
+   * halte_id -> report/task status, drawn as a colored ring around the
+   * halte's dot so a dispatcher spots it on the map itself, not just inside
+   * each halte's own detail panel. Owned by the dashboard page
+   * (fetchAllCitizenReports + fetchTasks), not this component, so it stays
+   * one source of truth the page can refresh after dispatch/approve/selesai
+   * actions instead of every layer fetching its own copy.
+   */
+  reportedHalteStatus?: Map<string, ReportMarkerStatus>;
 }
 
 function filterByCondition(
@@ -53,7 +75,13 @@ function filterByCondition(
  * moved here with it. The 71-point inventory file/script are left in place
  * (unused by the frontend now, not deleted) in case they're useful again.
  */
-export default function BusStopLayer({ map, visible, onSelect, conditionFilter = "all" }: BusStopLayerProps) {
+export default function BusStopLayer({
+  map,
+  visible,
+  onSelect,
+  conditionFilter = "all",
+  reportedHalteStatus,
+}: BusStopLayerProps) {
   const loadedRef = useRef(false);
   const onSelectRef = useRef(onSelect);
   useEffect(() => {
@@ -64,6 +92,25 @@ export default function BusStopLayer({ map, visible, onSelect, conditionFilter =
   const dataRef = useRef<HalteFeatureCollection | null>(null);
   const filterRef = useRef(conditionFilter);
   const visibleRef = useRef(visible);
+  const reportedStatusRef = useRef(reportedHalteStatus);
+
+  const updateReportMarkers = useCallback(() => {
+    const source = map.getSource(REPORT_MARKER_SOURCE_ID) as maplibregl.GeoJSONSource | undefined;
+    const statusByHalte = reportedStatusRef.current;
+    if (!source || !dataRef.current || !statusByHalte || statusByHalte.size === 0) {
+      source?.setData({ type: "FeatureCollection", features: [] });
+      return;
+    }
+    source.setData({
+      type: "FeatureCollection",
+      features: dataRef.current.features
+        .filter((f) => statusByHalte.has(f.properties.halte_id))
+        .map((f) => ({
+          ...f,
+          properties: { ...f.properties, [REPORT_STATUS_PROPERTY]: statusByHalte.get(f.properties.halte_id) },
+        })),
+    } as never);
+  }, [map]);
 
   useEffect(() => {
     if (loadedRef.current) return;
@@ -102,6 +149,32 @@ export default function BusStopLayer({ map, visible, onSelect, conditionFilter =
         },
       });
 
+      // Second, independent source/layer rather than folding this into
+      // POINT_LAYER_ID above -- reportedHalteStatus changes on its own
+      // schedule (dispatch/approve/selesai actions), separately from the
+      // halte survey data and its condition filter, so keeping it as its own
+      // GeoJSON source lets it update via setData without touching or
+      // re-filtering the halte points at all. The ring color itself IS a
+      // data-driven paint expression, keyed off each feature's
+      // _report_status ("baru" -> red: new or dispatched-but-not-started;
+      // "proses" -> orange: a technician has actually started work).
+      map.addSource(REPORT_MARKER_SOURCE_ID, {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] },
+      });
+      map.addLayer({
+        id: REPORT_MARKER_LAYER_ID,
+        type: "circle",
+        source: REPORT_MARKER_SOURCE_ID,
+        layout: { visibility: initialVisibility },
+        paint: {
+          "circle-radius": 12,
+          "circle-color": "transparent",
+          "circle-stroke-width": 3,
+          "circle-stroke-color": ["match", ["get", REPORT_STATUS_PROPERTY], "proses", "#f97316", "#dc2626"],
+        },
+      });
+
       map.on("mouseenter", POINT_LAYER_ID, () => {
         map.getCanvas().style.cursor = "pointer";
       });
@@ -117,14 +190,35 @@ export default function BusStopLayer({ map, visible, onSelect, conditionFilter =
         const match = dataRef.current?.features.find((f) => f.properties.halte_id === halteId);
         if (match) onSelectRef.current?.(match);
       });
+
+      map.on("click", REPORT_MARKER_LAYER_ID, (e: maplibregl.MapLayerMouseEvent) => {
+        const clicked = e.features?.[0];
+        if (!clicked || clicked.geometry.type !== "Point") return;
+
+        const halteId = clicked.properties?.halte_id as string | undefined;
+        const match = dataRef.current?.features.find((f) => f.properties.halte_id === halteId);
+        if (match) onSelectRef.current?.(match);
+      });
+
+      updateReportMarkers();
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map]);
 
   useEffect(() => {
     visibleRef.current = visible;
-    if (!map.getLayer(POINT_LAYER_ID)) return;
-    map.setLayoutProperty(POINT_LAYER_ID, "visibility", visible ? "visible" : "none");
+    if (map.getLayer(POINT_LAYER_ID)) {
+      map.setLayoutProperty(POINT_LAYER_ID, "visibility", visible ? "visible" : "none");
+    }
+    if (map.getLayer(REPORT_MARKER_LAYER_ID)) {
+      map.setLayoutProperty(REPORT_MARKER_LAYER_ID, "visibility", visible ? "visible" : "none");
+    }
   }, [map, visible]);
+
+  useEffect(() => {
+    reportedStatusRef.current = reportedHalteStatus;
+    updateReportMarkers();
+  }, [reportedHalteStatus, updateReportMarkers]);
 
   useEffect(() => {
     filterRef.current = conditionFilter;

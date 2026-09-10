@@ -1,17 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 import { conditionColor, conditionLabelText } from "@/lib/conditionScore";
-import { createTask } from "@/lib/fetchTasks";
+import { createTask, fetchTasksByHalte } from "@/lib/fetchTasks";
 import MediaCarousel from "@/components/map/MediaCarousel";
 import CitizenReportSection from "@/components/dashboard/CitizenReportSection";
+import AssigneePicker from "@/components/dashboard/AssigneePicker";
 import type { HalteFeature, HalteProperties } from "@/types/halte";
+import type { Task } from "@/types/task";
 
 interface HalteDetailModalProps {
   feature: HalteFeature | null;
   onClose: () => void;
+  /** Called after a citizen report is dispatched into a task, or a task is
+   * created manually -- lets the dashboard page refetch BusStopLayer's
+   * reportedHalteIds so the map's red ring reflects the new "diproses"
+   * status right away instead of only after reopening this modal. */
+  onTasksChanged?: () => void;
 }
 
 const ATTRIBUTE_ROWS: Array<{ key: keyof HalteProperties; label: string; icon: string }> = [
@@ -29,14 +36,44 @@ function formatState(value: string): { text: string; colorClass: string } {
 }
 
 interface FieldNoteSectionProps {
+  halteId: string;
   note: string;
+  /** Bumped whenever a task changes (dispatch, manual create, technician
+   * report submitted) so this section's "currently active" report reflects
+   * the latest state without requiring the modal to be reopened. */
+  refreshSignal?: number;
 }
 
-/** Collapsible like TaskCreateSection/CitizenReportSection below -- this is
- * the team's own field survey note (HalteProperties.catatan_lapangan),
- * distinct from CitizenReportSection's real citizen-submitted reports. */
-function FieldNoteSection({ note }: FieldNoteSectionProps) {
+/**
+ * The team's own initial field survey note (HalteProperties.catatan_lapangan)
+ * -- but per DISHUB's request, this section now surfaces whichever task is
+ * currently "proses" (being worked on) for this halte as the *active* note,
+ * since a technician's own report on ongoing work is more current than a
+ * one-time survey snapshot. The original survey note is never overwritten
+ * server-side (catatan_lapangan is untouched) -- it just moves into a
+ * collapsed "Catatan Awal (Riwayat)" block underneath once a technician
+ * report exists to take its place as the headline.
+ */
+function FieldNoteSection({ halteId, note, refreshSignal }: FieldNoteSectionProps) {
   const [open, setOpen] = useState(false);
+  const [archiveOpen, setArchiveOpen] = useState(false);
+  const [activeTask, setActiveTask] = useState<Task | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchTasksByHalte(halteId)
+      .then((tasks) => {
+        if (cancelled) return;
+        const inProgress = tasks.find((t) => t.status === "proses" && t.technician_report);
+        setActiveTask(inProgress ?? null);
+      })
+      .catch(() => {
+        // Non-critical -- falls back to showing just the original survey note.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [halteId, refreshSignal]);
 
   return (
     <div className="rounded-lg border border-border-low bg-surface p-3">
@@ -47,7 +84,7 @@ function FieldNoteSection({ note }: FieldNoteSectionProps) {
       >
         <span className="flex items-center gap-2">
           <span className="material-symbols-outlined text-transport-blue text-[18px]">edit_note</span>
-          Catatan Survei Lapangan (#timGOPEK)
+          Catatan Survei Lapangan
         </span>
         <span className="material-symbols-outlined text-[18px] text-on-surface-variant">
           {open ? "expand_less" : "expand_more"}
@@ -55,9 +92,41 @@ function FieldNoteSection({ note }: FieldNoteSectionProps) {
       </button>
 
       {open && (
-        <p className="mt-3 font-body-md text-[13px] text-on-surface-variant leading-relaxed italic bg-surface-container-low p-2.5 rounded">
-          &ldquo;{note}&rdquo;
-        </p>
+        <div className="mt-3 flex flex-col gap-2.5">
+          {activeTask ? (
+            <>
+              <div className="flex items-center gap-1.5 text-[11px] font-bold text-caution-yellow">
+                <span className="material-symbols-outlined text-[14px]">sync</span>
+                Sedang Dikerjakan -- laporan petugas terbaru
+              </div>
+              <p className="font-body-md text-[13px] text-on-surface-variant leading-relaxed italic bg-surface-container-low p-2.5 rounded">
+                &ldquo;{activeTask.technician_report}&rdquo;
+              </p>
+
+              <div className="border-t border-border-low pt-2">
+                <button
+                  onClick={() => setArchiveOpen((v) => !v)}
+                  aria-expanded={archiveOpen}
+                  className="flex w-full items-center justify-between text-[11px] font-bold text-on-surface-variant"
+                >
+                  Catatan Awal (Riwayat)
+                  <span className="material-symbols-outlined text-[16px]">
+                    {archiveOpen ? "expand_less" : "expand_more"}
+                  </span>
+                </button>
+                {archiveOpen && (
+                  <p className="mt-2 font-body-md text-[13px] text-on-surface-variant leading-relaxed italic bg-surface-container-low p-2.5 rounded">
+                    &ldquo;{note}&rdquo;
+                  </p>
+                )}
+              </div>
+            </>
+          ) : (
+            <p className="font-body-md text-[13px] text-on-surface-variant leading-relaxed italic bg-surface-container-low p-2.5 rounded">
+              &ldquo;{note}&rdquo;
+            </p>
+          )}
+        </div>
       )}
     </div>
   );
@@ -65,15 +134,20 @@ function FieldNoteSection({ note }: FieldNoteSectionProps) {
 
 interface TaskCreateSectionProps {
   halteId: string;
+  onCreated?: () => void;
 }
 
 /**
- * Policy & Task Dispatcher Dashboard (PRD roadmap item) -- every task traces
- * back to a specific surveyed halte, entered here rather than as a
- * free-floating to-do. See app/routers/task.py for why "assigned_to" is
- * plain text: there is no staff login/account system in this project.
+ * Manual task creation -- for when DISHUB dispatches a repair on its own
+ * initiative, with no citizen report behind it. Distinct from
+ * CitizenReportSection's "Dispatch ke Tugas" button, which creates a task
+ * from an existing report (and links citizen_report_id so that report gets
+ * cleaned up once the task is done); a task made here has no report to link,
+ * so citizen_report_id is left unset. See app/routers/task.py for why
+ * "assigned_to" is plain text: there is no staff login/account system in
+ * this project.
  */
-function TaskCreateSection({ halteId }: TaskCreateSectionProps) {
+function TaskCreateSection({ halteId, onCreated }: TaskCreateSectionProps) {
   const [open, setOpen] = useState(false);
   const [description, setDescription] = useState("");
   const [assignedTo, setAssignedTo] = useState("");
@@ -88,6 +162,7 @@ function TaskCreateSection({ halteId }: TaskCreateSectionProps) {
     try {
       await createTask({ halte_id: halteId, description: description.trim(), assigned_to: assignedTo.trim() || undefined });
       setStatus("done");
+      onCreated?.();
     } catch (err) {
       setStatus("error");
       setError(err instanceof Error ? err.message : "Gagal membuat tugas.");
@@ -116,7 +191,7 @@ function TaskCreateSection({ halteId }: TaskCreateSectionProps) {
       >
         <span className="flex items-center gap-2">
           <span className="material-symbols-outlined text-[18px] text-transport-blue">assignment_add</span>
-          Buat Tugas Perbaikan
+          Manual Dispatch
         </span>
         <span className="material-symbols-outlined text-[18px] text-on-surface-variant">
           {open ? "expand_less" : "expand_more"}
@@ -133,13 +208,7 @@ function TaskCreateSection({ halteId }: TaskCreateSectionProps) {
             rows={3}
             className="w-full rounded-lg border border-border-low bg-surface-container-low p-2.5 font-body-md text-[13px] text-on-surface focus:border-transport-blue focus:outline-none focus:ring-1 focus:ring-transport-blue"
           />
-          <input
-            type="text"
-            value={assignedTo}
-            onChange={(e) => setAssignedTo(e.target.value)}
-            placeholder="Ditugaskan ke (opsional, mis. Tim Trotoar Wilayah 1)"
-            className="w-full rounded-lg border border-border-low bg-surface-container-low p-2.5 font-body-md text-[13px] text-on-surface focus:border-transport-blue focus:outline-none focus:ring-1 focus:ring-transport-blue"
-          />
+          <AssigneePicker value={assignedTo} onChange={setAssignedTo} />
           {error && <p className="text-label-sm text-alert-red">{error}</p>}
           <button
             type="submit"
@@ -154,9 +223,16 @@ function TaskCreateSection({ halteId }: TaskCreateSectionProps) {
   );
 }
 
-export default function HalteDetailModal({ feature, onClose }: HalteDetailModalProps) {
+export default function HalteDetailModal({ feature, onClose, onTasksChanged }: HalteDetailModalProps) {
+  const [refreshSignal, setRefreshSignal] = useState(0);
+
   if (!feature) return null;
   const p = feature.properties;
+
+  function handleTasksChanged() {
+    setRefreshSignal((n) => n + 1);
+    onTasksChanged?.();
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
@@ -245,11 +321,13 @@ export default function HalteDetailModal({ feature, onClose }: HalteDetailModalP
             </div>
           </div>
 
-          <CitizenReportSection halteId={p.halte_id} />
+          <CitizenReportSection halteId={p.halte_id} onDispatched={handleTasksChanged} />
 
-          {p.catatan_lapangan && <FieldNoteSection note={p.catatan_lapangan} />}
+          {p.catatan_lapangan && (
+            <FieldNoteSection halteId={p.halte_id} note={p.catatan_lapangan} refreshSignal={refreshSignal} />
+          )}
 
-          <TaskCreateSection key={p.halte_id} halteId={p.halte_id} />
+          <TaskCreateSection halteId={p.halte_id} onCreated={handleTasksChanged} />
         </div>
       </div>
     </div>

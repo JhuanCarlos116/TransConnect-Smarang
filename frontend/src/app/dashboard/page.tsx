@@ -6,7 +6,9 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 import { DEFAULT_CENTER, DEFAULT_ZOOM, mapStyleUrl } from "@/lib/maplibre";
 import { fetchHalteData } from "@/lib/fetchHalteData";
-import BusStopLayer, { type HalteConditionFilter } from "@/components/dashboard/BusStopLayer";
+import { fetchAllCitizenReports } from "@/lib/fetchCitizenReports";
+import { fetchTasks } from "@/lib/fetchTasks";
+import BusStopLayer, { type HalteConditionFilter, type ReportMarkerStatus } from "@/components/dashboard/BusStopLayer";
 import PopulationLayer from "@/components/dashboard/PopulationLayer";
 import IsochroneLayer from "@/components/dashboard/IsochroneLayer";
 import RecommendationLayer from "@/components/dashboard/RecommendationLayer";
@@ -30,10 +32,40 @@ export default function DashboardPage() {
 
   const [halteFeatures, setHalteFeatures] = useState<HalteFeature[]>([]);
   const [detailTarget, setDetailTarget] = useState<HalteFeature | null>(null);
+  const [reportedHalteStatus, setReportedHalteStatus] = useState<Map<string, ReportMarkerStatus>>(new Map());
 
   useEffect(() => {
     fetchHalteData().then((data) => setHalteFeatures(data.features));
   }, []);
+
+  // Which halte need a report marker on the map, and what color: red for a
+  // citizen report that's either brand new or dispatched but not yet
+  // started (task "belum_dikerjakan"), orange once a technician has actually
+  // started work (task "proses"). A task reaching "selesai" deletes its
+  // citizen_report row server-side, so it naturally drops out of `reports`
+  // here and the ring disappears -- no separate "done" case needed.
+  // Refetched after dispatch/create-task actions (see handleTasksChanged)
+  // and once more each time this page mounts, so a task marked "selesai"
+  // from the separate /dashboard/tasks page is reflected next visit here.
+  const refreshReportedHalteIds = useCallback(() => {
+    Promise.all([fetchAllCitizenReports(), fetchTasks()])
+      .then(([reports, tasks]) => {
+        const taskByReportId = new Map(tasks.filter((t) => t.citizen_report_id).map((t) => [t.citizen_report_id!, t]));
+        const next = new Map<string, ReportMarkerStatus>();
+        for (const report of reports) {
+          const task = taskByReportId.get(report.report_id);
+          next.set(report.halte_id, task?.status === "proses" ? "proses" : "baru");
+        }
+        setReportedHalteStatus(next);
+      })
+      .catch(() => {
+        // Non-critical -- the map marker just won't update this cycle.
+      });
+  }, []);
+
+  useEffect(() => {
+    refreshReportedHalteIds();
+  }, [refreshReportedHalteIds]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -109,6 +141,7 @@ export default function DashboardPage() {
                 visible={busStopsVisible}
                 conditionFilter={conditionFilter}
                 onSelect={setDetailTarget}
+                reportedHalteStatus={reportedHalteStatus}
               />
               <RecommendationLayer map={map} visible={recommendationsVisible} />
               <MapInfoPopup map={map} />
@@ -119,7 +152,11 @@ export default function DashboardPage() {
         </main>
       </div>
 
-      <HalteDetailModal feature={detailTarget} onClose={() => setDetailTarget(null)} />
+      <HalteDetailModal
+        feature={detailTarget}
+        onClose={() => setDetailTarget(null)}
+        onTasksChanged={refreshReportedHalteIds}
+      />
     </div>
   );
 }
