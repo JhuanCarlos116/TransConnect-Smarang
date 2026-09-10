@@ -14,3 +14,14 @@ class CitizenReportOut(BaseModel):
     video_url: str | None
     status: str
     created_at: datetime
+
+    # Detector output for photo_url (None when no photo was attached).
+    # Kept in the response so the dashboard can show what the AI actually
+    # saw -- and so a human can check it before trusting a survey value the
+    # detector filled in. See app/services/photo_detection.py.
+    ai_detections: dict | None = None
+    ai_analyzed_at: datetime | None = None
+
+    # Facility variables the detector newly filled in on halte_survey for
+    # this report (facility -> "ada"). Empty when the photo added nothing.
+    halte_updated: dict[str, str] = {}
