@@ -3,9 +3,9 @@
 Per the PRD's "AI recommendation" feature: a user types a plain-language
 question ("tolong rekomendasikan saya titik halte bus yang baru") and gets an
 explained answer. The split that matters here -- and the reason this file is
-small -- is that Gemini never picks a location. The actual recommendations
+small -- is that the LLM never picks a location. The actual recommendations
 come straight from the greedy Maximal Covering Location Problem solver in
-build_location_allocation.py; Gemini's only job is turning that already-computed,
+build_location_allocation.py; the LLM's only job is turning that already-computed,
 already-verified JSON into a natural-language answer, grounded strictly in the
 numbers it's handed. Letting an LLM freehand geographic coordinates for a
 district it has no real knowledge of would risk confidently hallucinated
@@ -19,7 +19,7 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException
 
 from app.schemas.chat import ChatRequest, ChatResponse, RecommendationSummary
-from app.services.gemini_client import GeminiError, generate_reply
+from app.services.llm_client import LLMError, generate_reply
 
 router = APIRouter()
 
@@ -79,7 +79,7 @@ async def chat_halte_recommendation(body: ChatRequest) -> ChatResponse:
 
     try:
         reply = await generate_reply(system_instruction, body.message)
-    except GeminiError as exc:
+    except LLMError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
 
     recommendations = [
