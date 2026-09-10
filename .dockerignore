@@ -1,0 +1,14 @@
+# Build context hygiene — keep images small and builds fast.
+# (backend/.venv is ~640MB and frontend/node_modules ~510MB on the host;
+#  npm ci / pip install recreate them inside the image.)
+**/node_modules
+**/.venv
+**/.next
+**/__pycache__
+**/*.pyc
+.git
+.gitignore
+**/uploads
+**/.env
+**/.env.local
+*.log
