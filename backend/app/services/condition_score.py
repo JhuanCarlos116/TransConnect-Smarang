@@ -36,6 +36,16 @@ _STATE_MULTIPLIER: dict[VariableState, float] = {
     "tidak": 0.0,
 }
 
+# The five scored survey variables, in weight order. Exported so callers that
+# need to read or fill the same set (e.g. photo_detection applying a detector
+# finding back onto a survey row) stay in step with the scoring weights above
+# instead of repeating the list.
+FACILITY_VARIABLES = tuple(_WEIGHTS)
+
+# A survey variable nobody recorded yet. Distinct from "tidak": this is
+# "we don't know", not "it's absent".
+UNKNOWN_STATE: VariableState = "-"
+
 
 def compute_condition_score(properties: dict) -> tuple[int, ConditionLabel]:
     """Compute a 0-100 condition score and green/yellow/red label from

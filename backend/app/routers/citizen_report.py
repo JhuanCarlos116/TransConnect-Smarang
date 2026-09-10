@@ -9,6 +9,7 @@ halte so DISHUB's dashboard can show it under the halte it's about.
 """
 
 import uuid
+from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
@@ -21,6 +22,8 @@ from app.db import get_session
 from app.models.citizen_report import CitizenReport
 from app.models.halte import HalteSurvey
 from app.schemas.citizen_report import CitizenReportOut
+from app.services.condition_score import FACILITY_VARIABLES, UNKNOWN_STATE, compute_condition_score
+from app.services.photo_detection import analyze_photo
 
 router = APIRouter()
 
@@ -33,7 +36,7 @@ PHOTO_CONTENT_TYPE_TO_EXT = {"image/jpeg": "jpg", "image/png": "png", "image/web
 VIDEO_CONTENT_TYPE_TO_EXT = {"video/mp4": "mp4", "video/webm": "webm", "video/quicktime": "mov"}
 
 
-def _to_out(row: CitizenReport) -> CitizenReportOut:
+def _to_out(row: CitizenReport, halte_updated: dict[str, str] | None = None) -> CitizenReportOut:
     point = to_shape(row.geom)
     return CitizenReportOut(
         report_id=row.report_id,
@@ -46,7 +49,33 @@ def _to_out(row: CitizenReport) -> CitizenReportOut:
         video_url=row.video_url,
         status=row.status,
         created_at=row.created_at,
+        ai_detections=row.ai_detections,
+        ai_analyzed_at=row.ai_analyzed_at,
+        halte_updated=halte_updated or {},
     )
+
+
+def _apply_to_survey(halte: HalteSurvey, observed: dict[str, str]) -> dict[str, str]:
+    """Write detector findings onto the halte's survey row.
+
+    Only fills variables the field survey left unknown (UNKNOWN_STATE), so a
+    citizen photo can add evidence but can never overwrite or weaken a value
+    a surveyor actually recorded -- and, per photo_detection's presence-only
+    rule, never marks something absent. Re-scores the halte only when
+    something actually changed, so a photo that tells us nothing new leaves
+    the stored score untouched.
+    """
+    applied: dict[str, str] = {}
+    for facility, value in observed.items():
+        if getattr(halte, facility, None) == UNKNOWN_STATE:
+            setattr(halte, facility, value)
+            applied[facility] = value
+
+    if applied:
+        halte.condition_score, halte.condition_label = compute_condition_score(
+            {facility: getattr(halte, facility) for facility in FACILITY_VARIABLES}
+        )
+    return applied
 
 
 async def _save_upload(
@@ -114,6 +143,19 @@ async def create_citizen_report(
             "Ukuran video maksimal 25 MB.",
         )
 
+    # Read the photo with the infrastructure detector before saving the
+    # report, so the halte's survey row can be updated with whatever the
+    # photo proves. analyze_photo never raises -- if the detector is down the
+    # report is still saved, with the failure recorded in ai_detections.
+    ai_detections = None
+    ai_analyzed_at = None
+    halte_updated: dict[str, str] = {}
+    if photo_url is not None:
+        analysis = analyze_photo(UPLOAD_DIR / Path(photo_url).name)
+        ai_detections = analysis.as_jsonb()
+        ai_analyzed_at = datetime.now(timezone.utc)
+        halte_updated = _apply_to_survey(halte, analysis.observed)
+
     report = CitizenReport(
         report_id=str(uuid.uuid4()),
         halte_id=halte_id,
@@ -122,8 +164,10 @@ async def create_citizen_report(
         photo_url=photo_url,
         video_url=video_url,
         geom=WKTElement(f"POINT({lon} {lat})", srid=4326),
+        ai_detections=ai_detections,
+        ai_analyzed_at=ai_analyzed_at,
     )
     session.add(report)
     await session.commit()
     await session.refresh(report)
-    return _to_out(report)
+    return _to_out(report, halte_updated)

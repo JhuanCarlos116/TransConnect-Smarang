@@ -6,6 +6,10 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:3000"
     geomapid_api_key: str = ""
     deepseek_api_key: str = ""
+    # Infrastructure detector used to read citizen-report photos. In the
+    # deployed stack this resolves container-to-container on proxy-net; when
+    # running the backend on the host, point it at localhost:8000.
+    yolo_api_url: str = "http://transconnect-api:8000"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

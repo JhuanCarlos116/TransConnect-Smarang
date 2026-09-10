@@ -2,6 +2,7 @@ from datetime import datetime
 
 from geoalchemy2 import Geometry
 from sqlalchemy import DateTime, ForeignKey, String, func
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -40,3 +41,12 @@ class CitizenReport(Base):
     # location) so a report always records exactly where the citizen tapped,
     # even if that's a few meters off from the halte's surveyed point.
     geom: Mapped[str] = mapped_column(Geometry(geometry_type="POINT", srid=4326))
+
+    # Raw output of the YOLO infrastructure detector on photo_url, plus the
+    # facility-level reading derived from it. Stored per-report so the
+    # original evidence behind any halte_survey value the detector filled in
+    # stays auditable -- see app/services/photo_detection.py.
+    # Shape: {"detections": [...], "observed": {...}, "model": "...", "error": str|None}
+    ai_detections: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    ai_analyzed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
