@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { approveTechnicianPhoto, submitTechnicianReport } from "@/lib/fetchTasks";
+import { resolveUploadUrl } from "@/lib/resolveUploadUrl";
 import type { Task } from "@/types/task";
 
 interface TaskDetailModalProps {
@@ -77,6 +78,12 @@ export default function TaskDetailModal({ task, onClose, onUpdated }: TaskDetail
       <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide rounded-xl border border-border-low bg-surface p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
         <div className="mb-4 flex items-center justify-between border-b border-border-low pb-4">
           <div>
+            {task.citizen_report_id && (
+              <span className="mb-1 inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-bold text-transport-blue">
+                <span className="material-symbols-outlined text-[13px]">campaign</span>
+                Dari Laporan Warga
+              </span>
+            )}
             <h3 className="font-headline-md text-[18px] font-bold text-on-surface">{task.nama_halte}</h3>
             <p className="font-label-sm text-[12px] text-on-surface-variant">{task.description}</p>
           </div>
@@ -120,7 +127,7 @@ export default function TaskDetailModal({ task, onClose, onUpdated }: TaskDetail
             <div className="rounded-lg border border-border-low bg-surface p-3">
               <h4 className="mb-2 font-label-md text-[13px] font-bold text-on-surface">Foto Perbaikan</h4>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={task.technician_photo_url} alt="" className="mb-3 h-48 w-full rounded-md object-cover" />
+              <img src={resolveUploadUrl(task.technician_photo_url) ?? undefined} alt="" className="mb-3 h-48 w-full rounded-md object-cover" />
 
               {task.approved_for_public ? (
                 <div className="flex items-center gap-2 rounded-lg border border-safety-green/30 bg-green-50 p-2.5 text-label-sm text-on-surface">

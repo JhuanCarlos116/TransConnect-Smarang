@@ -17,6 +17,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import get_session
+from app.models.citizen_report import CitizenReport
 from app.models.halte import HalteSurvey
 from app.models.task import MaintenanceTask
 from app.routers.citizen_report import PHOTO_CONTENT_TYPE_TO_EXT, _save_upload
@@ -31,6 +32,7 @@ def _to_out(task: MaintenanceTask, halte: HalteSurvey) -> TaskOut:
     return TaskOut(
         task_id=task.task_id,
         halte_id=task.halte_id,
+        citizen_report_id=task.citizen_report_id,
         nama_halte=halte.nama_halte,
         kelurahan=halte.kelurahan,
         condition_label=halte.condition_label,
@@ -46,12 +48,15 @@ def _to_out(task: MaintenanceTask, halte: HalteSurvey) -> TaskOut:
 
 
 @router.get("/tasks", response_model=list[TaskOut])
-async def list_tasks(session: AsyncSession = Depends(get_session)) -> list[TaskOut]:
-    result = await session.execute(
+async def list_tasks(halte_id: str | None = None, session: AsyncSession = Depends(get_session)) -> list[TaskOut]:
+    query = (
         select(MaintenanceTask, HalteSurvey)
         .join(HalteSurvey, MaintenanceTask.halte_id == HalteSurvey.halte_id)
         .order_by(MaintenanceTask.created_at.desc())
     )
+    if halte_id is not None:
+        query = query.where(MaintenanceTask.halte_id == halte_id)
+    result = await session.execute(query)
     return [_to_out(task, halte) for task, halte in result.all()]
 
 
@@ -83,13 +88,28 @@ async def create_task(body: TaskCreate, session: AsyncSession = Depends(get_sess
     if halte is None:
         raise HTTPException(status_code=404, detail="Halte tidak ditemukan.")
 
+    citizen_report = None
+    if body.citizen_report_id is not None:
+        citizen_report = await session.get(CitizenReport, body.citizen_report_id)
+        if citizen_report is None:
+            raise HTTPException(status_code=404, detail="Laporan warga tidak ditemukan.")
+
     task = MaintenanceTask(
         task_id=str(uuid.uuid4()),
         halte_id=body.halte_id,
+        citizen_report_id=body.citizen_report_id,
         description=body.description,
         assigned_to=body.assigned_to,
     )
     session.add(task)
+
+    # Marks the report "diproses" so the dashboard map marker (BusStopLayer)
+    # and CitizenReportSection both know it's been dispatched, not just sitting
+    # unactioned -- see update_task_status below for what happens when this
+    # task is later marked done.
+    if citizen_report is not None:
+        citizen_report.status = "diproses"
+
     await session.commit()
     await session.refresh(task)
     return _to_out(task, halte)
@@ -104,6 +124,21 @@ async def update_task_status(
         raise HTTPException(status_code=404, detail="Tugas tidak ditemukan.")
 
     task.status = body.status
+
+    # Closing the loop DISHUB asked for: once a task dispatched from a
+    # citizen report is marked done, the report itself is done being tracked
+    # -- delete it outright so it drops off both the map marker and
+    # CitizenReportSection's list, rather than lingering in a third status.
+    # citizen_report_id must be cleared on the task first: it's a foreign key
+    # into citizen_report, so deleting the row it still points to violates
+    # that constraint otherwise. TaskOut keeps the field on the response as
+    # None here rather than the id that's no longer resolvable to anything.
+    if body.status == "selesai" and task.citizen_report_id is not None:
+        citizen_report = await session.get(CitizenReport, task.citizen_report_id)
+        task.citizen_report_id = None
+        if citizen_report is not None:
+            await session.delete(citizen_report)
+
     await session.commit()
     await session.refresh(task)
 
@@ -147,6 +182,21 @@ async def submit_technician_report(
 
     halte = await session.get(HalteSurvey, task.halte_id)
     return _to_out(task, halte)
+
+
+@router.delete("/tasks/{task_id}", status_code=204)
+async def delete_task(task_id: str, session: AsyncSession = Depends(get_session)) -> None:
+    """Lets DISHUB clear a "selesai" task off the board once it's been dealt
+    with -- see TaskBoard.tsx's delete button, shown only in that column.
+    Not restricted to "selesai" here: the dashboard is the one place that
+    decides when deleting makes sense, this endpoint just performs it.
+    """
+    task = await session.get(MaintenanceTask, task_id)
+    if task is None:
+        raise HTTPException(status_code=404, detail="Tugas tidak ditemukan.")
+
+    await session.delete(task)
+    await session.commit()
 
 
 @router.patch("/tasks/{task_id}/approve", response_model=TaskOut)

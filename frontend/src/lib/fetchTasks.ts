@@ -29,6 +29,11 @@ export async function fetchTasks(): Promise<Task[]> {
   return parseOrThrow<Task[]>(res);
 }
 
+export async function fetchTasksByHalte(halteId: string): Promise<Task[]> {
+  const res = await fetch(`${requireApiBase()}/api/v1/tasks?halte_id=${encodeURIComponent(halteId)}`);
+  return parseOrThrow<Task[]>(res);
+}
+
 export async function createTask(input: TaskCreateInput): Promise<Task> {
   const res = await fetch(`${requireApiBase()}/api/v1/tasks`, {
     method: "POST",
@@ -45,6 +50,14 @@ export async function updateTaskStatus(taskId: string, status: TaskStatus): Prom
     body: JSON.stringify({ status }),
   });
   return parseOrThrow<Task>(res);
+}
+
+export async function deleteTask(taskId: string): Promise<void> {
+  const res = await fetch(`${requireApiBase()}/api/v1/tasks/${taskId}`, { method: "DELETE" });
+  if (!res.ok) {
+    const body = (await res.json().catch(() => null)) as { detail?: string } | null;
+    throw new Error(body?.detail ?? `Backend merespons status ${res.status}`);
+  }
 }
 
 export async function submitTechnicianReport(taskId: string, report: string, photo?: File): Promise<Task> {

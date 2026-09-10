@@ -9,6 +9,12 @@ export interface CitizenReport {
   video_url: string | null;
   status: string;
   created_at: string;
+  // Detector output for photo_url and which halte_survey facility variables
+  // it filled in -- see backend/app/services/photo_detection.py. None/empty
+  // when no photo was attached or the detector found nothing new.
+  ai_detections: Record<string, unknown> | null;
+  ai_analyzed_at: string | null;
+  halte_updated: Record<string, string>;
 }
 
 export interface CitizenReportCreateInput {

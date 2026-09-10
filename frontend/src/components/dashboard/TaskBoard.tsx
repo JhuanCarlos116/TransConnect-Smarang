@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { fetchTasks, updateTaskStatus } from "@/lib/fetchTasks";
+import { deleteTask, fetchTasks, updateTaskStatus } from "@/lib/fetchTasks";
 import { conditionColor } from "@/lib/conditionScore";
 import TaskDetailModal from "@/components/dashboard/TaskDetailModal";
 import type { Task, TaskStatus } from "@/types/task";
@@ -30,15 +30,22 @@ interface TaskCardProps {
   task: Task;
   onMove: (taskId: string, status: TaskStatus) => void;
   onOpenDetail: (task: Task) => void;
+  onDelete: (taskId: string) => void;
 }
 
 // Detail (technician report + photo, admin approval) only makes sense once
 // work has actually started -- nothing to report on a task still in
 // "belum_dikerjakan".
-function TaskCard({ task, onMove, onOpenDetail }: TaskCardProps) {
+function TaskCard({ task, onMove, onOpenDetail, onDelete }: TaskCardProps) {
   const next = NEXT_STATUS[task.status];
   const prev = PREV_STATUS[task.status];
   const canOpenDetail = task.status === "proses" || task.status === "selesai";
+
+  function handleDelete() {
+    if (window.confirm(`Hapus tugas "${task.nama_halte}" ini? Tindakan ini tidak bisa dibatalkan.`)) {
+      onDelete(task.task_id);
+    }
+  }
 
   return (
     <div
@@ -51,14 +58,18 @@ function TaskCard({ task, onMove, onOpenDetail }: TaskCardProps) {
           style={{ backgroundColor: conditionColor(task.condition_label) }}
         />
         <span className="font-label-md text-label-md font-bold text-on-surface">{task.nama_halte}</span>
-        {task.technician_photo_url && (
-          <span
-            className="material-symbols-outlined ml-auto text-[16px] text-on-surface-variant"
-            title="Ada laporan petugas"
-          >
-            photo_camera
-          </span>
-        )}
+        <div className="ml-auto flex items-center gap-1.5">
+          {task.citizen_report_id && (
+            <span className="material-symbols-outlined text-[16px] text-transport-blue" title="Dari laporan warga">
+              campaign
+            </span>
+          )}
+          {task.technician_photo_url && (
+            <span className="material-symbols-outlined text-[16px] text-on-surface-variant" title="Ada laporan petugas">
+              photo_camera
+            </span>
+          )}
+        </div>
       </div>
       <div className="mb-2 text-label-sm text-on-surface-variant">{task.kelurahan}</div>
       <p className="mb-2 text-body-md text-[13px] leading-relaxed text-on-surface">{task.description}</p>
@@ -87,6 +98,16 @@ function TaskCard({ task, onMove, onOpenDetail }: TaskCardProps) {
               className="rounded-md bg-transport-blue px-2 py-1 text-[11px] font-bold text-on-primary transition-colors hover:bg-primary"
             >
               {task.status === "belum_dikerjakan" ? "Mulai →" : "Selesai →"}
+            </button>
+          )}
+          {task.status === "selesai" && (
+            <button
+              onClick={handleDelete}
+              aria-label="Hapus tugas"
+              title="Hapus tugas"
+              className="rounded-md border border-alert-red px-2 py-1 text-[11px] text-alert-red transition-colors hover:bg-alert-red hover:text-on-error"
+            >
+              <span className="material-symbols-outlined text-[14px] leading-none align-middle">delete</span>
             </button>
           )}
         </div>
@@ -134,6 +155,17 @@ export default function TaskBoard() {
     setDetailTask(updated);
   }
 
+  async function handleDelete(taskId: string) {
+    const previous = tasks;
+    setTasks((cur) => cur.filter((t) => t.task_id !== taskId));
+    try {
+      await deleteTask(taskId);
+    } catch (err) {
+      setTasks(previous); // revert -- the delete didn't actually happen
+      setError(err instanceof Error ? err.message : "Gagal menghapus tugas.");
+    }
+  }
+
   if (status === "loading") {
     return <div className="p-margin-page text-body-md text-on-surface-variant">Memuat tugas...</div>;
   }
@@ -169,7 +201,13 @@ export default function TaskBoard() {
                   <p className="mt-2 text-center text-label-sm text-on-surface-variant">Tidak ada tugas.</p>
                 )}
                 {colTasks.map((task) => (
-                  <TaskCard key={task.task_id} task={task} onMove={handleMove} onOpenDetail={setDetailTask} />
+                  <TaskCard
+                    key={task.task_id}
+                    task={task}
+                    onMove={handleMove}
+                    onOpenDetail={setDetailTask}
+                    onDelete={handleDelete}
+                  />
                 ))}
               </div>
             </div>

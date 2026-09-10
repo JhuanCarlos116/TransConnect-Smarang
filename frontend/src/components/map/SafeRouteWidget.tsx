@@ -37,7 +37,13 @@ export default function SafeRouteWidget({ map }: SafeRouteWidgetProps) {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<SafeHalteRouteResponse | null>(null);
+  // Set once handleShowRoute has actually drawn the route -- lets the popup
+  // show a "Tampilkan Rute" button first (see the click-order fix below)
+  // instead of the route/distance appearing on the map at the same instant
+  // the popup itself does.
+  const [routeShown, setRouteShown] = useState(false);
   const layersReadyRef = useRef(false);
+  const userLocationRef = useRef<{ lat: number; lon: number } | null>(null);
 
   const ensureLayers = useCallback(() => {
     if (layersReadyRef.current) return;
@@ -93,6 +99,8 @@ export default function SafeRouteWidget({ map }: SafeRouteWidgetProps) {
     setResult(null);
     setError(null);
     setStatus("idle");
+    setRouteShown(false);
+    userLocationRef.current = null;
     if (!layersReadyRef.current) return;
     setLineData(RECOMMENDED_SOURCE_ID, null);
     setLineData(NEAREST_SOURCE_ID, null);
@@ -100,6 +108,11 @@ export default function SafeRouteWidget({ map }: SafeRouteWidgetProps) {
     userSource?.setData(EMPTY_COLLECTION);
   }, [map, setLineData]);
 
+  // Locates the user and fetches the recommendation, but stops at showing
+  // the info popup -- no line drawn on the map yet, no camera movement. Per
+  // the team's request, the popup (halte name, condition, distance/estimate)
+  // must appear on its own first; only handleShowRoute below, triggered from
+  // a button inside that popup, actually draws the route.
   const handleClick = useCallback(() => {
     if (!("geolocation" in navigator)) {
       setStatus("error");
@@ -113,28 +126,13 @@ export default function SafeRouteWidget({ map }: SafeRouteWidgetProps) {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
-        ensureLayers();
-
-        const userSource = map.getSource(USER_SOURCE_ID) as maplibregl.GeoJSONSource | undefined;
-        userSource?.setData({
-          type: "FeatureCollection",
-          features: [
-            { type: "Feature", properties: {}, geometry: { type: "Point", coordinates: [longitude, latitude] } },
-          ],
-        });
+        userLocationRef.current = { lat: latitude, lon: longitude };
 
         setStatus("loading");
         fetchSafeRoute(latitude, longitude)
           .then((data) => {
             setResult(data);
             setStatus("idle");
-            setLineData(RECOMMENDED_SOURCE_ID, data.recommended.route);
-            setLineData(NEAREST_SOURCE_ID, data.nearest?.route ?? null);
-
-            const bounds = new maplibregl.LngLatBounds([longitude, latitude], [longitude, latitude]);
-            for (const c of data.recommended.route.coordinates) bounds.extend(c);
-            if (data.nearest) for (const c of data.nearest.route.coordinates) bounds.extend(c);
-            map.fitBounds(bounds, { padding: 60, maxZoom: 17, duration: 800 });
           })
           .catch((err: unknown) => {
             setStatus("error");
@@ -151,7 +149,29 @@ export default function SafeRouteWidget({ map }: SafeRouteWidgetProps) {
       },
       { enableHighAccuracy: true, timeout: 10000 },
     );
-  }, [map, ensureLayers, setLineData]);
+  }, []);
+
+  const handleShowRoute = useCallback(() => {
+    const loc = userLocationRef.current;
+    if (!loc || !result) return;
+
+    ensureLayers();
+
+    const userSource = map.getSource(USER_SOURCE_ID) as maplibregl.GeoJSONSource | undefined;
+    userSource?.setData({
+      type: "FeatureCollection",
+      features: [{ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: [loc.lon, loc.lat] } }],
+    });
+
+    setLineData(RECOMMENDED_SOURCE_ID, result.recommended.route);
+    setLineData(NEAREST_SOURCE_ID, result.nearest?.route ?? null);
+    setRouteShown(true);
+
+    const bounds = new maplibregl.LngLatBounds([loc.lon, loc.lat], [loc.lon, loc.lat]);
+    for (const c of result.recommended.route.coordinates) bounds.extend(c);
+    if (result.nearest) for (const c of result.nearest.route.coordinates) bounds.extend(c);
+    map.fitBounds(bounds, { padding: 60, maxZoom: 17, duration: 800 });
+  }, [map, result, ensureLayers, setLineData]);
 
   const busy = status === "locating" || status === "loading";
 
@@ -234,6 +254,16 @@ export default function SafeRouteWidget({ map }: SafeRouteWidgetProps) {
               {result.within_budget_count} halte tersurvei terjangkau dalam {result.budget_minutes} menit jalan kaki
               dari lokasimu. Rute mengikuti jaringan jalan sungguhan, bukan garis lurus.
             </div>
+
+            {!routeShown && (
+              <button
+                onClick={handleShowRoute}
+                className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg bg-transport-blue px-3 py-2 font-label-sm text-label-sm font-bold text-on-primary transition-colors hover:bg-primary"
+              >
+                <span className="material-symbols-outlined text-[16px]">route</span>
+                Tampilkan Rute di Peta
+              </button>
+            )}
           </div>
         </div>
       )}
