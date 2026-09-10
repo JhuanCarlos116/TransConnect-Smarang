@@ -56,6 +56,8 @@ interface DashboardSidebarProps {
   onIsochroneChange: (v: boolean) => void;
   recommendationsVisible: boolean;
   onRecommendationsChange: (v: boolean) => void;
+  brtVisible: boolean;
+  onBrtChange: (v: boolean) => void;
 }
 
 /**
@@ -108,10 +110,13 @@ export default function DashboardSidebar({
   onIsochroneChange,
   recommendationsVisible,
   onRecommendationsChange,
+  brtVisible,
+  onBrtChange,
 }: DashboardSidebarProps) {
   const [layersOpen, setLayersOpen] = useState(true);
   const filterDotColor = conditionFilterColor(conditionFilter);
-  const showLegend = busStopsVisible || densityVisible || isochroneVisible || recommendationsVisible;
+  const showLegend =
+    busStopsVisible || densityVisible || isochroneVisible || recommendationsVisible || brtVisible;
 
   function cycleConditionFilter() {
     const next =
@@ -171,6 +176,11 @@ export default function DashboardSidebar({
                 </button>
               )}
             </div>
+            <LayerToggleRow
+              label="Jaringan BRT Trans Semarang"
+              checked={brtVisible}
+              onChange={onBrtChange}
+            />
             <LayerToggleRow label="Kepadatan Penduduk" checked={densityVisible} onChange={onDensityChange} />
             <LayerToggleRow label="Jangkauan Jalan Kaki" checked={isochroneVisible} onChange={onIsochroneChange} />
             <LayerToggleRow
@@ -199,6 +209,32 @@ export default function DashboardSidebar({
                 <div className="flex items-center gap-2">
                   <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: conditionColor("red") }} />
                   <span className="font-label-sm text-label-sm text-on-surface-variant">Rawan</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {brtVisible && (
+            <div>
+              <h3 className="mb-2 font-label-sm text-label-sm font-bold text-on-surface">
+                Jaringan BRT Trans Semarang
+              </h3>
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="inline-block h-0.5 w-4 shrink-0 rounded-full"
+                    style={{ backgroundColor: "#1d4ed8" }}
+                  />
+                  <span className="font-label-sm text-label-sm text-on-surface-variant">
+                    Koridor BRT (warna per koridor)
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span
+                    className="inline-block h-2.5 w-2.5 rounded-full border border-white"
+                    style={{ backgroundColor: "#0f766e" }}
+                  />
+                  <span className="font-label-sm text-label-sm text-on-surface-variant">Halte BRT</span>
                 </div>
               </div>
             </div>
