@@ -26,7 +26,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center bg-surface-subtle px-6 font-sans">
-      <Link href="/" className="mb-8 flex flex-col items-center gap-2">
+      <Link href="/masuk" className="mb-8 flex flex-col items-center gap-2">
         <Image src="/logo-icon.png" alt="" width={128} height={128} className="h-14 w-14" priority />
         <span className="font-headline-md text-headline-md font-bold text-transport-blue">TransConnect</span>
       </Link>
@@ -70,7 +70,7 @@ export default function LoginPage() {
         </form>
       </div>
 
-      <Link href="/" className="mt-6 text-label-sm text-on-surface-variant underline">
+      <Link href="/masuk" className="mt-6 text-label-sm text-on-surface-variant underline">
         Kembali ke halaman utama
       </Link>
     </div>
