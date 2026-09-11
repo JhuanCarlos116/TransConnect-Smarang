@@ -135,7 +135,10 @@ export default function FacilityEditor({ feature, onUpdated }: FacilityEditorPro
         diketahui, dan admin DISHUB boleh mengoreksinya karena model deteksi masih bisa salah.
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+      {/* One column, not two: at this modal's width a half-width cell cannot
+          hold the facility label plus BOTH the provenance badge and the state
+          badge, and the state text was being clipped ("Tersedia & Ba..."). */}
+      <div className="grid grid-cols-1 gap-2">
         {ROWS.map(({ key, label, icon }) => {
           const value = p[key];
           const badge = stateBadge(value);
@@ -150,7 +153,7 @@ export default function FacilityEditor({ feature, onUpdated }: FacilityEditorPro
                   aria-label={`${label} — status fasilitas`}
                   value={draft[key] ?? value}
                   onChange={(e) => setDraft((cur) => ({ ...cur, [key]: e.target.value as FacilityState }))}
-                  className="rounded border border-border-low bg-surface px-1.5 py-1 font-label-sm text-[11px] text-on-surface"
+                  className="shrink-0 rounded border border-border-low bg-surface px-1.5 py-1 font-label-sm text-[11px] text-on-surface"
                 >
                   {STATE_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -159,7 +162,7 @@ export default function FacilityEditor({ feature, onUpdated }: FacilityEditorPro
                   ))}
                 </select>
               ) : (
-                <span className="flex shrink-0 items-center gap-1">
+                <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
                   {sourceBadge(p.facility_sources?.[key])}
                   <span className={`font-label-sm text-[11px] font-bold px-2 py-0.5 rounded ${badge.colorClass}`}>{badge.text}</span>
                 </span>
