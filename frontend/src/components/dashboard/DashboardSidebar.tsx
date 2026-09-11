@@ -6,7 +6,7 @@ import { conditionColor, conditionLabelText } from "@/lib/conditionScore";
 import { densityGradientCss } from "@/lib/populationColor";
 import { BRT_HALTE_COLOR } from "@/lib/brtCorridorStyle";
 import DashboardNav from "@/components/dashboard/DashboardNav";
-import CorridorLegendRows, { CorridorFilterReset } from "@/components/ui/CorridorLegendRows";
+import CorridorLegendRows from "@/components/ui/CorridorLegendRows";
 import type { HalteConditionFilter } from "@/components/dashboard/BusStopLayer";
 
 const ISOCHRONE_BANDS = [
@@ -65,13 +65,6 @@ interface DashboardSidebarProps {
    * the layer's fetch resolves (or if it failed), and then the corridor rows
    * simply are not there -- see CorridorLegendRows. */
   koridors: string[];
-  /** Corridors DISHUB has filtered out, plus the handlers that change that.
-   * The corridor rows in this sidebar's legend ARE the filter: clicking a row
-   * hides/shows that corridor on the map. Kept here rather than in a separate
-   * control so there is only one list of corridors on the page. */
-  hiddenKoridors: string[];
-  onToggleKoridor: (koridor: string) => void;
-  onShowAllKoridors: () => void;
 }
 
 /**
@@ -127,9 +120,6 @@ export default function DashboardSidebar({
   brtVisible,
   onBrtChange,
   koridors,
-  hiddenKoridors,
-  onToggleKoridor,
-  onShowAllKoridors,
 }: DashboardSidebarProps) {
   const [layersOpen, setLayersOpen] = useState(true);
   const filterDotColor = conditionFilterColor(conditionFilter);
@@ -244,44 +234,16 @@ export default function DashboardSidebar({
                     which line is which. Capped and scrollable so the 17 rows
                     cannot push the rest of the legend (e.g. "Halte BRT",
                     which is what the corridors are context for) out of view
-                    in a sidebar that is the only way to reach either.
-
-                    The rows are also the corridor filter (DISHUB's request:
-                    pick which corridors to draw, up to all of them again), so
-                    they are buttons that toggle. "Semua koridor" appears above
-                    them only while something is filtered out. */}
+                    in a sidebar that is the only way to reach either. */}
                 <div className="flex max-h-[30vh] flex-col gap-1 overflow-y-auto pr-1">
-                  <CorridorFilterReset
-                    hiddenCount={hiddenKoridors.length}
-                    onShowAll={onShowAllKoridors}
-                  />
-                  <CorridorLegendRows
-                    koridors={koridors}
-                    hidden={hiddenKoridors}
-                    onToggle={onToggleKoridor}
-                  />
+                  <CorridorLegendRows koridors={koridors} />
                 </div>
                 <div className="flex items-center gap-2">
                   <span
                     className="inline-block h-2.5 w-2.5 rounded-full border border-white"
-                    style={{
-                      backgroundColor: BRT_HALTE_COLOR,
-                      opacity: hiddenKoridors.length > 0 ? 0.3 : 1,
-                    }}
+                    style={{ backgroundColor: BRT_HALTE_COLOR }}
                   />
-                  <span
-                    className={[
-                      "font-label-sm text-label-sm text-on-surface-variant",
-                      hiddenKoridors.length > 0 ? "opacity-45" : "",
-                    ].join(" ")}
-                    title={
-                      hiddenKoridors.length > 0
-                        ? "Titik halte BRT disembunyikan selama koridor difilter. Data sumber BRT tidak memuat daftar halte per koridor, jadi titik halte tidak bisa ikut difilter -- menampilkannya bersama koridor terpilih akan tampak seolah titik itu milik koridor tersebut."
-                        : "Titik halte BRT Trans Semarang"
-                    }
-                  >
-                    Halte BRT{hiddenKoridors.length > 0 ? " (tersembunyi)" : ""}
-                  </span>
+                  <span className="font-label-sm text-label-sm text-on-surface-variant">Halte BRT</span>
                 </div>
               </div>
             </div>

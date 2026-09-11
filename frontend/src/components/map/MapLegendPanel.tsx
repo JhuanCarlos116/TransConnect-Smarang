@@ -35,21 +35,9 @@ interface MapLegendPanelProps {
   /** Corridor tags in the exact order the layer assigned them colours, so the
    * swatch shown here is by construction the colour of that line on the map. */
   koridors: string[];
-  /** Corridor tags the passenger has filtered out, and the two handlers that
-   * change that. Passed straight through to the corridor legend, which is
-   * where the passenger picks corridors -- the legend rows ARE the filter. */
-  hiddenKoridors: string[];
-  onToggleKoridor: (koridor: string) => void;
-  onShowAllKoridors: () => void;
 }
 
-export default function MapLegendPanel({
-  routesVisible,
-  koridors,
-  hiddenKoridors,
-  onToggleKoridor,
-  onShowAllKoridors,
-}: MapLegendPanelProps) {
+export default function MapLegendPanel({ routesVisible, koridors }: MapLegendPanelProps) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -87,14 +75,7 @@ export default function MapLegendPanel({
       {open && (
         <div className="flex flex-col gap-2">
           <ConditionLegend />
-          {routesVisible && (
-            <BrtRoutesLegend
-              koridors={koridors}
-              hidden={hiddenKoridors}
-              onToggle={onToggleKoridor}
-              onShowAll={onShowAllKoridors}
-            />
-          )}
+          {routesVisible && <BrtRoutesLegend koridors={koridors} />}
         </div>
       )}
     </div>

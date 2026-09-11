@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
@@ -57,21 +57,6 @@ export default function MapView() {
   // legend's swatches are coloured from this list, so it has to be the layer's
   // own ordering rather than a second fetch that could come back differently.
   const [koridors, setKoridors] = useState<string[]>([]);
-  // Which corridors the passenger has switched off. Owned here for the same
-  // reason as routesVisible: the layer (the MapLibre filter), the legend rows
-  // and the "Semua koridor" reset all read one list, so the row the passenger
-  // unticked is by construction the line that disappeared. Empty = show all,
-  // which is the default: a citizen arriving at the map should see the network,
-  // not an empty one waiting to be discovered.
-  const [hiddenKoridors, setHiddenKoridors] = useState<string[]>([]);
-
-  const toggleKoridor = useCallback((koridor: string) => {
-    setHiddenKoridors((cur) =>
-      cur.includes(koridor) ? cur.filter((k) => k !== koridor) : [...cur, koridor],
-    );
-  }, []);
-
-  const showAllKoridors = useCallback(() => setHiddenKoridors([]), []);
   // SafeRouteWidget needs the full feature list to hand off to
   // HaltePublicModal (via setDetailTarget) once it finds the nearest halte --
   // fetched here rather than inside the widget so HalteLayer's own fetch and
@@ -115,14 +100,7 @@ export default function MapView() {
         {/* Corridors render before the survey markers so the natural order is
             already correct; BrtRoutesLayer additionally moves itself beneath
             HALTE_POINT_LAYER_ID because the two fetches race. */}
-        {map && (
-          <BrtRoutesLayer
-            map={map}
-            visible={routesVisible}
-            hidden={hiddenKoridors}
-            onCorridors={setKoridors}
-          />
-        )}
+        {map && <BrtRoutesLayer map={map} visible={routesVisible} onCorridors={setKoridors} />}
         {map && <HalteLayer map={map} visible onSelect={setDetailTarget} />}
 
         {map && (
@@ -141,13 +119,7 @@ export default function MapView() {
             flag and keeps the corridor legend tied to `routesVisible` -- an
             explanation of lines that are folded away is worse than none. */}
         <div className="absolute left-margin-page top-margin-page z-20">
-          <MapLegendPanel
-            routesVisible={routesVisible}
-            koridors={koridors}
-            hiddenKoridors={hiddenKoridors}
-            onToggleKoridor={toggleKoridor}
-            onShowAllKoridors={showAllKoridors}
-          />
+          <MapLegendPanel routesVisible={routesVisible} koridors={koridors} />
         </div>
       </main>
 

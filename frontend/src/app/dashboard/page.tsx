@@ -43,20 +43,6 @@ export default function DashboardPage() {
   // Corridor tags reported by BrtLayer once it has styled them, so the sidebar
   // legend and the map lines come from one ordering (see CorridorLegendRows).
   const [koridors, setKoridors] = useState<string[]>([]);
-  // Corridors DISHUB has switched off. One list read by the layer (as a
-  // MapLibre filter), the legend rows and the "Semua koridor" reset, so the row
-  // that was clicked is by construction the line that disappeared. Empty =
-  // show every corridor, the default: a dispatcher opening the dashboard should
-  // see the network, not have to switch it on corridor by corridor.
-  const [hiddenKoridors, setHiddenKoridors] = useState<string[]>([]);
-
-  const toggleKoridor = useCallback((koridor: string) => {
-    setHiddenKoridors((cur) =>
-      cur.includes(koridor) ? cur.filter((k) => k !== koridor) : [...cur, koridor],
-    );
-  }, []);
-
-  const showAllKoridors = useCallback(() => setHiddenKoridors([]), []);
 
   useEffect(() => {
     fetchHalteData().then((data) => setHalteFeatures(data.features));
@@ -166,9 +152,6 @@ export default function DashboardPage() {
           brtVisible={brtVisible}
           onBrtChange={setBrtVisible}
           koridors={koridors}
-          hiddenKoridors={hiddenKoridors}
-          onToggleKoridor={toggleKoridor}
-          onShowAllKoridors={showAllKoridors}
         />
 
         {/* Map canvas -- deliberately free of overlays now. Layer toggles
@@ -183,12 +166,7 @@ export default function DashboardPage() {
               {/* Rendered before BusStopLayer so the survey points stay the
                   dominant marks; BrtLayer also moves itself underneath once
                   mounted, since fetch order is not guaranteed. */}
-              <BrtLayer
-                map={map}
-                visible={brtVisible}
-                hidden={hiddenKoridors}
-                onCorridors={setKoridors}
-              />
+              <BrtLayer map={map} visible={brtVisible} onCorridors={setKoridors} />
               <BusStopLayer
                 map={map}
                 visible={busStopsVisible}
