@@ -40,6 +40,9 @@ export default function DashboardPage() {
   // Bumped after a manual facility correction so HalteLayer re-reads the
   // points and repaints the affected marker in its new condition colour.
   const [halteRefreshSignal, setHalteRefreshSignal] = useState(0);
+  // Corridor tags reported by BrtLayer once it has styled them, so the sidebar
+  // legend and the map lines come from one ordering (see CorridorLegendRows).
+  const [koridors, setKoridors] = useState<string[]>([]);
 
   useEffect(() => {
     fetchHalteData().then((data) => setHalteFeatures(data.features));
@@ -148,6 +151,7 @@ export default function DashboardPage() {
           onRecommendationsChange={setRecommendationsVisible}
           brtVisible={brtVisible}
           onBrtChange={setBrtVisible}
+          koridors={koridors}
         />
 
         {/* Map canvas -- deliberately free of overlays now. Layer toggles
@@ -162,7 +166,7 @@ export default function DashboardPage() {
               {/* Rendered before BusStopLayer so the survey points stay the
                   dominant marks; BrtLayer also moves itself underneath once
                   mounted, since fetch order is not guaranteed. */}
-              <BrtLayer map={map} visible={brtVisible} />
+              <BrtLayer map={map} visible={brtVisible} onCorridors={setKoridors} />
               <BusStopLayer
                 map={map}
                 visible={busStopsVisible}

@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import * as maplibregl from "maplibre-gl";
 
 import { HALTE_POINT_LAYER_ID } from "@/components/map/HalteLayer";
-import { KORIDOR_PALETTE, koridorColorExpression, koridorTags } from "@/lib/brtCorridorStyle";
+import CorridorLegendRows from "@/components/ui/CorridorLegendRows";
+import { koridorColorExpression, koridorTags } from "@/lib/brtCorridorStyle";
 import { fetchBrtNetwork } from "@/lib/fetchBrtNetwork";
 import type { BrtRuteFeature } from "@/types/brt";
 
@@ -196,17 +197,11 @@ export function BrtRoutesLegend({ koridors }: { koridors: string[] }) {
       {/* Capped and scrollable: 17 rows would otherwise be taller than the
           phone viewport the legend was just made foldable to protect. */}
       <div className="flex max-h-[34vh] flex-col gap-0.5 overflow-y-auto pr-0.5 md:max-h-[46vh] md:gap-1">
-        {koridors.map((koridor, i) => (
-          <div key={koridor} className="flex items-center gap-1.5 md:gap-2">
-            <span
-              className="inline-block h-[3px] w-5 shrink-0 rounded-full md:w-6"
-              style={{ backgroundColor: KORIDOR_PALETTE[i % KORIDOR_PALETTE.length] }}
-            />
-            <span className="truncate text-[10px] text-on-surface-variant md:text-[11px]">
-              Koridor {koridor}
-            </span>
-          </div>
-        ))}
+        <CorridorLegendRows
+          koridors={koridors}
+          swatchClassName="inline-block h-[3px] w-5 shrink-0 rounded-full md:w-6"
+          labelClassName="truncate text-[10px] text-on-surface-variant md:text-[11px]"
+        />
       </div>
     </div>
   );
