@@ -16,6 +16,10 @@ export const BRT_HALTE_LAYER_ID = "brt-network-halte-points";
 interface BrtLayerProps {
   map: maplibregl.Map;
   visible: boolean;
+  /** Reports the corridor tags this layer styled, in the same order it gave
+   * them colours. The sidebar legend colours its rows from this list, so the
+   * legend cannot disagree with the map and there is still only one fetch. */
+  onCorridors?: (koridors: string[]) => void;
 }
 
 /**
@@ -36,9 +40,16 @@ interface BrtLayerProps {
  *    dots across Semarang read as noise; the corridors still show the network
  *    shape at any zoom.
  */
-export default function BrtLayer({ map, visible }: BrtLayerProps) {
+export default function BrtLayer({ map, visible, onCorridors }: BrtLayerProps) {
   const loadedRef = useRef(false);
   const visibleRef = useRef(visible);
+  // In a ref so an inline arrow from the caller cannot re-run the fetch effect
+  // below (deps are [map] only) and re-add the sources.
+  const onCorridorsRef = useRef(onCorridors);
+
+  useEffect(() => {
+    onCorridorsRef.current = onCorridors;
+  }, [onCorridors]);
 
   useEffect(() => {
     if (loadedRef.current) return;
@@ -53,6 +64,9 @@ export default function BrtLayer({ map, visible }: BrtLayerProps) {
     fetchBrtNetwork().then(({ halte, rute }) => {
       const initial = visibleRef.current ? "visible" : "none";
 
+      // One list, used for the colour expression and for the legend rows.
+      const koridors = koridorTags(rute);
+
       map.addSource(RUTE_SOURCE_ID, { type: "geojson", data: { type: "FeatureCollection", features: rute } as never });
       map.addLayer({
         id: BRT_RUTE_LAYER_ID,
@@ -60,7 +74,7 @@ export default function BrtLayer({ map, visible }: BrtLayerProps) {
         source: RUTE_SOURCE_ID,
         layout: { visibility: initial, "line-cap": "round", "line-join": "round" },
         paint: {
-          "line-color": koridorColorExpression(koridorTags(rute)) as never,
+          "line-color": koridorColorExpression(koridors) as never,
           "line-width": ["interpolate", ["linear"], ["zoom"], 10, 1.2, 14, 2.6, 17, 4] as never,
           "line-opacity": 0.65,
         },
@@ -118,6 +132,10 @@ export default function BrtLayer({ map, visible }: BrtLayerProps) {
       const current = visibleRef.current ? "visible" : "none";
       map.setLayoutProperty(BRT_RUTE_LAYER_ID, "visibility", current);
       map.setLayoutProperty(BRT_HALTE_LAYER_ID, "visibility", current);
+
+      // After the lines exist: the legend explains drawn corridors, so it must
+      // not list any the map failed to add.
+      onCorridorsRef.current?.(koridors);
     });
 
     return () => {

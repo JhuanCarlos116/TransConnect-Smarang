@@ -5,6 +5,7 @@ import { useState } from "react";
 import { conditionColor, conditionLabelText } from "@/lib/conditionScore";
 import { densityGradientCss } from "@/lib/populationColor";
 import DashboardNav from "@/components/dashboard/DashboardNav";
+import CorridorLegendRows from "@/components/ui/CorridorLegendRows";
 import type { HalteConditionFilter } from "@/components/dashboard/BusStopLayer";
 
 const ISOCHRONE_BANDS = [
@@ -58,6 +59,11 @@ interface DashboardSidebarProps {
   onRecommendationsChange: (v: boolean) => void;
   brtVisible: boolean;
   onBrtChange: (v: boolean) => void;
+  /** Corridor tags as reported by the BRT layer, in the layer's own order, so
+   * the legend swatch is the colour of the line actually drawn. Empty until
+   * the layer's fetch resolves (or if it failed), and then the corridor rows
+   * simply are not there -- see CorridorLegendRows. */
+  koridors: string[];
 }
 
 /**
@@ -112,6 +118,7 @@ export default function DashboardSidebar({
   onRecommendationsChange,
   brtVisible,
   onBrtChange,
+  koridors,
 }: DashboardSidebarProps) {
   const [layersOpen, setLayersOpen] = useState(true);
   const filterDotColor = conditionFilterColor(conditionFilter);
@@ -220,14 +227,15 @@ export default function DashboardSidebar({
                 Jaringan BRT Trans Semarang
               </h3>
               <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  <span
-                    className="inline-block h-0.5 w-4 shrink-0 rounded-full"
-                    style={{ backgroundColor: "#1d4ed8" }}
-                  />
-                  <span className="font-label-sm text-label-sm text-on-surface-variant">
-                    Koridor BRT (warna per koridor)
-                  </span>
+                {/* One row per corridor, same rows as the public map's legend
+                    (components/ui/CorridorLegendRows) -- the generic "warna per
+                    koridor" swatch told DISHUB that the colours differ but not
+                    which line is which. Capped and scrollable so the 17 rows
+                    cannot push the rest of the legend (e.g. "Halte BRT",
+                    which is what the corridors are context for) out of view
+                    in a sidebar that is the only way to reach either. */}
+                <div className="flex max-h-[30vh] flex-col gap-1 overflow-y-auto pr-1">
+                  <CorridorLegendRows koridors={koridors} />
                 </div>
                 <div className="flex items-center gap-2">
                   <span
