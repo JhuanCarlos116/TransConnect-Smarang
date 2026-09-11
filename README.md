@@ -4,172 +4,146 @@ WebGIS Decision Support System untuk perencanaan halte Bus Rapid Transit (BRT) T
 evaluasi aksesibilitas pejalan kaki menuju halte, di Kecamatan Tembalang, Kota Semarang.
 Dibangun untuk MAPID WebGIS Competition #2 2026 oleh Tim GOPEK (Universitas Diponegoro).
 
-Status saat ini: **Fase 1 MVP** — peta interaktif dengan layer titik survei halte terkurasi
-(kode warna sesuai skor kondisi, popup foto & atribut). Lihat roadmap fase berikutnya di bagian
-bawah.
+**Live**: https://transconnect.ownmap.id
 
-## Prasyarat
+## Status
 
-- Node.js LTS (sudah diverifikasi jalan dengan Node 26 / npm 11)
-- Python 3.11+ (untuk backend FastAPI dan script data — **belum terinstall di setup ini**, install
-  dulu sebelum menjalankan `backend/`)
-- Docker Desktop (untuk PostGIS lewat `docker-compose`)
-- API Key dari [geo.mapid.io](https://geo.mapid.io) (Dashboard → Map Services → API Keys) — dipakai
-  untuk basemap (MapLibre GL) **dan** untuk menarik data survei (endpoint Activities). Tidak perlu
-  akun Mapbox terpisah.
+Proyek sudah melewati seluruh tahapan utama roadmap awal dan berjalan di produksi:
+
+- Peta publik dengan 42 titik survei halte terkurasi (kode warna skor kondisi, foto, komentar
+  warga) dan jaringan koridor BRT Trans Semarang (per-koridor, foldable).
+- Alur laporan warga sungguhan (bukan lagi data contoh): warga memilih halte di peta, menulis
+  deskripsi, dan opsional melampirkan foto/video. Foto otomatis dianalisis oleh **detektor
+  infrastruktur YOLOv5** (9 kelas: crosswalk, trotoar, rambu, lampu jalan, shelter, dll.) — hasil
+  deteksi bisa mengisi otomatis atribut survei halte yang sebelumnya tidak diketahui (lihat
+  `backend/app/services/photo_detection.py`).
+- Network Isochrone Analysis (jangkauan jalan kaki 3/5/10 menit dari tiap halte).
+- Location Allocation Model — solver Maximal Covering Location Problem (greedy) yang
+  merekomendasikan lokasi halte baru berdasarkan kepadatan penduduk yang belum terlayani.
+- Chatbot yang menjelaskan hasil Location Allocation Model dalam bahasa natural (LLM hanya
+  menerjemahkan angka yang sudah dihitung solver, tidak menentukan lokasi sendiri).
+- Safe Transit Navigator: mencari halte tersurvei terdekat lewat jaringan jalan pejalan kaki
+  sungguhan (bukan garis lurus), dengan **navigasi live** (posisi & rute ter-update berjalan,
+  mirip aplikasi peta pada umumnya) begitu warga menekan "Navigasi ke Halte Ini".
+- Policy & Task Dispatcher Dashboard (khusus staf DISHUB, `/dashboard`): mengelola laporan warga,
+  membuat/mendispatch tugas perbaikan (dari laporan warga maupun manual) ke salah satu dari empat
+  tim lapangan, menandai tugas selesai, dan melihat catatan survei lapangan yang selalu
+  diperbarui dari laporan teknisi terbaru.
+- Deploy produksi di VPS dengan domain & HTTPS (lihat bagian Deployment).
+
+Belum dikerjakan (dinilai *nice to have*, bukan kebutuhan inti saat ini):
+
+- Weighted Overlay & AHP sebagai metodologi skor kondisi halte yang lebih formal — skor kondisi
+  saat ini masih heuristik rule-based sederhana (`backend/app/services/condition_score.py`) dari
+  atribut tri-state ("ada"/"tidak"/"-").
+- Layer tambahan LST (Land Surface Temperature) / Slope.
 
 ## Struktur Repo
 
 ```
 frontend/   Next.js (App Router, TypeScript) + MapLibre GL JS (basemap dari MAPID)
 backend/    FastAPI + PostgreSQL/PostGIS
+detector/   YOLOv5 (vendored via git subtree dari repo tim) -- layanan deteksi foto infrastruktur
 ```
 
-Lihat `.env.example` di root untuk daftar lengkap environment variable yang dipakai kedua sisi.
+Lihat `.env.example` di root dan `backend/.env.example` untuk daftar environment variable.
 
-## Setup & Menjalankan
+## Setup & Menjalankan Lokal
 
 ### 1. Frontend
 
 ```bash
 cd frontend
 npm install
-cp .env.local.example .env.local   # isi NEXT_PUBLIC_MAPID_API_KEY
+```
+
+Buat `frontend/.env.local` (tidak di-commit) berisi:
+
+```
+NEXT_PUBLIC_MAPID_API_KEY=       # dari geo.mapid.io Dashboard > Map Services > API Keys
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+```
+
+```bash
 npm run dev
 ```
 
-Buka http://localhost:3000 — peta akan langsung menampilkan **data contoh** (termasuk satu titik
-data asli: "Bus Stop Bukit Kencana Jaya") dari `frontend/public/data/halte-survey.geojson` selama
-backend belum jalan (lihat `src/lib/fetchHalteData.ts` untuk logika fallback-nya).
+Buka http://localhost:3000 — peta memuat data lewat `NEXT_PUBLIC_API_BASE_URL`; tanpa backend
+hidup, layer yang butuh data (halte, BRT, dsb.) tidak akan tampil.
 
-### 2. Backend + PostGIS (opsional untuk lihat peta, wajib untuk jalur data "sungguhan")
+### 2. Backend + PostGIS
 
 ```bash
 docker-compose up -d          # jalankan PostGIS
 cd backend
 python -m venv .venv && .venv\Scripts\activate   # Windows
 pip install -r requirements.txt
-cp .env.example .env
+cp .env.example .env          # isi GEOMAPID_API_KEY, GEMINI_API_KEY sesuai kebutuhan
 uvicorn app.main:app --reload
 ```
 
-Cek `http://localhost:8000/api/v1/halte-survey` mengembalikan `FeatureCollection`. Frontend akan
-otomatis memakai endpoint ini begitu backend terdeteksi hidup.
+Cek `http://localhost:8000/api/v1/halte-survey` mengembalikan `FeatureCollection`.
 
-### 3. Menarik 40 titik data survei asli dari MAPID
+Catatan `YOLO_API_URL` (dipakai `photo_detection.py` untuk menganalisis foto laporan warga):
+default-nya `http://transconnect-api:8000`, hostname Docker yang hanya bisa di-resolve di jaringan
+proxy VPS produksi. Untuk menguji analisis foto dari lokal, set env var ini ke instance detektor
+yang bisa dijangkau (mis. endpoint produksi `https://transconnect.ownmap.id/api`, atau jalankan
+`detector/` sendiri secara lokal). Tanpa ini, laporan warga tetap tersimpan normal — hanya
+`ai_detections` pada laporan itu yang mencatat error koneksi, dan tidak ada atribut survei yang
+ter-update otomatis.
 
-Data survei disubmit lewat fitur **Activities** (Community Maps) di MAPID Apps, ditandai hashtag
-`#timGOPEK` — bukan form terstruktur, jadi atribut kondisi (CCTV/penerangan/trotoar/dst) tidak
-punya field sendiri, melainkan tertulis bebas di deskripsi tiap post.
+Skema database tidak memakai tool migrasi — perubahan kolom perlu dijalankan manual
+(`ALTER TABLE ... ADD COLUMN IF NOT EXISTS ...`) di tiap environment. Cek riwayat model terbaru di
+`backend/app/models/` untuk kolom yang perlu ditambahkan pada database yang sudah ada.
 
-1. Tarik data lewat endpoint Activities MAPID (perlu API Key dari geo.mapid.io, header `x-api-key`):
-   ```bash
-   curl -X POST https://server.mapid.io/web/competition/activities \
-     -H "Content-Type: application/json" \
-     -H "x-api-key: API_KEY_KALIAN" \
-     -d '{
-       "feature": {
-         "type": "Polygon",
-         "coordinates": [[[110.38,-7.10],[110.49,-7.10],[110.49,-7.00],[110.38,-7.00],[110.38,-7.10]]]
-       },
-       "start_date": "2026-08-21",
-       "end_date": "2026-08-23",
-       "hashtag": ["timGOPEK"]
-     }' > tembalang_activities.json
-   ```
-   (Kotak koordinat di atas cuma bounding box longgar yang mencakup Kecamatan Tembalang, bukan
-   batas administrasi presisi — cukup untuk menyaring data tahap ini.)
+### 3. Menyiapkan data dasar
 
-2. Jalankan script pembersih + ekstraksi atribut dari teks:
-   ```bash
-   cd backend
-   python scripts/clean_survey_export.py path/to/tembalang_activities.json
-   ```
-   Ini akan:
-   - Membaca `title`/`description`/`geometry`/`medias`/`created_at` tiap Activity.
-   - **Menebak** nilai `cctv`, `lighting`, `sidewalk_condition`, `route_info_signage`, `canopy`
-     ("ada" / "tidak" / "-" kalau tidak disebutkan) dari teks deskripsi, pakai pencarian kata kunci
-     + deteksi kata negasi ("tidak", "tanpa", dst.) di sekitarnya.
-   - Menghitung `condition_score`/`condition_label`.
-   - Menyimpan teks deskripsi asli ke `catatan_lapangan` di setiap fitur, supaya bisa dicek ulang.
-   - Menulis hasilnya ke `backend/data/processed/halte-survey.geojson` **dan**
-     `frontend/public/data/halte-survey.geojson` (menggantikan data contoh).
+Data survei 42 titik halte, kepadatan penduduk, jaringan BRT, dan graf pejalan kaki sudah tersedia
+sebagai file terproses di `backend/data/processed/` dan `frontend/public/data/`. Untuk membangun
+ulang dari sumber mentah, jalankan script di `backend/scripts/` sesuai urutan dependensinya (baca
+docstring tiap file untuk detail sumber data dan metodologinya):
 
-   **Penting**: ini heuristik berbasis kata kunci, bukan pemahaman bahasa yang sempurna — SELALU
-   cek ulang `condition_score`/label tiap titik terhadap `catatan_lapangan`-nya sebelum dipakai,
-   terutama untuk kasus kalimat yang tidak biasa. Script akan cetak peringatan kalau ada `kelurahan`
-   yang tidak berhasil ditebak dari teks maupun batas kelurahan (perlu dicek manual).
+1. `clean_survey_export.py` — membersihkan hasil tarikan data survei MAPID Activities (hashtag
+   `#timGOPEK`) dan menebak atribut kondisi dari teks deskripsi. Koreksi manual tim disimpan
+   permanen di `backend/data/reference/manual_corrections.json` (keyed by `halte_id`) supaya
+   re-pull data tidak menimpa nilai yang sudah diverifikasi.
+2. `build_pedestrian_network.py` — graf jalan pejalan kaki dari OpenStreetMap (osmnx), dasar untuk
+   isochrone, location allocation, dan Safe Transit Navigator.
+3. `build_isochrones.py` — jangkauan jalan kaki 3/5/10 menit. File yang di-commit sebenarnya berasal
+   dari isochrone Valhalla (Stadia Maps) yang lebih akurat; script ini adalah fallback berbasis
+   buffer jaringan kalau akses Valhalla tidak tersedia.
+4. `build_population_layer.py` + `add_survey_coverage_to_population.py` — layer kepadatan penduduk
+   per kelurahan dari data BPS.
+5. `build_location_allocation.py` — solver MCLP (greedy) untuk rekomendasi lokasi halte baru.
+6. `build_bus_stops.py` + `match_survey_to_bus_stops.py` — inventaris titik bus stop di luar 42
+   titik survei tim, dicocokkan dengan laporan warga yang mungkin menggambarkan halte yang sama.
+7. `load_to_postgis.py` — memuat semua GeoJSON terproses ke PostGIS.
 
-3. (Opsional, untuk jalur PostGIS) `python scripts/load_to_postgis.py`.
+### 4. Detektor foto (YOLOv5)
 
-4. (Opsional) `python scripts/build_community_reports.py` — menurunkan layer "Community Maps"
-   (`frontend/public/data/community-reports.geojson`) dari `halte-survey.geojson` yang baru saja
-   dibersihkan. Lihat penjelasan di bawah.
+`detector/` adalah salinan (git subtree) dari repo YOLOv5 tim, plus dua file wrapper produksi:
 
-### 3b. Layer Community Maps (data contoh laporan warga)
+- `detector/api_server.py` — FastAPI wrapper yang memuat `best.pt` dan menyediakan endpoint
+  `/detect` (dipanggil backend lewat `YOLO_API_URL`).
+- `detector/sitecustomize.py` — shim kompatibilitas pathlib supaya checkpoint model yang dilatih di
+  Linux bisa dimuat di Windows.
 
-PRD mendefinisikan alur AI: warga melapor lewat Community Maps → foto diverifikasi otomatis
-(QC Pipeline + YOLOv8-seg) → laporan yang lolos tampil di dashboard DISHUB. Partisipasi warga
-organik dan model YOLOv8 belum ada di tahap ini, jadi `scripts/build_community_reports.py`
-memakai 40+ titik survei tim (yang sudah melalui QA manual — lihat `manual_corrections.json`)
-sebagai **data contoh** laporan warga, dengan QA manual itu berperan sebagai pengganti sementara
-untuk verifikasi YOLOv8 (semua ditandai `verification_status: "verified"`).
+Model weights (`best.pt`) tidak ikut di-commit (`.gitignore`) — perlu didapatkan terpisah dari tim
+yang melatih model, atau dari lingkungan produksi.
 
-Ini murni untuk mendemokan bentuk pipeline-nya sekarang; setiap field yang berhubungan dengan ini
-(`pelapor`, `verified_by`) sengaja diberi label eksplisit "data contoh" / "placeholder" supaya
-tidak disalahartikan sebagai partisipasi warga sungguhan. Ganti `build_community_reports.py`
-dengan endpoint submission warga + panggilan YOLOv8 sungguhan begitu keduanya sudah dibangun —
-skema GeoJSON-nya (`report_id`, `judul`, `deskripsi`, `verification_status`, dst., lihat
-`frontend/src/types/communityReport.ts`) sudah dirancang untuk itu.
+## Deployment
 
-Jalankan setelah `clean_survey_export.py`:
-```
-python scripts/build_community_reports.py
-```
-Ini menulis ke `backend/data/processed/community-reports.geojson` dan
-`frontend/public/data/community-reports.geojson`. Layer ini muncul di peta sebagai marker biru
-ber-cluster (toggle "Laporan Warga (contoh)", nonaktif secara default), dan laporan yang lolos
-verifikasi terdaftar di halaman `/dashboard` ("Dashboard DISHUB").
-
-### 4. Menarik ulang data (re-pull) setelah data awal berubah
-
-Karena MAPID Apps memungkinkan posting/edit kapan saja, setiap re-pull memproses ULANG semua
-activity dari nol — bukan cuma yang baru. Supaya titik yang atributnya sudah pernah dibaca &
-dikoreksi manual oleh tim TIDAK balik lagi ke tebakan otomatis, `clean_survey_export.py` menyimpan
-koreksi itu secara permanen di `backend/data/reference/manual_corrections.json` (keyed by
-`halte_id` MAPID) dan otomatis menerapkannya di setiap run.
-
-Alurnya:
-
-1. Jalankan ulang curl di langkah 3.1 (ganti `start_date`/`end_date` sesuai kebutuhan) →
-   overwrite `tembalang_activities.json`.
-2. `python scripts/clean_survey_export.py path/to/tembalang_activities.json` seperti biasa.
-3. Baca output di terminal:
-   - Titik yang `halte_id`-nya sudah ada di `manual_corrections.json` otomatis dapat nilai yang
-     sudah diverifikasi tim — aman, tidak perlu dikerjakan ulang.
-   - Titik **baru** (belum pernah ada) akan dicetak sebagai daftar `N NEW point(s) not found in
-     manual_corrections.json` lengkap dengan `halte_id` dan nama halte-nya — atribut titik ini
-     masih tebakan otomatis murni.
-4. Untuk tiap titik baru itu: buka `catatan_lapangan`-nya di GeoJSON hasil, baca manual, lalu
-   tambahkan entrinya ke `manual_corrections.json` (format: `"halte_id": {"cctv": "...",
-   "lighting": "...", "sidewalk_condition": "...", "route_info_signage": "...", "canopy": "..."}`).
-5. Jalankan ulang `clean_survey_export.py` sekali lagi — sekarang seharusnya tercetak "All points
-   are covered".
-6. (Kalau memakai layer Community Maps) jalankan ulang `python scripts/build_community_reports.py`
-   supaya `community-reports.geojson` ikut ter-update dari `halte-survey.geojson` terbaru.
+Produksi berjalan di VPS (ownmap.id) dengan domain & HTTPS, dikelola oleh dosen pembimbing:
+frontend dan backend di-build langsung dari branch `main` repo ini, detektor dibangun dari folder
+`detector/` di repo yang sama. Konfigurasi Docker/deploy spesifik VPS (`Dockerfile`, `fly.toml`,
+dsb.) tidak seluruhnya di-commit ke repo ini karena sebagian bersifat environment-specific.
 
 ## Catatan
 
-- Skor kondisi (`condition_score`/`condition_label`) di Fase 1 dihitung dengan heuristik rule-based
-  sederhana di `backend/app/services/condition_score.py`, dari atribut tri-state ("ada"/"tidak"/"-")
-  yang ditebak dari teks — bukan hasil visual dari foto. Akan digantikan skor YOLOv8-seg + Weighted
-  Overlay/AHP di fase berikutnya, begitu model itu jadi.
+- Skor kondisi (`condition_score`/`condition_label`) masih heuristik rule-based sederhana dari
+  atribut tri-state ("ada"/"tidak"/"-") -- lihat `backend/app/services/condition_score.py`. Foto
+  laporan warga bisa memperkaya atribut yang sebelumnya tidak diketahui lewat deteksi YOLOv5
+  (`backend/app/services/photo_detection.py`), tapi tidak pernah menimpa nilai yang sudah ada atau
+  menandai sesuatu sebagai "tidak ada" -- foto cuma bisa membuktikan keberadaan, bukan ketiadaan.
 - Skema Pydantic (backend), TypeScript types (frontend), dan file GeoJSON statis disinkronkan
-  manual untuk saat ini (wajar di skala 40 data) — perlu diperhatikan kalau data bertambah.
-
-## Roadmap Setelah Fase 1
-
-Layer Community Maps (cluster) → YOLOv8-seg + Automated QC Pipeline (klasifikasi kondisi trotoar/
-lampu dari foto, gantikan tebakan dari teks) → Network Isochrone Analysis → Location Allocation
-Model → Weighted Overlay & AHP + layer LST/Slope → Safe Transit Navigator → Policy & Task
-Dispatcher Dashboard → deployment ke VPS dengan domain & HTTPS.
+  manual untuk saat ini (wajar di skala puluhan data) -- perlu diperhatikan kalau data bertambah.
