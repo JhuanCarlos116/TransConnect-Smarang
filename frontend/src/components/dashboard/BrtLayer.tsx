@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import * as maplibregl from "maplibre-gl";
 
 import { BUS_STOP_POINT_LAYER_ID } from "@/components/dashboard/BusStopLayer";
-import { koridorColorExpression, koridorTags } from "@/lib/brtCorridorStyle";
+import { koridorColorExpression, koridorTags, BRT_HALTE_COLOR } from "@/lib/brtCorridorStyle";
 import { fetchBrtNetwork } from "@/lib/fetchBrtNetwork";
 import type { BrtHalteFeature } from "@/types/brt";
 
@@ -89,7 +89,7 @@ export default function BrtLayer({ map, visible, onCorridors }: BrtLayerProps) {
         layout: { visibility: initial },
         paint: {
           "circle-radius": ["interpolate", ["linear"], ["zoom"], 11, 2.5, 14, 4, 17, 6] as never,
-          "circle-color": "#0f766e",
+          "circle-color": BRT_HALTE_COLOR,
           "circle-stroke-width": 1.2,
           "circle-stroke-color": "#fff",
           "circle-opacity": 0.85,

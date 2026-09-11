@@ -36,3 +36,21 @@ export function koridorColorExpression(koridors: string[]): unknown {
   match.push("#64748b"); // fallback for an unnamed corridor
   return match;
 }
+
+/**
+ * The BRT halte points on the dashboard map.
+ *
+ * Neutral grey on purpose, at DISHUB's request: "biar tidak bertabrakan dengan
+ * warna kelayakan bus". The survey markers carry the green/yellow/red condition
+ * scale, and those are the marks a dispatcher triages on -- a coloured BRT halte
+ * dot competes with them for the same read. The teal it used to be made it
+ * worse in two ways: teal reads as "green-ish" next to the condition greens, and
+ * it was the exact hex of one of the corridor colours, so a halte could be
+ * mistaken for a corridor line.
+ *
+ * #727782 is the app's own neutral (--color-outline in globals.css), so the grey
+ * is the same grey as the rest of the interface rather than a new one. Lives
+ * here, next to the corridor palette, because the dashboard map layer and the
+ * sidebar legend must not be able to disagree about it.
+ */
+export const BRT_HALTE_COLOR = "#727782";

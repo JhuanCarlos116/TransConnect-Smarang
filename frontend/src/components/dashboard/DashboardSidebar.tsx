@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { conditionColor, conditionLabelText } from "@/lib/conditionScore";
 import { densityGradientCss } from "@/lib/populationColor";
+import { BRT_HALTE_COLOR } from "@/lib/brtCorridorStyle";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import CorridorLegendRows from "@/components/ui/CorridorLegendRows";
 import type { HalteConditionFilter } from "@/components/dashboard/BusStopLayer";
@@ -240,7 +241,7 @@ export default function DashboardSidebar({
                 <div className="flex items-center gap-2">
                   <span
                     className="inline-block h-2.5 w-2.5 rounded-full border border-white"
-                    style={{ backgroundColor: "#0f766e" }}
+                    style={{ backgroundColor: BRT_HALTE_COLOR }}
                   />
                   <span className="font-label-sm text-label-sm text-on-surface-variant">Halte BRT</span>
                 </div>
