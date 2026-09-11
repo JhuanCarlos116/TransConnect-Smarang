@@ -7,8 +7,8 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { DEFAULT_CENTER, DEFAULT_ZOOM, mapStyleUrl } from "@/lib/maplibre";
 import { fetchHalteData } from "@/lib/fetchHalteData";
 import HalteLayer from "@/components/map/HalteLayer";
-import BrtRoutesLayer, { BrtRoutesLegend } from "@/components/map/BrtRoutesLayer";
-import ConditionLegend from "@/components/map/ConditionLegend";
+import BrtRoutesLayer from "@/components/map/BrtRoutesLayer";
+import MapLegendPanel from "@/components/map/MapLegendPanel";
 import AppHeader from "@/components/ui/AppHeader";
 import SafeRouteWidget from "@/components/map/SafeRouteWidget";
 import RouteToggleButton from "@/components/map/RouteToggleButton";
@@ -53,6 +53,10 @@ export default function MapView() {
   // Owned here rather than inside BrtRoutesLayer: the toggle button, the layer
   // and the corridor legend all read it, so it has to live above all three.
   const [routesVisible, setRoutesVisible] = useState(true);
+  // Corridor tags, reported by BrtRoutesLayer once it has styled them. The
+  // legend's swatches are coloured from this list, so it has to be the layer's
+  // own ordering rather than a second fetch that could come back differently.
+  const [koridors, setKoridors] = useState<string[]>([]);
   // SafeRouteWidget needs the full feature list to hand off to
   // HaltePublicModal (via setDetailTarget) once it finds the nearest halte --
   // fetched here rather than inside the widget so HalteLayer's own fetch and
@@ -96,7 +100,7 @@ export default function MapView() {
         {/* Corridors render before the survey markers so the natural order is
             already correct; BrtRoutesLayer additionally moves itself beneath
             HALTE_POINT_LAYER_ID because the two fetches race. */}
-        {map && <BrtRoutesLayer map={map} visible={routesVisible} />}
+        {map && <BrtRoutesLayer map={map} visible={routesVisible} onCorridors={setKoridors} />}
         {map && <HalteLayer map={map} visible onSelect={setDetailTarget} />}
 
         {map && (
@@ -110,11 +114,12 @@ export default function MapView() {
           </div>
         )}
 
-        <div className="absolute left-margin-page top-margin-page z-20 flex flex-col gap-2">
-          <ConditionLegend />
-          {/* The corridor legend follows the corridors: leaving it up while the
-              lines are folded away would explain something not on the map. */}
-          {routesVisible && <BrtRoutesLegend />}
+        {/* Foldable, at the passenger's request: on a phone the stacked cards
+            covered a real part of the map. MapLegendPanel owns the open/closed
+            flag and keeps the corridor legend tied to `routesVisible` -- an
+            explanation of lines that are folded away is worse than none. */}
+        <div className="absolute left-margin-page top-margin-page z-20">
+          <MapLegendPanel routesVisible={routesVisible} koridors={koridors} />
         </div>
       </main>
 
