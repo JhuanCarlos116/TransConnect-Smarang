@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import * as maplibregl from "maplibre-gl";
 
 import { HALTE_POINT_LAYER_ID } from "@/components/map/HalteLayer";
-import { koridorColorExpression, koridorTags } from "@/lib/brtCorridorStyle";
+import { KORIDOR_PALETTE, koridorColorExpression, koridorTags } from "@/lib/brtCorridorStyle";
 import { fetchBrtNetwork } from "@/lib/fetchBrtNetwork";
 import type { BrtRuteFeature } from "@/types/brt";
 
@@ -34,8 +34,21 @@ export const BRT_PUBLIC_RUTE_LAYER_ID = "brt-rute-public-lines";
  *    passenger now, but the flag is owned by MapView and arrives as a prop, so
  *    the toggle button, this layer and BrtRoutesLegend cannot disagree about
  *    whether the lines are showing.
+ *
+ * It does report the corridor tags it styled, via `onCorridors`, because the
+ * legend needs the same list in the same order to colour its swatches -- and
+ * only the layer has it (MapView fetches the halte survey, not the network).
+ * Reporting rather than re-fetching keeps one fetch and one ordering.
  */
-export default function BrtRoutesLayer({ map, visible }: { map: maplibregl.Map; visible: boolean }) {
+export default function BrtRoutesLayer({
+  map,
+  visible,
+  onCorridors,
+}: {
+  map: maplibregl.Map;
+  visible: boolean;
+  onCorridors?: (koridors: string[]) => void;
+}) {
   const loadedRef = useRef(false);
   // The layer is added from a promise callback, so the first `visible` value is
   // already stale by then. This ref is refreshed in an effect declared BEFORE
@@ -50,6 +63,13 @@ export default function BrtRoutesLayer({ map, visible }: { map: maplibregl.Map; 
     visibleRef.current = visible;
   }, [visible]);
 
+  // Held in a ref so that a caller passing an inline arrow cannot re-run the
+  // fetch effect below (whose deps are [map] only) and re-add the source.
+  const onCorridorsRef = useRef(onCorridors);
+  useEffect(() => {
+    onCorridorsRef.current = onCorridors;
+  }, [onCorridors]);
+
   useEffect(() => {
     if (loadedRef.current) return;
     loadedRef.current = true;
@@ -63,6 +83,10 @@ export default function BrtRoutesLayer({ map, visible }: { map: maplibregl.Map; 
     fetchBrtNetwork().then(({ rute }) => {
       if (rute.length === 0) return;
 
+      // One list, used for both the colour expression and the legend rows, so
+      // the swatch a reader sees is the colour of the line they see.
+      const koridors = koridorTags(rute);
+
       map.addSource(SOURCE_ID, {
         type: "geojson",
         data: { type: "FeatureCollection", features: rute } as never,
@@ -74,7 +98,7 @@ export default function BrtRoutesLayer({ map, visible }: { map: maplibregl.Map; 
         source: SOURCE_ID,
         layout: { "line-cap": "round", "line-join": "round" },
         paint: {
-          "line-color": koridorColorExpression(koridorTags(rute)) as never,
+          "line-color": koridorColorExpression(koridors) as never,
           // Thinner and softer than the dashboard's 1.2/2.6/4 at the same zooms:
           // here the corridors sit under 42 markers that must stay legible.
           "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.8, 14, 1.8, 17, 3] as never,
@@ -91,6 +115,9 @@ export default function BrtRoutesLayer({ map, visible }: { map: maplibregl.Map; 
         visibleRef.current ? "visible" : "none",
       );
       setLayerReady(true);
+      // Only after the layer exists: the legend explains drawn lines, so it
+      // must not list corridors the map failed to add.
+      onCorridorsRef.current?.(koridors);
 
       // Corridors must render BENEATH the surveyed halte. Mount order can't
       // guarantee it (each layer adds itself when its own fetch resolves, and
@@ -149,21 +176,37 @@ export default function BrtRoutesLayer({ map, visible }: { map: maplibregl.Map; 
  * Companion legend for the layer above. Kept in this file so the swatch colour
  * and the line colour can only ever be changed together. Without it these
  * coloured lines read as an unexplained overlay on a citizen-facing map.
+ *
+ * One row per corridor rather than a single "warna per koridor" line, at the
+ * passenger's request: "Keterangan legenda BRT eksisting bisa dibedakan sesuai
+ * koridornya". 17 corridors means 17 colours, and a generic swatch told the
+ * reader only that the colours differ, not which line is which. The swatch is
+ * `KORIDOR_PALETTE[i]` for the same index the colour expression used, so a
+ * legend row cannot disagree with the line it describes.
  */
-export function BrtRoutesLegend() {
+export function BrtRoutesLegend({ koridors }: { koridors: string[] }) {
+  // Nothing to explain before the corridors arrive, or if the fetch failed
+  // (fetchBrtNetwork resolves empty rather than throwing, and then the layer
+  // draws nothing either).
+  if (koridors.length === 0) return null;
+
   return (
     <div className="w-36 rounded-lg border border-border-low bg-surface/95 p-2 shadow-sm backdrop-blur-sm md:w-48 md:p-3">
       <h4 className="mb-1 text-[11px] font-bold text-on-surface md:mb-2 md:text-label-sm">Jaringan BRT Eksisting</h4>
-      <div className="flex items-center gap-1.5 md:gap-2">
-        <span
-          className="inline-block h-[3px] w-5 shrink-0 rounded-full md:w-6"
-          style={{ backgroundColor: "#1d4ed8" }}
-        />
-        <span className="text-[11px] text-on-surface-variant md:text-label-sm">
-          Rute koridor
-          <br />
-          (warna per koridor)
-        </span>
+      {/* Capped and scrollable: 17 rows would otherwise be taller than the
+          phone viewport the legend was just made foldable to protect. */}
+      <div className="flex max-h-[34vh] flex-col gap-0.5 overflow-y-auto pr-0.5 md:max-h-[46vh] md:gap-1">
+        {koridors.map((koridor, i) => (
+          <div key={koridor} className="flex items-center gap-1.5 md:gap-2">
+            <span
+              className="inline-block h-[3px] w-5 shrink-0 rounded-full md:w-6"
+              style={{ backgroundColor: KORIDOR_PALETTE[i % KORIDOR_PALETTE.length] }}
+            />
+            <span className="truncate text-[10px] text-on-surface-variant md:text-[11px]">
+              Koridor {koridor}
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   );
