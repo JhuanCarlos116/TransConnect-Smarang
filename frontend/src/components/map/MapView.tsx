@@ -4,8 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
-import { DEFAULT_CENTER, DEFAULT_ZOOM, MAPID_API_KEY, mapStyleUrl } from "@/lib/maplibre";
+import { DEFAULT_CENTER, DEFAULT_ZOOM, mapStyleUrl } from "@/lib/maplibre";
 import HalteLayer from "@/components/map/HalteLayer";
+import BrtRoutesLayer, { BrtRoutesLegend } from "@/components/map/BrtRoutesLayer";
 import ConditionLegend from "@/components/map/ConditionLegend";
 import AppHeader from "@/components/ui/AppHeader";
 import SafeRouteWidget from "@/components/map/SafeRouteWidget";
@@ -24,6 +25,17 @@ import type { HalteFeature } from "@/types/halte";
  * facing only now, so it doesn't need a way to route out to that internal
  * tool, and the halte layer has no toggle since there's nothing else to
  * choose between here.
+ *
+ * Two things sit under the survey markers, both without a toggle: the existing
+ * BRT corridors (BrtRoutesLayer -- context, so a citizen can see which route a
+ * surveyed halte is on) and the halte condition colours themselves.
+ *
+ * Note there is deliberately no MAPID_API_KEY gate on map init any more. The
+ * style function in lib/maplibre.ts falls back to OpenStreetMap tiles when the
+ * key is absent, but this component used to return before constructing the map
+ * whenever the key was empty -- which made that fallback unreachable and left
+ * the whole page a grey void behind an error banner. The dashboard never had
+ * that gate.
  */
 export default function MapView() {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -31,7 +43,7 @@ export default function MapView() {
   const [detailTarget, setDetailTarget] = useState<HalteFeature | null>(null);
 
   useEffect(() => {
-    if (!containerRef.current || !MAPID_API_KEY) return;
+    if (!containerRef.current) return;
 
     // Bundlers (both Turbopack and Webpack) mis-resolve maplibre-gl's
     // internal `import.meta.url`-based worker lookup in this Next.js setup,
@@ -60,6 +72,10 @@ export default function MapView() {
 
       <main className="relative flex-1">
         <div ref={containerRef} className="h-full w-full" />
+        {/* Corridors render before the survey markers so the natural order is
+            already correct; BrtRoutesLayer additionally moves itself beneath
+            HALTE_POINT_LAYER_ID because the two fetches race. */}
+        {map && <BrtRoutesLayer map={map} />}
         {map && <HalteLayer map={map} visible onSelect={setDetailTarget} />}
 
         {map && (
@@ -69,14 +85,9 @@ export default function MapView() {
           </div>
         )}
 
-        {!MAPID_API_KEY && (
-          <div className="absolute left-margin-page top-margin-page z-20 rounded-lg bg-error-container px-stack-md py-stack-sm text-label-md text-on-error-container">
-            NEXT_PUBLIC_MAPID_API_KEY belum diisi di frontend/.env.local
-          </div>
-        )}
-
-        <div className="absolute left-margin-page top-margin-page z-20">
+        <div className="absolute left-margin-page top-margin-page z-20 flex flex-col gap-2">
           <ConditionLegend />
+          <BrtRoutesLegend />
         </div>
       </main>
 

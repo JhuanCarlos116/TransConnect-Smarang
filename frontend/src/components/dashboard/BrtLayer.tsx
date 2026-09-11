@@ -4,33 +4,14 @@ import { useEffect, useRef } from "react";
 import * as maplibregl from "maplibre-gl";
 
 import { BUS_STOP_POINT_LAYER_ID } from "@/components/dashboard/BusStopLayer";
+import { koridorColorExpression, koridorTags } from "@/lib/brtCorridorStyle";
 import { fetchBrtNetwork } from "@/lib/fetchBrtNetwork";
-import type { BrtHalteFeature, BrtRuteFeature } from "@/types/brt";
+import type { BrtHalteFeature } from "@/types/brt";
 
 const RUTE_SOURCE_ID = "brt-network-rute";
 const HALTE_SOURCE_ID = "brt-network-halte";
 export const BRT_RUTE_LAYER_ID = "brt-network-rute-lines";
 export const BRT_HALTE_LAYER_ID = "brt-network-halte-points";
-
-/** Corridor colours. Deliberately a different family from the condition
- * palette (green/yellow/red) and the recommendation amber, so a judge can
- * tell "this is the existing BRT network" from "this is our assessment"
- * without reading the legend. Assigned per corridor in sorted order. */
-const KORIDOR_PALETTE = [
-  "#1d4ed8", "#7c3aed", "#0891b2", "#0f766e", "#b45309",
-  "#be185d", "#4338ca", "#0369a1", "#15803d", "#a21caf",
-  "#c2410c", "#1e40af", "#6d28d9", "#047857", "#9d174d",
-  "#3730a3", "#0e7490", "#7f1d1d",
-];
-
-function koridorColorExpression(koridors: string[]): unknown {
-  const match: unknown[] = ["match", ["get", "koridor"]];
-  koridors.forEach((k, i) => {
-    match.push(k, KORIDOR_PALETTE[i % KORIDOR_PALETTE.length]);
-  });
-  match.push("#64748b"); // fallback for an unnamed corridor
-  return match;
-}
 
 interface BrtLayerProps {
   map: maplibregl.Map;
@@ -79,9 +60,7 @@ export default function BrtLayer({ map, visible }: BrtLayerProps) {
         source: RUTE_SOURCE_ID,
         layout: { visibility: initial, "line-cap": "round", "line-join": "round" },
         paint: {
-          "line-color": koridorColorExpression(
-            [...new Set(rute.map((f: BrtRuteFeature) => f.properties.koridor).filter((k): k is string => !!k))].sort(),
-          ) as never,
+          "line-color": koridorColorExpression(koridorTags(rute)) as never,
           "line-width": ["interpolate", ["linear"], ["zoom"], 10, 1.2, 14, 2.6, 17, 4] as never,
           "line-opacity": 0.65,
         },
