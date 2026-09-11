@@ -130,10 +130,6 @@ export default function FacilityEditor({ feature, onUpdated }: FacilityEditorPro
           </button>
         )}
       </div>
-      <p className="font-label-sm text-[11px] text-on-surface-variant mb-2">
-        Nilai awal dari pengamatan tim survei di lapangan. Foto laporan warga boleh mengisi variabel yang belum
-        diketahui, dan admin DISHUB boleh mengoreksinya karena model deteksi masih bisa salah.
-      </p>
 
       {/* One column, not two: at this modal's width a half-width cell cannot
           hold the facility label plus BOTH the provenance badge and the state
@@ -190,9 +186,6 @@ export default function FacilityEditor({ feature, onUpdated }: FacilityEditorPro
               Batal
             </button>
           </div>
-          <p className="font-label-sm text-[11px] text-on-surface-variant">
-            Skor kondisi dihitung ulang otomatis dari kelima variabel ini setelah disimpan.
-          </p>
         </div>
       )}
     </div>
