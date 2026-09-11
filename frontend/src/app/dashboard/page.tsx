@@ -37,9 +37,26 @@ export default function DashboardPage() {
   const [halteFeatures, setHalteFeatures] = useState<HalteFeature[]>([]);
   const [detailTarget, setDetailTarget] = useState<HalteFeature | null>(null);
   const [reportedHalteStatus, setReportedHalteStatus] = useState<Map<string, ReportMarkerStatus>>(new Map());
+  // Bumped after a manual facility correction so HalteLayer re-reads the
+  // points and repaints the affected marker in its new condition colour.
+  const [halteRefreshSignal, setHalteRefreshSignal] = useState(0);
 
   useEffect(() => {
     fetchHalteData().then((data) => setHalteFeatures(data.features));
+  }, []);
+
+  /**
+   * A DISHUB correction rewrites the halte's own row (facility values, score,
+   * label), so every copy of that feature has to move together: the header
+   * search reads halteFeatures, the open modal reads detailTarget, and the map
+   * layer fetches its own -- the latter via halteRefreshSignal.
+   */
+  const handleHalteUpdated = useCallback((updated: HalteFeature) => {
+    setHalteFeatures((cur) =>
+      cur.map((f) => (f.properties.halte_id === updated.properties.halte_id ? updated : f)),
+    );
+    setDetailTarget((cur) => (cur && cur.properties.halte_id === updated.properties.halte_id ? updated : cur));
+    setHalteRefreshSignal((n) => n + 1);
   }, []);
 
   // Which halte need a report marker on the map, and what color: red for a
@@ -152,6 +169,7 @@ export default function DashboardPage() {
                 conditionFilter={conditionFilter}
                 onSelect={setDetailTarget}
                 reportedHalteStatus={reportedHalteStatus}
+                refreshSignal={halteRefreshSignal}
               />
               <RecommendationLayer map={map} visible={recommendationsVisible} />
               <MapInfoPopup map={map} />
@@ -166,6 +184,7 @@ export default function DashboardPage() {
         feature={detailTarget}
         onClose={() => setDetailTarget(null)}
         onTasksChanged={refreshReportedHalteIds}
+        onHalteUpdated={handleHalteUpdated}
       />
     </div>
   );

@@ -7,8 +7,9 @@ import { conditionColor, conditionLabelText } from "@/lib/conditionScore";
 import { createTask, fetchTasksByHalte } from "@/lib/fetchTasks";
 import MediaCarousel from "@/components/map/MediaCarousel";
 import CitizenReportSection from "@/components/dashboard/CitizenReportSection";
+import FacilityEditor from "@/components/dashboard/FacilityEditor";
 import AssigneePicker from "@/components/dashboard/AssigneePicker";
-import type { HalteFeature, HalteProperties } from "@/types/halte";
+import type { HalteFeature } from "@/types/halte";
 import type { Task } from "@/types/task";
 
 interface HalteDetailModalProps {
@@ -19,20 +20,10 @@ interface HalteDetailModalProps {
    * reportedHalteIds so the map's red ring reflects the new "diproses"
    * status right away instead of only after reopening this modal. */
   onTasksChanged?: () => void;
-}
-
-const ATTRIBUTE_ROWS: Array<{ key: keyof HalteProperties; label: string; icon: string }> = [
-  { key: "cctv", label: "CCTV Pengawas", icon: "videocam" },
-  { key: "lighting", label: "Penerangan Jalan", icon: "lightbulb" },
-  { key: "sidewalk_condition", label: "Kondisi Trotoar", icon: "directions_walk" },
-  { key: "route_info_signage", label: "Papan Informasi Rute", icon: "signpost" },
-  { key: "canopy", label: "Kanopi / Peneduh", icon: "roofing" },
-];
-
-function formatState(value: string): { text: string; colorClass: string } {
-  if (value === "ada") return { text: "Tersedia & Baik", colorClass: "text-safety-green bg-green-50" };
-  if (value === "tidak") return { text: "Tidak Ada / Rusak", colorClass: "text-alert-red bg-red-50" };
-  return { text: "Tidak Disebutkan", colorClass: "text-on-surface-variant bg-surface-container" };
+  /** Called with the whole feature after a manual facility correction, so the
+   * map marker and its condition colour move together with the edit instead
+   * of showing the pre-correction score until the next page load. */
+  onHalteUpdated?: (feature: HalteFeature) => void;
 }
 
 interface FieldNoteSectionProps {
@@ -223,7 +214,7 @@ function TaskCreateSection({ halteId, onCreated }: TaskCreateSectionProps) {
   );
 }
 
-export default function HalteDetailModal({ feature, onClose, onTasksChanged }: HalteDetailModalProps) {
+export default function HalteDetailModal({ feature, onClose, onTasksChanged, onHalteUpdated }: HalteDetailModalProps) {
   const [refreshSignal, setRefreshSignal] = useState(0);
 
   if (!feature) return null;
@@ -232,6 +223,16 @@ export default function HalteDetailModal({ feature, onClose, onTasksChanged }: H
   function handleTasksChanged() {
     setRefreshSignal((n) => n + 1);
     onTasksChanged?.();
+  }
+
+  function handleHalteUpdated(updated: HalteFeature) {
+    // The modal renders from the page's copy of this feature, so hand the
+    // corrected one back up -- otherwise the score banner and the map marker
+    // would keep showing the pre-correction values until a page reload. The
+    // field-note section is also re-signalled, since its "skor" context
+    // comes from the same row.
+    setRefreshSignal((n) => n + 1);
+    onHalteUpdated?.(updated);
   }
 
   return (
@@ -291,35 +292,8 @@ export default function HalteDetailModal({ feature, onClose, onTasksChanged }: H
             </div>
           </div>
 
-          {/* Facility Attributes Checklist */}
-          <div>
-            <h4 className="font-label-md text-[13px] font-bold text-on-surface mb-1">
-              Ketersediaan Fasilitas
-            </h4>
-            <p className="font-label-sm text-[11px] text-on-surface-variant mb-2">
-              Hasil pengamatan manual tim survei di lapangan -- YOLOv8 belum terintegrasi ke aplikasi ini, jadi ini
-              bukan deteksi otomatis.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {ATTRIBUTE_ROWS.map(({ key, label, icon }) => {
-                const state = formatState(p[key] as string);
-                return (
-                  <div
-                    key={key}
-                    className="flex items-center justify-between p-2.5 rounded-lg border border-border-low bg-surface"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="material-symbols-outlined text-outline text-[18px]">{icon}</span>
-                      <span className="font-label-sm text-[12px] text-on-surface font-medium">{label}</span>
-                    </div>
-                    <span className={`font-label-sm text-[11px] font-bold px-2 py-0.5 rounded ${state.colorClass}`}>
-                      {state.text}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          {/* Facility Attributes Checklist -- editable, see FacilityEditor */}
+          <FacilityEditor feature={feature} onUpdated={handleHalteUpdated} />
 
           <CitizenReportSection halteId={p.halte_id} onDispatched={handleTasksChanged} />
 

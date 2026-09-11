@@ -33,6 +33,13 @@ class CitizenReport(Base):
     # Relative paths under /uploads, e.g. "/uploads/<uuid>.jpg" -- None if the
     # reporter didn't attach that media type.
     photo_url: Mapped[str | None] = mapped_column(String, nullable=True)
+    # The same photo with the detector's boxes drawn on it, rendered by the
+    # detector itself (see photo_detection.render_annotated). This is what the
+    # dashboard shows DISHUB -- a dispatcher should see what the model saw,
+    # not have to reconstruct it from a class list. None when the photo
+    # produced no detection or the render failed; photo_url is always kept, so
+    # the raw evidence never depends on the detector being up.
+    photo_annotated_url: Mapped[str | None] = mapped_column(String, nullable=True)
     video_url: Mapped[str | None] = mapped_column(String, nullable=True)
     # "baru" (not yet dispatched -- shown on the dashboard map as a marker
     # needing attention) -> "diproses" (a MaintenanceTask now exists for it,

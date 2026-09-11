@@ -38,6 +38,11 @@ logger = logging.getLogger(__name__)
 # Detector endpoint (container-to-container on proxy-net).
 DETECT_URL = f"{settings.yolo_api_url.rstrip('/')}/detect"
 
+# Same inference, but the detector returns the photo with its own boxes and
+# labels drawn on it. The backend re-requests rather than drawing the boxes
+# itself, so the picture DISHUB sees is literally the model's own output.
+DETECT_ANNOTATED_URL = f"{settings.yolo_api_url.rstrip('/')}/detect/annotated"
+
 # A detection below this confidence is treated as noise. Matches the
 # detector's own default; raised here because a citizen photo is a single
 # uncontrolled view, not a survey frame.
@@ -117,3 +122,25 @@ def analyze_photo(image_path: Path, confidence_threshold: float = CONFIDENCE_THR
         if facility is not None:
             analysis.observed[facility] = "ada"
     return analysis
+
+
+def render_annotated(image_path: Path) -> bytes | None:
+    """Ask the detector for the same photo with its boxes drawn on it.
+
+    Returns None when the detector cannot produce one. The annotated image is
+    a display nicety for the dispatcher, so a failure here must never cost the
+    citizen their report -- the raw photo is already saved and is what the
+    report falls back to.
+    """
+    try:
+        with image_path.open("rb") as fh:
+            response = httpx.post(
+                DETECT_ANNOTATED_URL,
+                files={"file": (image_path.name, fh, "image/jpeg")},
+                timeout=60.0,
+            )
+        response.raise_for_status()
+        return response.content
+    except Exception as exc:  # detector down, timeout, malformed image
+        logger.warning("annotated render failed for %s: %s: %s", image_path.name, type(exc).__name__, exc)
+        return None
