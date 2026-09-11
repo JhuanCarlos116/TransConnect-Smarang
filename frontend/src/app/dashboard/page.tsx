@@ -11,6 +11,7 @@ import { fetchTasks } from "@/lib/fetchTasks";
 import BusStopLayer, { type HalteConditionFilter, type ReportMarkerStatus } from "@/components/dashboard/BusStopLayer";
 import PopulationLayer from "@/components/dashboard/PopulationLayer";
 import IsochroneLayer from "@/components/dashboard/IsochroneLayer";
+import BrtLayer from "@/components/dashboard/BrtLayer";
 import RecommendationLayer from "@/components/dashboard/RecommendationLayer";
 import MapInfoPopup from "@/components/dashboard/MapInfoPopup";
 import ChatWidget from "@/components/dashboard/ChatWidget";
@@ -29,6 +30,9 @@ export default function DashboardPage() {
   const [conditionFilter, setConditionFilter] = useState<HalteConditionFilter>("all");
   const [isochroneVisible, setIsochroneVisible] = useState(false);
   const [recommendationsVisible, setRecommendationsVisible] = useState(false);
+  // On by default: it is the context the team's own 42 points sit in, and a
+  // layer nobody switches on is a layer nobody can tell is working.
+  const [brtVisible, setBrtVisible] = useState(true);
 
   const [halteFeatures, setHalteFeatures] = useState<HalteFeature[]>([]);
   const [detailTarget, setDetailTarget] = useState<HalteFeature | null>(null);
@@ -125,6 +129,8 @@ export default function DashboardPage() {
           onIsochroneChange={setIsochroneVisible}
           recommendationsVisible={recommendationsVisible}
           onRecommendationsChange={setRecommendationsVisible}
+          brtVisible={brtVisible}
+          onBrtChange={setBrtVisible}
         />
 
         {/* Map canvas -- deliberately free of overlays now. Layer toggles
@@ -136,6 +142,10 @@ export default function DashboardPage() {
             <>
               <IsochroneLayer map={map} visible={isochroneVisible} />
               <PopulationLayer map={map} visible={densityVisible} />
+              {/* Rendered before BusStopLayer so the survey points stay the
+                  dominant marks; BrtLayer also moves itself underneath once
+                  mounted, since fetch order is not guaranteed. */}
+              <BrtLayer map={map} visible={brtVisible} />
               <BusStopLayer
                 map={map}
                 visible={busStopsVisible}
