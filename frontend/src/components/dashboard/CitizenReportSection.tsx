@@ -171,16 +171,13 @@ function ReportCard({ report, halteId, onDispatched }: ReportCardProps) {
           </div>
 
           {detectorFailed ? (
-            <p className="text-label-sm text-[11px] text-alert-red">
-              Detektor gagal membaca foto ini, jadi tidak ada hasil otomatis. Foto tetap bisa dinilai manual.
-            </p>
+            <p className="text-label-sm text-[11px] text-alert-red">Detektor gagal membaca foto ini.</p>
           ) : detections.length === 0 ? (
-            // Honest wording: the model can only prove presence. Nothing here
-            // is evidence that a facility is absent -- see photo_detection.py.
-            <p className="text-label-sm text-[11px] text-on-surface-variant">
-              Tidak ada objek yang terdeteksi di foto ini. Artinya tidak terbaca otomatis -- bukan berarti
-              fasilitasnya tidak ada.
-            </p>
+            // Terse on purpose: the long "this means not-detected, not absent"
+            // paragraph was noise for a dispatcher. The model still only
+            // proves presence -- see photo_detection.py -- so the wording stays
+            // on the safe side without explaining itself.
+            <p className="text-label-sm text-[11px] text-on-surface-variant">Tidak ada objek terbaca.</p>
           ) : (
             <div className="flex flex-wrap gap-1.5">
               {detections.map((d, i) => (
