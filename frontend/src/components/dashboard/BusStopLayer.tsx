@@ -40,6 +40,14 @@ interface BusStopLayerProps {
    * actions instead of every layer fetching its own copy.
    */
   reportedHalteStatus?: Map<string, ReportMarkerStatus>;
+  /**
+   * Bump to re-read the survey points after something changed a halte's own
+   * row -- a DISHUB manual correction to its facility availability moves its
+   * score and so its marker colour. This layer fetches its own data, so
+   * without the signal its copy would stay stale until a page reload. The
+   * first render already fetches, so 0 is ignored.
+   */
+  refreshSignal?: number;
 }
 
 function filterByCondition(
@@ -81,6 +89,7 @@ export default function BusStopLayer({
   onSelect,
   conditionFilter = "all",
   reportedHalteStatus,
+  refreshSignal = 0,
 }: BusStopLayerProps) {
   const loadedRef = useRef(false);
   const onSelectRef = useRef(onSelect);
@@ -226,6 +235,20 @@ export default function BusStopLayer({
     if (!source || !dataRef.current) return;
     source.setData(filterByCondition(dataRef.current, conditionFilter) as never);
   }, [map, conditionFilter]);
+
+  // Re-read the points after an edit to a halte's own row (see refreshSignal).
+  // setData on the existing source instead of re-adding it, so the layer never
+  // blinks out, and dataRef is refreshed too or a click would open the detail
+  // modal with the pre-correction values.
+  useEffect(() => {
+    if (refreshSignal === 0) return;
+    fetchHalteData().then((data) => {
+      dataRef.current = data;
+      const source = map.getSource(SOURCE_ID) as maplibregl.GeoJSONSource | undefined;
+      source?.setData(filterByCondition(data, filterRef.current) as never);
+      updateReportMarkers();
+    });
+  }, [map, refreshSignal, updateReportMarkers]);
 
   return null;
 }

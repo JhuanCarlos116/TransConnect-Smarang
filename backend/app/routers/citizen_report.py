@@ -23,7 +23,7 @@ from app.models.citizen_report import CitizenReport
 from app.models.halte import HalteSurvey
 from app.schemas.citizen_report import CitizenReportOut
 from app.services.condition_score import FACILITY_VARIABLES, UNKNOWN_STATE, compute_condition_score
-from app.services.photo_detection import analyze_photo
+from app.services.photo_detection import analyze_photo, render_annotated
 
 router = APIRouter()
 
@@ -46,12 +46,17 @@ def _to_out(row: CitizenReport, halte_updated: dict[str, str] | None = None) -> 
         lon=point.x,
         description=row.description,
         photo_url=row.photo_url,
+        photo_annotated_url=row.photo_annotated_url,
         video_url=row.video_url,
         status=row.status,
         created_at=row.created_at,
         ai_detections=row.ai_detections,
         ai_analyzed_at=row.ai_analyzed_at,
-        halte_updated=halte_updated or {},
+        # On the POST response the caller passes what it just applied. On a GET
+        # it is read back out of the stored analysis, so the dashboard can show
+        # "this photo changed these variables" for reports submitted earlier in
+        # the session too, not just the one being created right now.
+        halte_updated=halte_updated if halte_updated is not None else (row.ai_detections or {}).get("applied", {}),
     )
 
 
@@ -64,6 +69,11 @@ def _apply_to_survey(halte: HalteSurvey, observed: dict[str, str]) -> dict[str, 
     rule, never marks something absent. Re-scores the halte only when
     something actually changed, so a photo that tells us nothing new leaves
     the stored score untouched.
+
+    Anything written is tagged `"ai"` in facility_sources, which is what lets
+    the dashboard mark a value as machine-written so a dispatcher knows which
+    ones are worth double-checking (the model gets lighting and signage wrong
+    most often, and has no CCTV class at all).
     """
     applied: dict[str, str] = {}
     for facility, value in observed.items():
@@ -75,6 +85,9 @@ def _apply_to_survey(halte: HalteSurvey, observed: dict[str, str]) -> dict[str, 
         halte.condition_score, halte.condition_label = compute_condition_score(
             {facility: getattr(halte, facility) for facility in FACILITY_VARIABLES}
         )
+        # Reassign the whole dict: SQLAlchemy does not track changes made
+        # inside a JSONB value, so an in-place update would not persist.
+        halte.facility_sources = {**(halte.facility_sources or {}), **{f: "ai" for f in applied}}
     return applied
 
 
@@ -150,11 +163,28 @@ async def create_citizen_report(
     ai_detections = None
     ai_analyzed_at = None
     halte_updated: dict[str, str] = {}
+    annotated_url = None
     if photo_url is not None:
-        analysis = analyze_photo(UPLOAD_DIR / Path(photo_url).name)
+        saved_photo = UPLOAD_DIR / Path(photo_url).name
+        analysis = analyze_photo(saved_photo)
         ai_detections = analysis.as_jsonb()
         ai_analyzed_at = datetime.now(timezone.utc)
         halte_updated = _apply_to_survey(halte, analysis.observed)
+        # Stored with the analysis so a GET can report what this photo changed
+        # on the survey row, not only the POST that applied it.
+        ai_detections["applied"] = halte_updated
+
+        # The annotated copy is what DISHUB sees: the dispatcher looks at one
+        # picture and sees what the model saw, instead of cross-reading a
+        # class list against a raw photo. Only rendered when there is
+        # something to draw -- otherwise it would just duplicate photo_url.
+        # A failure here costs the annotation, never the report.
+        if analysis.detections:
+            annotated_bytes = render_annotated(saved_photo)
+            if annotated_bytes:
+                annotated_name = f"{Path(photo_url).stem}.annotated.jpg"
+                (UPLOAD_DIR / annotated_name).write_bytes(annotated_bytes)
+                annotated_url = f"/uploads/{annotated_name}"
 
     report = CitizenReport(
         report_id=str(uuid.uuid4()),
@@ -162,6 +192,7 @@ async def create_citizen_report(
         reporter_name=reporter_name.strip(),
         description=description.strip(),
         photo_url=photo_url,
+        photo_annotated_url=annotated_url,
         video_url=video_url,
         geom=WKTElement(f"POINT({lon} {lat})", srid=4326),
         ai_detections=ai_detections,

@@ -11,6 +11,7 @@ class CitizenReportOut(BaseModel):
     lon: float
     description: str
     photo_url: str | None
+    photo_annotated_url: str | None = None
     video_url: str | None
     status: str
     created_at: datetime

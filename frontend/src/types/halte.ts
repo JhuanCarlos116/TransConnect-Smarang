@@ -24,7 +24,18 @@ export interface HalteProperties {
 
   condition_score: number;
   condition_label: ConditionLabel;
+
+  // Per-variable provenance: "ai" = the photo detector filled this in,
+  // "manual" = a DISHUB admin corrected it. Absent = the field survey's own
+  // reading. Drives the small badges next to each facility row, so a
+  // dispatcher can tell at a glance which values were machine-written and
+  // therefore worth double-checking.
+  facility_sources: Partial<Record<FacilityVariable, FacilitySource>>;
 }
+
+export type FacilityVariable = "sidewalk_condition" | "lighting" | "cctv" | "route_info_signage" | "canopy";
+export type FacilitySource = "ai" | "manual";
+export type FacilityState = "ada" | "tidak" | "-";
 
 export interface HalteFeature {
   type: "Feature";

@@ -1,5 +1,5 @@
 from geoalchemy2 import Geometry
-from sqlalchemy import Date, String
+from sqlalchemy import Date, String, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -30,5 +30,16 @@ class HalteSurvey(Base):
 
     condition_score: Mapped[int] = mapped_column()
     condition_label: Mapped[str] = mapped_column(String)  # "green" | "yellow" | "red"
+
+    # Where each facility value came from, so the dashboard can label it:
+    # {"sidewalk_condition": "ai" | "manual"} for variables the photo detector
+    # filled in or a DISHUB admin corrected by hand. A variable absent from
+    # this map is the field survey's own reading. Needed because the model is
+    # still error-prone, and a dispatcher correcting it has to be able to see
+    # which values were ever machine-written -- see photo_detection.py and the
+    # manual-correction endpoint in routers/halte.py.
+    facility_sources: Mapped[dict] = mapped_column(
+        JSONB, default=dict, server_default=text("'{}'::jsonb")
+    )
 
     geom: Mapped[str] = mapped_column(Geometry(geometry_type="POINT", srid=4326))

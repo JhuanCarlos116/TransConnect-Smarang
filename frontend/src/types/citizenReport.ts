@@ -6,6 +6,10 @@ export interface CitizenReport {
   lon: number;
   description: string;
   photo_url: string | null;
+  // The detector's own render of photo_url with its boxes drawn on it --
+  // what "Laporan Warga" shows DISHUB. Null when the photo produced no
+  // detection (or the render failed); photo_url is always the fallback.
+  photo_annotated_url: string | null;
   video_url: string | null;
   status: string;
   created_at: string;
