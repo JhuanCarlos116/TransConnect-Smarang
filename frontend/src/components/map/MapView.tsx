@@ -10,6 +10,7 @@ import BrtRoutesLayer, { BrtRoutesLegend } from "@/components/map/BrtRoutesLayer
 import ConditionLegend from "@/components/map/ConditionLegend";
 import AppHeader from "@/components/ui/AppHeader";
 import SafeRouteWidget from "@/components/map/SafeRouteWidget";
+import RouteToggleButton from "@/components/map/RouteToggleButton";
 import ReportFormWidget from "@/components/map/ReportFormWidget";
 import HaltePublicModal from "@/components/map/HaltePublicModal";
 import ProfileFooter from "@/components/map/ProfileFooter";
@@ -26,9 +27,16 @@ import type { HalteFeature } from "@/types/halte";
  * tool, and the halte layer has no toggle since there's nothing else to
  * choose between here.
  *
- * Two things sit under the survey markers, both without a toggle: the existing
- * BRT corridors (BrtRoutesLayer -- context, so a citizen can see which route a
- * surveyed halte is on) and the halte condition colours themselves.
+ * Two things sit under the survey markers: the existing BRT corridors
+ * (BrtRoutesLayer -- context, so a citizen can see which route a surveyed halte
+ * is on) and the halte condition colours themselves.
+ *
+ * The corridors are now foldable, at the passenger's request: RouteToggleButton
+ * sits with the other two map controls on the right and flips `routesVisible`.
+ * That single flag drives the layer, the button's own on/off appearance, and
+ * the corridor legend, so the three can never contradict each other. It
+ * defaults to visible -- corridors are context for the survey, so they should
+ * be there on first load rather than waiting to be discovered.
  *
  * Note there is deliberately no MAPID_API_KEY gate on map init any more. The
  * style function in lib/maplibre.ts falls back to OpenStreetMap tiles when the
@@ -41,6 +49,9 @@ export default function MapView() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [map, setMap] = useState<maplibregl.Map | null>(null);
   const [detailTarget, setDetailTarget] = useState<HalteFeature | null>(null);
+  // Owned here rather than inside BrtRoutesLayer: the toggle button, the layer
+  // and the corridor legend all read it, so it has to live above all three.
+  const [routesVisible, setRoutesVisible] = useState(true);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -75,19 +86,25 @@ export default function MapView() {
         {/* Corridors render before the survey markers so the natural order is
             already correct; BrtRoutesLayer additionally moves itself beneath
             HALTE_POINT_LAYER_ID because the two fetches race. */}
-        {map && <BrtRoutesLayer map={map} />}
+        {map && <BrtRoutesLayer map={map} visible={routesVisible} />}
         {map && <HalteLayer map={map} visible onSelect={setDetailTarget} />}
 
         {map && (
           <div className="absolute right-margin-page top-1/2 z-20 flex -translate-y-1/2 flex-col gap-3">
             <ReportFormWidget />
             <SafeRouteWidget map={map} />
+            <RouteToggleButton
+              visible={routesVisible}
+              onToggle={() => setRoutesVisible((v) => !v)}
+            />
           </div>
         )}
 
         <div className="absolute left-margin-page top-margin-page z-20 flex flex-col gap-2">
           <ConditionLegend />
-          <BrtRoutesLegend />
+          {/* The corridor legend follows the corridors: leaving it up while the
+              lines are folded away would explain something not on the map. */}
+          {routesVisible && <BrtRoutesLegend />}
         </div>
       </main>
 
