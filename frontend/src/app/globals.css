@@ -150,16 +150,21 @@
   --spacing-stack-lg: 32px;
 }
 
+/* The app is light-only, and these two variables say so explicitly. Every
+   design token above is a single light value and not one component carries a
+   `dark:` variant, so there is no dark theme to switch to -- but this file
+   still flipped `--background`/`--foreground` (and, at the bottom,
+   `color-scheme` on <html>) whenever the *visitor's* OS preferred dark. That
+   scaffold came from create-next-app and only bites elements that do not name
+   their own colour, which is why it survived review while being very visible
+   on screen: body text turned #ededed, and anything inheriting it rendered
+   near-white on a light surface (1.06:1 contrast -- invisible). Pinning the
+   pair and declaring `color-scheme: light` also keeps form controls and
+   scrollbars light, matching the rest of the UI. */
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  color-scheme: light;
 }
 
 /* Material Symbols is loaded as a webfont in layout.tsx (a <link> to
@@ -265,10 +270,17 @@ body {
       display: none;
     }
   }
-}
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+  /* Popup text colour, pinned here rather than in each `setHTML` call.
+     maplibre-gl.css gives `.maplibregl-popup-content` a white background and
+     NO `color`, so popup text inherits the document's colour; the corridor
+     popup (BrtRoutesLayer) and the halte popup (BrtLayer) both inject raw
+     HTML with no colour of their own. Under the dark-mode scaffold this file
+     used to carry, that inheritance turned near-white, i.e. white-on-white --
+     the "tulisan tidak terlihat" popups. These popups are built as strings,
+     outside Tailwind's reach, so a future popup cannot be relied on to
+     remember this: one rule covers all of them. */
+  .maplibregl-popup-content {
+    color: var(--color-on-surface);
   }
 }
