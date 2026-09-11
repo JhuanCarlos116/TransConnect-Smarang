@@ -13,9 +13,10 @@ interface AppHeaderProps {
   /**
    * Where the brand/logo links to. Defaults to /map (the public map) --
    * that's the right "home" for both the public map itself and the tasks
-   * board, since neither should route out to the Penumpang/DISHUB chooser at
-   * "/". The dashboard passes "/dashboard" instead so its logo stays inside
-   * the staff app rather than leaving it for the public map.
+   * board, since neither should route out to the landing page at "/" or the
+   * Penumpang/DISHUB chooser at "/masuk". The dashboard passes "/dashboard"
+   * instead so its logo stays inside the staff app rather than leaving it
+   * for the public map.
    */
   homeHref?: string;
 }
