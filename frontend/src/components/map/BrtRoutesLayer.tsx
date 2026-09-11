@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as maplibregl from "maplibre-gl";
 
 import { HALTE_POINT_LAYER_ID } from "@/components/map/HalteLayer";
@@ -27,14 +27,28 @@ export const BRT_PUBLIC_RUTE_LAYER_ID = "brt-rute-public-lines";
  * dashboard about where a corridor runs or what colour it is.
  *
  * Two things are deliberately NOT here:
- *  - no toggle: the public page has no layer panel, and this is context, not a
- *    choice the citizen is asked to make
  *  - no error state: fetchBrtNetwork resolves to an empty network if the
  *    endpoint is unreachable, so the page draws the survey without corridors
  *    rather than failing to load
+ *  - no visibility state of its own: the corridors can be folded away by the
+ *    passenger now, but the flag is owned by MapView and arrives as a prop, so
+ *    the toggle button, this layer and BrtRoutesLegend cannot disagree about
+ *    whether the lines are showing.
  */
-export default function BrtRoutesLayer({ map }: { map: maplibregl.Map }) {
+export default function BrtRoutesLayer({ map, visible }: { map: maplibregl.Map; visible: boolean }) {
   const loadedRef = useRef(false);
+  // The layer is added from a promise callback, so the first `visible` value is
+  // already stale by then. This ref is refreshed in an effect declared BEFORE
+  // the visibility effect below, which guarantees it holds the current value by
+  // the time that one runs.
+  const visibleRef = useRef(visible);
+  // Flips once the source and layer actually exist; before that
+  // setLayoutProperty would throw on an unknown layer id.
+  const [layerReady, setLayerReady] = useState(false);
+
+  useEffect(() => {
+    visibleRef.current = visible;
+  }, [visible]);
 
   useEffect(() => {
     if (loadedRef.current) return;
@@ -67,6 +81,16 @@ export default function BrtRoutesLayer({ map }: { map: maplibregl.Map }) {
           "line-opacity": 0.55,
         },
       });
+
+      // Honour whatever the passenger has already chosen while the fetch was in
+      // flight, otherwise the lines flash on for a frame before the visibility
+      // effect below catches up.
+      map.setLayoutProperty(
+        BRT_PUBLIC_RUTE_LAYER_ID,
+        "visibility",
+        visibleRef.current ? "visible" : "none",
+      );
+      setLayerReady(true);
 
       // Corridors must render BENEATH the surveyed halte. Mount order can't
       // guarantee it (each layer adds itself when its own fetch resolves, and
@@ -105,6 +129,18 @@ export default function BrtRoutesLayer({ map }: { map: maplibregl.Map }) {
       popup.remove();
     };
   }, [map]);
+
+  // Applies every later press of the toggle. Depends on layerReady so it also
+  // fires the moment the layer appears, and on `visible` so it fires on each
+  // change. Guarded with getLayer because MapLibre throws on an unknown id.
+  useEffect(() => {
+    if (!layerReady || !map.getLayer(BRT_PUBLIC_RUTE_LAYER_ID)) return;
+    map.setLayoutProperty(
+      BRT_PUBLIC_RUTE_LAYER_ID,
+      "visibility",
+      visible ? "visible" : "none",
+    );
+  }, [map, visible, layerReady]);
 
   return null;
 }
