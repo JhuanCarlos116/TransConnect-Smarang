@@ -5,6 +5,7 @@ import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { DEFAULT_CENTER, DEFAULT_ZOOM, mapStyleUrl } from "@/lib/maplibre";
+import { fetchHalteData } from "@/lib/fetchHalteData";
 import HalteLayer from "@/components/map/HalteLayer";
 import BrtRoutesLayer, { BrtRoutesLegend } from "@/components/map/BrtRoutesLayer";
 import ConditionLegend from "@/components/map/ConditionLegend";
@@ -52,6 +53,15 @@ export default function MapView() {
   // Owned here rather than inside BrtRoutesLayer: the toggle button, the layer
   // and the corridor legend all read it, so it has to live above all three.
   const [routesVisible, setRoutesVisible] = useState(true);
+  // SafeRouteWidget needs the full feature list to hand off to
+  // HaltePublicModal (via setDetailTarget) once it finds the nearest halte --
+  // fetched here rather than inside the widget so HalteLayer's own fetch and
+  // this one share nothing but both stay simple.
+  const [halteFeatures, setHalteFeatures] = useState<HalteFeature[]>([]);
+
+  useEffect(() => {
+    fetchHalteData().then((data) => setHalteFeatures(data.features));
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -92,7 +102,7 @@ export default function MapView() {
         {map && (
           <div className="absolute right-margin-page top-1/2 z-20 flex -translate-y-1/2 flex-col gap-3">
             <ReportFormWidget />
-            <SafeRouteWidget map={map} />
+            <SafeRouteWidget halteFeatures={halteFeatures} onFound={setDetailTarget} />
             <RouteToggleButton
               visible={routesVisible}
               onToggle={() => setRoutesVisible((v) => !v)}
