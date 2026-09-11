@@ -211,8 +211,8 @@ export default function SafeRouteWidget({ map }: SafeRouteWidgetProps) {
       )}
 
       {result && (
-        <div className="absolute right-full top-0 mr-2 w-72 max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-border-low bg-surface shadow-lg">
-          <div className="flex items-center justify-between gap-2 border-b border-border-low bg-surface-container-low px-3 py-2">
+        <div className="absolute right-full top-0 mr-2 flex max-h-[calc(100dvh-8rem)] w-72 max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-lg border border-border-low bg-surface shadow-lg">
+          <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border-low bg-surface-container-low px-3 py-2">
             <span className="flex items-center gap-1.5 font-label-sm text-label-sm font-bold text-on-surface">
               <span className="material-symbols-outlined text-[16px] text-transport-blue">alt_route</span>
               Halte Teraman Terjangkau
@@ -226,7 +226,7 @@ export default function SafeRouteWidget({ map }: SafeRouteWidgetProps) {
             </button>
           </div>
 
-          <div className="p-3">
+          <div className="overflow-y-auto p-3">
             <div className="mb-1.5 flex items-center gap-2">
               <ScoreBadge score={result.recommended.condition_score} label={result.recommended.condition_label} />
             </div>
