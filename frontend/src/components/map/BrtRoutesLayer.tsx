@@ -4,8 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import * as maplibregl from "maplibre-gl";
 
 import { HALTE_POINT_LAYER_ID } from "@/components/map/HalteLayer";
-import CorridorLegendRows from "@/components/ui/CorridorLegendRows";
+import CorridorLegendRows, { CorridorFilterReset } from "@/components/ui/CorridorLegendRows";
 import { koridorColorExpression, koridorTags } from "@/lib/brtCorridorStyle";
+import { corridorFilterFor } from "@/lib/corridorFilter";
 import { fetchBrtNetwork } from "@/lib/fetchBrtNetwork";
 import type { BrtRuteFeature } from "@/types/brt";
 
@@ -44,10 +45,15 @@ export const BRT_PUBLIC_RUTE_LAYER_ID = "brt-rute-public-lines";
 export default function BrtRoutesLayer({
   map,
   visible,
+  hidden = [],
   onCorridors,
 }: {
   map: maplibregl.Map;
   visible: boolean;
+  /** Corridor tags the passenger has filtered out. Applied to the line layer
+   * as a MapLibre filter; only the corridors are filterable because only the
+   * lines carry a `koridor` tag -- see lib/corridorFilter.ts. */
+  hidden?: string[];
   onCorridors?: (koridors: string[]) => void;
 }) {
   const loadedRef = useRef(false);
@@ -56,13 +62,18 @@ export default function BrtRoutesLayer({
   // the visibility effect below, which guarantees it holds the current value by
   // the time that one runs.
   const visibleRef = useRef(visible);
+  // Same reasoning for the filter, plus one more: the filter needs the list of
+  // corridors the layer turned out to have, which only exists after the fetch.
+  const hiddenRef = useRef(hidden);
+  const koridorsRef = useRef<string[]>([]);
   // Flips once the source and layer actually exist; before that
   // setLayoutProperty would throw on an unknown layer id.
   const [layerReady, setLayerReady] = useState(false);
 
   useEffect(() => {
     visibleRef.current = visible;
-  }, [visible]);
+    hiddenRef.current = hidden;
+  }, [visible, hidden]);
 
   // Held in a ref so that a caller passing an inline arrow cannot re-run the
   // fetch effect below (whose deps are [map] only) and re-add the source.
@@ -87,6 +98,7 @@ export default function BrtRoutesLayer({
       // One list, used for both the colour expression and the legend rows, so
       // the swatch a reader sees is the colour of the line they see.
       const koridors = koridorTags(rute);
+      koridorsRef.current = koridors;
 
       map.addSource(SOURCE_ID, {
         type: "geojson",
@@ -109,11 +121,17 @@ export default function BrtRoutesLayer({
 
       // Honour whatever the passenger has already chosen while the fetch was in
       // flight, otherwise the lines flash on for a frame before the visibility
-      // effect below catches up.
+      // effect below catches up. The corridor filter is applied here for the
+      // same reason: without it a passenger who had already unticked corridors
+      // would see their lines drawn until the next interaction.
       map.setLayoutProperty(
         BRT_PUBLIC_RUTE_LAYER_ID,
         "visibility",
         visibleRef.current ? "visible" : "none",
+      );
+      map.setFilter(
+        BRT_PUBLIC_RUTE_LAYER_ID,
+        corridorFilterFor(hiddenRef.current, koridors) as never,
       );
       setLayerReady(true);
       // Only after the layer exists: the legend explains drawn lines, so it
@@ -170,6 +188,18 @@ export default function BrtRoutesLayer({
     );
   }, [map, visible, layerReady]);
 
+  // Applies every later corridor-filter change. Deliberately its own effect
+  // rather than folded into the visibility one: folding the corridors away and
+  // choosing which ones to draw are independent, so the filter survives a
+  // fold/unfold instead of having to be reapplied on the way back.
+  useEffect(() => {
+    if (!layerReady || !map.getLayer(BRT_PUBLIC_RUTE_LAYER_ID)) return;
+    map.setFilter(
+      BRT_PUBLIC_RUTE_LAYER_ID,
+      corridorFilterFor(hidden, koridorsRef.current) as never,
+    );
+  }, [map, hidden, layerReady]);
+
   return null;
 }
 
@@ -185,7 +215,17 @@ export default function BrtRoutesLayer({
  * `KORIDOR_PALETTE[i]` for the same index the colour expression used, so a
  * legend row cannot disagree with the line it describes.
  */
-export function BrtRoutesLegend({ koridors }: { koridors: string[] }) {
+export function BrtRoutesLegend({
+  koridors,
+  hidden = [],
+  onToggle,
+  onShowAll,
+}: {
+  koridors: string[];
+  hidden?: string[];
+  onToggle?: (koridor: string) => void;
+  onShowAll?: () => void;
+}) {
   // Nothing to explain before the corridors arrive, or if the fetch failed
   // (fetchBrtNetwork resolves empty rather than throwing, and then the layer
   // draws nothing either).
@@ -197,8 +237,17 @@ export function BrtRoutesLegend({ koridors }: { koridors: string[] }) {
       {/* Capped and scrollable: 17 rows would otherwise be taller than the
           phone viewport the legend was just made foldable to protect. */}
       <div className="flex max-h-[34vh] flex-col gap-0.5 overflow-y-auto pr-0.5 md:max-h-[46vh] md:gap-1">
+        {onShowAll && (
+          <CorridorFilterReset
+            hiddenCount={hidden.length}
+            onShowAll={onShowAll}
+            className="text-[10px] md:text-[11px]"
+          />
+        )}
         <CorridorLegendRows
           koridors={koridors}
+          hidden={hidden}
+          onToggle={onToggle}
           swatchClassName="inline-block h-[3px] w-5 shrink-0 rounded-full md:w-6"
           labelClassName="truncate text-[10px] text-on-surface-variant md:text-[11px]"
         />
