@@ -6,6 +6,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
 from app.db import Base, engine
+from app.routers.brt import router as brt_router
 from app.routers.chat import router as chat_router
 from app.routers.citizen_report import UPLOAD_DIR, router as citizen_report_router
 from app.routers.comment import router as comment_router
@@ -41,6 +42,7 @@ app.add_middleware(
 )
 
 app.include_router(halte_router, prefix="/api/v1")
+app.include_router(brt_router, prefix="/api/v1")
 app.include_router(chat_router, prefix="/api/v1")
 app.include_router(route_router, prefix="/api/v1")
 app.include_router(task_router, prefix="/api/v1")
