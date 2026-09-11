@@ -1,11 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import * as maplibregl from "maplibre-gl";
 
 import { BUS_STOP_POINT_LAYER_ID } from "@/components/dashboard/BusStopLayer";
 import { koridorColorExpression, koridorTags, BRT_HALTE_COLOR } from "@/lib/brtCorridorStyle";
-import { corridorFilterFor } from "@/lib/corridorFilter";
 import { fetchBrtNetwork } from "@/lib/fetchBrtNetwork";
 import type { BrtHalteFeature } from "@/types/brt";
 
@@ -17,12 +16,6 @@ export const BRT_HALTE_LAYER_ID = "brt-network-halte-points";
 interface BrtLayerProps {
   map: maplibregl.Map;
   visible: boolean;
-  /** Corridor tags DISHUB has filtered out. Only the corridor LINES can be
-   * filtered -- the 673 halte points carry no corridor tag in the source data
-   * -- so while a filter is active the halte dots are hidden rather than left
-   * on screen looking like they belong to the selected corridors. Reasoning
-   * and the measurement behind it: lib/corridorFilter.ts. */
-  hidden?: string[];
   /** Reports the corridor tags this layer styled, in the same order it gave
    * them colours. The sidebar legend colours its rows from this list, so the
    * legend cannot disagree with the map and there is still only one fetch. */
@@ -47,17 +40,9 @@ interface BrtLayerProps {
  *    dots across Semarang read as noise; the corridors still show the network
  *    shape at any zoom.
  */
-export default function BrtLayer({ map, visible, hidden = [], onCorridors }: BrtLayerProps) {
+export default function BrtLayer({ map, visible, onCorridors }: BrtLayerProps) {
   const loadedRef = useRef(false);
   const visibleRef = useRef(visible);
-  // The fetch resolves after the dispatcher may already have folded the layer
-  // away or ticked corridors off, so both values are read from refs by the
-  // effect below and by the fetch callback rather than closed over.
-  const hiddenRef = useRef(hidden);
-  // The corridor list only exists once the fetch has returned; the filter needs
-  // it to tell "nothing hidden" (no filter at all) from "nothing visible"
-  // (filter that must match no line).
-  const koridorsRef = useRef<string[]>([]);
   // In a ref so an inline arrow from the caller cannot re-run the fetch effect
   // below (deps are [map] only) and re-add the sources.
   const onCorridorsRef = useRef(onCorridors);
@@ -65,29 +50,6 @@ export default function BrtLayer({ map, visible, hidden = [], onCorridors }: Brt
   useEffect(() => {
     onCorridorsRef.current = onCorridors;
   }, [onCorridors]);
-
-  /**
-   * Pushes the current visibility + corridor filter onto both layers.
-   *
-   * One function for all three inputs (folded away, corridor filter, fetch
-   * landed) because they interact: the halte dots have no corridor tag, so
-   * they follow `visible AND nothing filtered out`. Splitting this into two
-   * effects is what let the dots and the lines disagree in the first place.
-   */
-  const applyState = useCallback(() => {
-    const lines = visibleRef.current ? "visible" : "none";
-    if (map.getLayer(BRT_RUTE_LAYER_ID)) {
-      map.setLayoutProperty(BRT_RUTE_LAYER_ID, "visibility", lines);
-      map.setFilter(
-        BRT_RUTE_LAYER_ID,
-        corridorFilterFor(hiddenRef.current, koridorsRef.current) as never,
-      );
-    }
-    if (map.getLayer(BRT_HALTE_LAYER_ID)) {
-      const dots = visibleRef.current && hiddenRef.current.length === 0 ? "visible" : "none";
-      map.setLayoutProperty(BRT_HALTE_LAYER_ID, "visibility", dots);
-    }
-  }, [map]);
 
   useEffect(() => {
     if (loadedRef.current) return;
@@ -104,7 +66,6 @@ export default function BrtLayer({ map, visible, hidden = [], onCorridors }: Brt
 
       // One list, used for the colour expression and for the legend rows.
       const koridors = koridorTags(rute);
-      koridorsRef.current = koridors;
 
       map.addSource(RUTE_SOURCE_ID, { type: "geojson", data: { type: "FeatureCollection", features: rute } as never });
       map.addLayer({
@@ -167,8 +128,10 @@ export default function BrtLayer({ map, visible, hidden = [], onCorridors }: Brt
       map.on("mouseleave", BRT_HALTE_LAYER_ID, hideHaltePopup);
 
       // Same desync guard as the survey layer: the fetch resolves after the
-      // toggle may already have been flipped, or corridors already ticked off.
-      applyState();
+      // toggle may already have been flipped.
+      const current = visibleRef.current ? "visible" : "none";
+      map.setLayoutProperty(BRT_RUTE_LAYER_ID, "visibility", current);
+      map.setLayoutProperty(BRT_HALTE_LAYER_ID, "visibility", current);
 
       // After the lines exist: the legend explains drawn corridors, so it must
       // not list any the map failed to add.
@@ -180,14 +143,14 @@ export default function BrtLayer({ map, visible, hidden = [], onCorridors }: Brt
     };
   }, [map]);
 
-  // Applies every later toggle/filter change. Runs after the fetch effect on
-  // mount, where it is harmless: applyState checks getLayer before touching
-  // anything, and the fetch callback calls it again once the layers exist.
   useEffect(() => {
     visibleRef.current = visible;
-    hiddenRef.current = hidden;
-    applyState();
-  }, [visible, hidden, applyState]);
+    for (const id of [BRT_RUTE_LAYER_ID, BRT_HALTE_LAYER_ID]) {
+      if (map.getLayer(id)) {
+        map.setLayoutProperty(id, "visibility", visible ? "visible" : "none");
+      }
+    }
+  }, [map, visible]);
 
   return null;
 }
