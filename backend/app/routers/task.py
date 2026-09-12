@@ -537,6 +537,14 @@ async def approve_facility_update(task_id: str, session: AsyncSession = Depends(
     source_snapshot = {f: (halte.facility_sources or {}).get(f) for f in task.facility_updates}
     prev_score, prev_label = halte.condition_score, halte.condition_label
 
+    # How many items at the FRONT of the media list an earlier approval on this
+    # same task already put there. Needed below: the snapshot must describe the
+    # front block as it will actually be, not just this approval's share of it.
+    prev_snapshot = task.facility_updates_snapshot
+    prev_prepended = (
+        prev_snapshot.get("media_prepended_count", 0) if isinstance(prev_snapshot, dict) else 0
+    )
+
     for facility, value in task.facility_updates.items():
         setattr(halte, facility, value)
 
@@ -552,6 +560,7 @@ async def approve_facility_update(task_id: str, session: AsyncSession = Depends(
     }
 
     existing_urls = {m.get("url") for m in (halte.media or [])}
+    media_before = list(halte.media or [])
     new_media: list[dict] = []
     # A rejected video or photo must not ride into the public gallery on the
     # back of a facility approval -- the rejection is a decision about what the
@@ -573,7 +582,16 @@ async def approve_facility_update(task_id: str, session: AsyncSession = Depends(
             if url not in existing_urls:
                 new_media.append({"url": url, "type": "photo"})
     if new_media:
-        halte.media = [*new_media, *(halte.media or [])]
+        halte.media = [*new_media, *media_before]
+
+    # The front block is this approval's new items PLUS whatever survived of an
+    # earlier approval's block. Recording only len(new_media) lost the earlier
+    # ones the moment an approval had nothing new to add -- the count fell to 0
+    # while the block was still sitting there, and a revert then removed nothing,
+    # leaving the technician's photo/video on the public halte gallery for good.
+    # Approving twice reached that on its own; turning down a video or a photo
+    # walked into it too, because those removals already decremented the count.
+    prepended_count = len(new_media) + len(media_before[:prev_prepended])
 
     task.facility_updates_approved = True
     # Approving overrides an earlier rejection of the same batch (rejecting
@@ -586,7 +604,7 @@ async def approve_facility_update(task_id: str, session: AsyncSession = Depends(
         "facility_sources": source_snapshot,
         "condition_score": prev_score,
         "condition_label": prev_label,
-        "media_prepended_count": len(new_media),
+        "media_prepended_count": prepended_count,
     }
 
     await session.commit()
