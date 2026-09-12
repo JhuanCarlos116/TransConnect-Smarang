@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
@@ -118,15 +119,38 @@ async def is_referenced(session: AsyncSession, name: str) -> bool:
     return bool(await _matching_values(session, f"%{name}%", limit=1))
 
 
+# Every "/uploads/<name>" inside one database value.
+#
+# A regex rather than a split on "/uploads/", because one value can hold SEVERAL
+# of them: a JSONB array column like technician_photo_urls stores
+# ["/uploads/a.jpg", "/uploads/b.jpg"], and splitting on the first occurrence
+# yielded a single mangled string with the rest of the array still attached
+# ("b.jpg\"]"). So every name in such an array except a broken version of the
+# last one looked unreferenced -- and that is the dangerous direction, because
+# the bulk sweep then moves a photo a live row still points at. It nearly did:
+# with technician_photo_urls holding two photos, the sweep reported the second
+# one as an orphan while the task row was pointing straight at it.
+#
+# The character class stops at the delimiters a URL can be wrapped in, so array
+# elements, quoted JSON strings and plain paths all come out whole.
+_UPLOAD_REF = re.compile(r"/uploads/([^\s\"',;\]\)\}<>]+)")
+
+
+def _names_in_value(value: str) -> set[str]:
+    """Every uploaded filename mentioned in one database value, cleaned up."""
+    names: set[str] = set()
+    for match in _UPLOAD_REF.finditer(value):
+        tail = match.group(1).split("?")[0].split("#")[0]
+        if tail:
+            names.add(Path(tail).name)
+    return names
+
+
 async def referenced_upload_names(session: AsyncSession) -> set[str]:
     """Every uploaded filename that some row refers to, in one pass."""
     names: set[str] = set()
     for value in await _matching_values(session, "%/uploads/%"):
-        # Values look like "/uploads/<uuid>.jpg" or "http://host/uploads/<uuid>.jpg".
-        tail = value.split("/uploads/", 1)[-1]
-        tail = tail.split("?")[0].split("#")[0].strip().strip('"')
-        if tail:
-            names.add(Path(tail).name)
+        names |= _names_in_value(value)
     return names
 
 
