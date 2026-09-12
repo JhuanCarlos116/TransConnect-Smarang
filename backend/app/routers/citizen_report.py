@@ -21,19 +21,69 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db import get_session
 from app.models.citizen_report import CitizenReport
 from app.models.halte import HalteSurvey
-from app.schemas.citizen_report import CitizenReportOut
+from app.schemas.citizen_report import CitizenReportOut, CitizenReportPhoto
 from app.services.condition_score import FACILITY_VARIABLES, UNKNOWN_STATE, compute_condition_score
-from app.services.photo_detection import analyze_photo, render_annotated
+from app.services.photo_detection import analyze_photo, merge_analyses, render_annotated
 
 router = APIRouter()
 
 UPLOAD_DIR = Path(__file__).resolve().parent.parent.parent / "uploads"
 UPLOAD_DIR.mkdir(exist_ok=True)
 
-MAX_PHOTO_BYTES = 5 * 1024 * 1024  # 5 MB
+MAX_PHOTO_BYTES = 15 * 1024 * 1024  # 15 MB
 MAX_VIDEO_BYTES = 25 * 1024 * 1024  # 25 MB -- video files run bigger than photos
+# How many photos one report may carry. "Beberapa foto" still has to be bounded:
+# nothing here limits a request's total size on its own, so without a cap a
+# single POST could stream arbitrarily many 15 MB parts. 5 x 15 MB + a 25 MB
+# video is the worst case this admits, which is what nginx's client_max_body_size
+# for /api/ is sized against (see the reverse-proxy config) -- raise one and the
+# other has to move with it or the upload dies as a 413 at the proxy instead of
+# producing a readable error from the API.
+MAX_PHOTOS = 5
 PHOTO_CONTENT_TYPE_TO_EXT = {"image/jpeg": "jpg", "image/png": "png", "image/webp": "webp"}
 VIDEO_CONTENT_TYPE_TO_EXT = {"video/mp4": "mp4", "video/webm": "webm", "video/quicktime": "mov"}
+
+
+def _photo_list(row: CitizenReport) -> list[CitizenReportPhoto]:
+    """The report's photos as a list, whichever era the row is from.
+
+    Rows written before this app accepted more than one photo have `photos`
+    NULL and only the scalar pair set. Those are synthesised into a one-entry
+    list here, so every reader downstream sees one shape instead of having to
+    handle two -- and an older report shows up in the new gallery alongside a
+    newer one without a backfill.
+    """
+    if row.photos:
+        return [
+            CitizenReportPhoto(url=p.get("url") or "", annotated_url=p.get("annotated_url"))
+            for p in row.photos
+            if p.get("url")
+        ]
+    if row.photo_url:
+        return [CitizenReportPhoto(url=row.photo_url, annotated_url=row.photo_annotated_url)]
+    return []
+
+
+def _collect_photo_uploads(
+    photos: list[UploadFile] | None, legacy_photo: UploadFile | None
+) -> list[UploadFile]:
+    """The photos to save: the multi-file field plus the old single-file one.
+
+    `photo` (singular) is still accepted so a browser serving a cached bundle
+    from before this change stays able to submit -- dropping it would turn
+    those users' uploads into silent no-photo reports. Whatever it holds is
+    appended to the list rather than ignored.
+
+    Parts with no filename are dropped: an HTML file input the user cleared
+    still posts its part, and keeping those would either save a zero-byte
+    "photo" or count an empty slot against the cap.
+    """
+    uploads = [u for u in (photos or []) if u is not None and u.filename]
+    if legacy_photo is not None and legacy_photo.filename:
+        uploads.append(legacy_photo)
+    if len(uploads) > MAX_PHOTOS:
+        raise HTTPException(status_code=400, detail=f"Maksimal {MAX_PHOTOS} foto per laporan.")
+    return uploads
 
 
 def _to_out(row: CitizenReport, halte_updated: dict[str, str] | None = None) -> CitizenReportOut:
@@ -47,6 +97,7 @@ def _to_out(row: CitizenReport, halte_updated: dict[str, str] | None = None) -> 
         description=row.description,
         photo_url=row.photo_url,
         photo_annotated_url=row.photo_annotated_url,
+        photos=_photo_list(row),
         video_url=row.video_url,
         status=row.status,
         created_at=row.created_at,
@@ -123,6 +174,11 @@ async def create_citizen_report(
     halte_id: str = Form(...),
     reporter_name: str = Form(...),
     description: str = Form(...),
+    # Repeated multipart parts named "photos" for the multi-photo field. `photo`
+    # (singular) is the pre-existing single-photo field, still accepted so a
+    # cached frontend bundle can submit -- _collect_photo_uploads folds the two
+    # together, with the same 15 MB-per-file and 5-photo caps either way.
+    photos: list[UploadFile] | None = File(None),
     photo: UploadFile | None = File(None),
     video: UploadFile | None = File(None),
     session: AsyncSession = Depends(get_session),
@@ -136,15 +192,16 @@ async def create_citizen_report(
     if halte is None:
         raise HTTPException(status_code=404, detail="Halte tidak ditemukan.")
 
-    photo_url = None
-    if photo is not None and photo.filename:
-        photo_url = await _save_upload(
-            photo,
+    saved_photos: list[dict] = []
+    for upload in _collect_photo_uploads(photos, photo):
+        url = await _save_upload(
+            upload,
             PHOTO_CONTENT_TYPE_TO_EXT,
             MAX_PHOTO_BYTES,
             "Format foto harus JPEG, PNG, atau WebP.",
-            "Ukuran foto maksimal 5 MB.",
+            "Ukuran foto maksimal 15 MB.",
         )
+        saved_photos.append({"url": url, "annotated_url": None})
 
     video_url = None
     if video is not None and video.filename:
@@ -156,43 +213,54 @@ async def create_citizen_report(
             "Ukuran video maksimal 25 MB.",
         )
 
-    # Read the photo with the infrastructure detector before saving the
+    # Read every photo with the infrastructure detector before saving the
     # report, so the halte's survey row can be updated with whatever the
-    # photo proves. analyze_photo never raises -- if the detector is down the
-    # report is still saved, with the failure recorded in ai_detections.
+    # evidence proves. analyze_photo never raises -- if the detector is down
+    # the report is still saved, with the failure recorded in ai_detections.
     ai_detections = None
     ai_analyzed_at = None
     halte_updated: dict[str, str] = {}
-    annotated_url = None
-    if photo_url is not None:
-        saved_photo = UPLOAD_DIR / Path(photo_url).name
-        analysis = analyze_photo(saved_photo)
-        ai_detections = analysis.as_jsonb()
-        ai_analyzed_at = datetime.now(timezone.utc)
-        halte_updated = _apply_to_survey(halte, analysis.observed)
-        # Stored with the analysis so a GET can report what this photo changed
-        # on the survey row, not only the POST that applied it.
-        ai_detections["applied"] = halte_updated
+    if saved_photos:
+        analyses = []
+        for entry in saved_photos:
+            saved_photo = UPLOAD_DIR / Path(entry["url"]).name
+            analysis = analyze_photo(saved_photo)
+            analyses.append(analysis)
 
-        # The annotated copy is what DISHUB sees: the dispatcher looks at one
-        # picture and sees what the model saw, instead of cross-reading a
-        # class list against a raw photo. Only rendered when there is
-        # something to draw -- otherwise it would just duplicate photo_url.
-        # A failure here costs the annotation, never the report.
-        if analysis.detections:
-            annotated_bytes = render_annotated(saved_photo)
-            if annotated_bytes:
-                annotated_name = f"{Path(photo_url).stem}.annotated.jpg"
-                (UPLOAD_DIR / annotated_name).write_bytes(annotated_bytes)
-                annotated_url = f"/uploads/{annotated_name}"
+            # The annotated copy is what DISHUB sees: the dispatcher looks at
+            # one picture and sees what the model saw, instead of cross-reading
+            # a class list against a raw photo. Rendered per photo and only
+            # when there is something to draw -- otherwise it would just
+            # duplicate the photo. A failure here costs the annotation, never
+            # the report.
+            if analysis.detections:
+                annotated_bytes = render_annotated(saved_photo)
+                if annotated_bytes:
+                    annotated_name = f"{Path(entry['url']).stem}.annotated.jpg"
+                    (UPLOAD_DIR / annotated_name).write_bytes(annotated_bytes)
+                    entry["annotated_url"] = f"/uploads/{annotated_name}"
+
+        # The photos are applied as ONE merged set, not one at a time.
+        # _apply_to_survey only fills variables that are still unknown, so
+        # applying photo-by-photo would let the first photo to mention a
+        # variable block every later photo from contributing to the same one --
+        # making the outcome depend on the order the citizen happened to pick
+        # the files in. Merging first removes that order dependence entirely.
+        ai_detections = merge_analyses(analyses, saved_photos)
+        ai_analyzed_at = datetime.now(timezone.utc)
+        halte_updated = _apply_to_survey(halte, ai_detections["observed"])
+        # Stored with the analysis so a GET can report what these photos
+        # changed on the survey row, not only the POST that applied it.
+        ai_detections["applied"] = halte_updated
 
     report = CitizenReport(
         report_id=str(uuid.uuid4()),
         halte_id=halte_id,
         reporter_name=reporter_name.strip(),
         description=description.strip(),
-        photo_url=photo_url,
-        photo_annotated_url=annotated_url,
+        photos=saved_photos or None,
+        photo_url=saved_photos[0]["url"] if saved_photos else None,
+        photo_annotated_url=saved_photos[0]["annotated_url"] if saved_photos else None,
         video_url=video_url,
         geom=WKTElement(f"POINT({lon} {lat})", srid=4326),
         ai_detections=ai_detections,

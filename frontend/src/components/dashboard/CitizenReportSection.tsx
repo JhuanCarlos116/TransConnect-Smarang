@@ -7,7 +7,7 @@ import { fetchCitizenReportsByHalte } from "@/lib/fetchCitizenReports";
 import { createTask } from "@/lib/fetchTasks";
 import { resolveUploadUrl } from "@/lib/resolveUploadUrl";
 import AssigneePicker from "@/components/dashboard/AssigneePicker";
-import type { CitizenReport } from "@/types/citizenReport";
+import type { CitizenReport, CitizenReportPhoto } from "@/types/citizenReport";
 
 interface CitizenReportSectionProps {
   halteId: string;
@@ -77,6 +77,46 @@ interface ReportCardProps {
 }
 
 /**
+ * One report photo, with a toggle between the detector's annotated render and
+ * the original (see ReportCard's note on why the annotated one is shown
+ * first). Its own component so that each photo carries its own toggle state:
+ * a report can hold several photos, and one shared flag in the parent would
+ * flip every photo at once the moment the dispatcher compared one of them.
+ */
+function ReportPhoto({ photo }: { photo: CitizenReportPhoto }) {
+  const [showRaw, setShowRaw] = useState(false);
+  const annotatedUrl = resolveUploadUrl(photo.annotated_url);
+  const rawUrl = resolveUploadUrl(photo.url);
+  const showingAnnotated = Boolean(annotatedUrl) && !showRaw;
+  const shownUrl = showingAnnotated ? annotatedUrl : rawUrl;
+  if (!shownUrl) return null;
+
+  return (
+    <div>
+      <div className="relative overflow-hidden rounded-md border border-border-low">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={shownUrl} alt="" className="h-40 w-full object-cover" />
+        <span
+          className={`absolute top-2 left-2 rounded px-2 py-0.5 font-label-sm text-[10px] font-bold ${
+            showingAnnotated ? "bg-transport-blue text-on-primary" : "bg-black/70 text-white"
+          }`}
+        >
+          {showingAnnotated ? "Hasil deteksi YOLO" : "Foto asli"}
+        </span>
+      </div>
+      {annotatedUrl && (
+        <button
+          onClick={() => setShowRaw((v) => !v)}
+          className="mt-1 font-label-sm text-[11px] font-bold text-transport-blue underline"
+        >
+          {showRaw ? "Lihat hasil deteksi" : "Lihat foto asli"}
+        </button>
+      )}
+    </div>
+  );
+}
+
+/**
  * One citizen report, with the "Dispatch ke Tugas" action folded in -- this
  * used to be a read-only list sitting next to a separate "Buat Tugas
  * Perbaikan" form with no link between the two. Now dispatching *is* the
@@ -93,7 +133,6 @@ function ReportCard({ report, halteId, onDispatched }: ReportCardProps) {
   const [assignedTo, setAssignedTo] = useState("");
   const [status, setStatus] = useState<"idle" | "submitting" | "done" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
-  const [showRaw, setShowRaw] = useState(false);
 
   async function handleDispatch() {
     setStatus("submitting");
@@ -115,9 +154,6 @@ function ReportCard({ report, halteId, onDispatched }: ReportCardProps) {
 
   const isNew = report.status === "baru";
   const detections = parseDetections(report.ai_detections);
-  const annotatedUrl = resolveUploadUrl(report.photo_annotated_url);
-  const rawUrl = resolveUploadUrl(report.photo_url);
-  const shownUrl = annotatedUrl && !showRaw ? annotatedUrl : rawUrl;
   const facilityUpdates = Object.entries(report.halte_updated ?? {});
   const detectorFailed = Boolean((report.ai_detections?.error as string | null | undefined) ?? null);
 
@@ -129,27 +165,11 @@ function ReportCard({ report, halteId, onDispatched }: ReportCardProps) {
       </div>
       <p className="mb-2 text-[13px] leading-relaxed text-on-surface-variant">{report.description}</p>
 
-      {shownUrl && (
-        <div className="mb-2">
-          <div className="relative overflow-hidden rounded-md border border-border-low">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={shownUrl} alt="" className="h-40 w-full object-cover" />
-            <span
-              className={`absolute top-2 left-2 rounded px-2 py-0.5 font-label-sm text-[10px] font-bold ${
-                annotatedUrl && !showRaw ? "bg-transport-blue text-on-primary" : "bg-black/70 text-white"
-              }`}
-            >
-              {annotatedUrl && !showRaw ? "Hasil deteksi YOLO" : "Foto asli"}
-            </span>
-          </div>
-          {annotatedUrl && (
-            <button
-              onClick={() => setShowRaw((v) => !v)}
-              className="mt-1 font-label-sm text-[11px] font-bold text-transport-blue underline"
-            >
-              {showRaw ? "Lihat hasil deteksi" : "Lihat foto asli"}
-            </button>
-          )}
+      {report.photos.length > 0 && (
+        <div className="mb-2 flex flex-col gap-2">
+          {report.photos.map((photo) => (
+            <ReportPhoto key={photo.url} photo={photo} />
+          ))}
         </div>
       )}
 
@@ -161,7 +181,7 @@ function ReportCard({ report, halteId, onDispatched }: ReportCardProps) {
         />
       )}
 
-      {report.photo_url && (
+      {report.photos.length > 0 && (
         <div className="mb-2 rounded-lg border border-border-low bg-surface p-2.5">
           <div className="mb-1.5 flex items-center gap-1.5">
             <span className="material-symbols-outlined text-[16px] text-transport-blue">visibility</span>

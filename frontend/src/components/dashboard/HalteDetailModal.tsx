@@ -316,12 +316,27 @@ function FieldNoteSection({ halteId, note, refreshSignal, onTasksChanged, onHalt
               {reviewTask.technician_photo_url && (
                 <div className="rounded-lg border border-border-low bg-surface p-2.5">
                   <h6 className="mb-2 font-label-md text-[12px] font-bold text-on-surface">Foto Perbaikan</h6>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={resolveUploadUrl(reviewTask.technician_photo_url) ?? undefined}
-                    alt=""
-                    className="mb-2.5 h-40 w-full rounded-md object-cover"
-                  />
+                  {/* Every photo on the task, not just the first: the decision
+                      below is about the whole submission, so the reviewer has
+                      to be able to see all of it. */}
+                  <div className="mb-2.5 flex flex-wrap gap-2">
+                    {reviewTask.technician_photo_urls.map((url) => (
+                      <a
+                        key={url}
+                        href={resolveUploadUrl(url) ?? "#"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="h-24 w-24 overflow-hidden rounded-md border border-border-low"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={resolveUploadUrl(url) ?? undefined}
+                          alt=""
+                          className="h-full w-full object-cover"
+                        />
+                      </a>
+                    ))}
+                  </div>
                   {reviewTask.approved_for_public ? (
                     <div className="flex items-center gap-2 rounded-lg border border-safety-green/30 bg-green-50 p-2.5 text-label-sm text-on-surface">
                       <span className="material-symbols-outlined text-[18px] text-safety-green">check_circle</span>

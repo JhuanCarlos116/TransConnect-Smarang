@@ -4,13 +4,12 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import AppHeader from "@/components/ui/AppHeader";
+import PhotoPicker from "@/components/ui/PhotoPicker";
 import ReportHaltePicker from "@/components/map/ReportHaltePicker";
 import { createCitizenReport } from "@/lib/fetchCitizenReports";
+import { MAX_VIDEO_BYTES, mb } from "@/lib/uploadLimits";
 import { useLocalProfile } from "@/lib/useLocalProfile";
 import type { HalteFeature } from "@/types/halte";
-
-const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
-const MAX_VIDEO_BYTES = 25 * 1024 * 1024;
 
 type Status = "idle" | "submitting" | "done" | "error";
 
@@ -27,28 +26,18 @@ export default function LaporPage() {
   const [halte, setHalte] = useState<HalteFeature | null>(null);
   const [name, setName] = useState(profile.name);
   const [description, setDescription] = useState("");
-  const [photo, setPhoto] = useState<File | null>(null);
+  const [photos, setPhotos] = useState<File[]>([]);
   const [video, setVideo] = useState<File | null>(null);
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
 
-  function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > MAX_PHOTO_BYTES) {
-      setError("Ukuran foto maksimal 5 MB.");
-      e.target.value = "";
-      return;
-    }
-    setError(null);
-    setPhoto(file);
-  }
-
+  // Photo size/count limits are enforced by PhotoPicker, which owns that
+  // field's state now that there can be several files.
   function handleVideoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > MAX_VIDEO_BYTES) {
-      setError("Ukuran video maksimal 25 MB.");
+      setError(`Ukuran video maksimal ${mb(MAX_VIDEO_BYTES)}.`);
       e.target.value = "";
       return;
     }
@@ -69,7 +58,7 @@ export default function LaporPage() {
         halteId: halte.properties.halte_id,
         reporterName: name.trim(),
         description: description.trim(),
-        photo: photo ?? undefined,
+        photos: photos.length > 0 ? photos : undefined,
         video: video ?? undefined,
       });
       setStatus("done");
@@ -158,14 +147,15 @@ export default function LaporPage() {
               4. Tambah Foto / Video (opsional)
             </label>
             <div className="flex flex-col gap-2">
-              <label className="flex items-center gap-2 rounded-lg border border-border-low bg-surface-container-low p-2.5 text-label-sm text-on-surface-variant">
-                <span className="material-symbols-outlined text-[18px]">photo_camera</span>
-                {photo ? photo.name : "Pilih foto (JPEG/PNG/WebP, maks 5 MB)"}
-                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePhotoChange} className="hidden" />
-              </label>
+              <PhotoPicker
+                photos={photos}
+                onChange={setPhotos}
+                onError={setError}
+                idleLabel="Pilih foto (bisa beberapa)"
+              />
               <label className="flex items-center gap-2 rounded-lg border border-border-low bg-surface-container-low p-2.5 text-label-sm text-on-surface-variant">
                 <span className="material-symbols-outlined text-[18px]">videocam</span>
-                {video ? video.name : "Pilih video (MP4/WebM/MOV, maks 25 MB)"}
+                {video ? video.name : `Pilih video (MP4/WebM/MOV, maks ${mb(MAX_VIDEO_BYTES)})`}
                 <input type="file" accept="video/mp4,video/webm,video/quicktime" onChange={handleVideoChange} className="hidden" />
               </label>
             </div>

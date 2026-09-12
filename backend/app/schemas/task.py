@@ -33,6 +33,11 @@ class TaskOut(BaseModel):
     status: TaskStatus
     technician_report: str | None
     technician_photo_url: str | None
+    # Every repair photo on the task, in submission order; technician_photo_url
+    # above is its first entry. Tasks reported before multi-photo uploads
+    # existed are served as a one-entry list (see _task_photo_urls in
+    # routers/task.py), so a reader only ever deals with the list.
+    technician_photo_urls: list[str] = []
     technician_video_url: str | None
     approved_for_public: bool
     # Explicit "no" from DISHUB, as opposed to "not reviewed yet" -- the two
@@ -59,4 +64,8 @@ class ApprovedRepairPhoto(BaseModel):
 
     technician_report: str
     technician_photo_url: str
+    # All of the task's approved repair photos, in submission order;
+    # technician_photo_url above is the first one. The public strip renders
+    # every entry rather than only the first.
+    technician_photo_urls: list[str] = []
     updated_at: datetime
