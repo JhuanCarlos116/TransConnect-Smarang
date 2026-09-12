@@ -83,8 +83,17 @@ interface ReportCardProps {
  * a report can hold several photos, and one shared flag in the parent would
  * flip every photo at once the moment the dispatcher compared one of them.
  */
-function ReportPhoto({ photo }: { photo: CitizenReportPhoto }) {
-  const [showRaw, setShowRaw] = useState(false);
+function ReportPhoto({
+  photo,
+  showRaw,
+  onToggleRaw,
+  onOpen,
+}: {
+  photo: CitizenReportPhoto;
+  showRaw: boolean;
+  onToggleRaw: () => void;
+  onOpen: () => void;
+}) {
   const annotatedUrl = resolveUploadUrl(photo.annotated_url);
   const rawUrl = resolveUploadUrl(photo.url);
   const showingAnnotated = Boolean(annotatedUrl) && !showRaw;
@@ -93,7 +102,17 @@ function ReportPhoto({ photo }: { photo: CitizenReportPhoto }) {
 
   return (
     <div>
-      <div className="relative overflow-hidden rounded-md border border-border-low">
+      {/* Clicking the photo opens it full size. It used to be a bare <img>, so
+          the only thing a dispatcher could do was look at a 160px-tall crop --
+          the detector's boxes are drawn at the photo's own resolution and were
+          partly cut off by object-cover, which is the opposite of what this
+          block exists for. */}
+      <button
+        type="button"
+        onClick={onOpen}
+        aria-label="Buka foto ukuran penuh"
+        className="relative block w-full cursor-zoom-in overflow-hidden rounded-md border border-border-low"
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={shownUrl} alt="" className="h-40 w-full object-cover" />
         <span
@@ -103,15 +122,137 @@ function ReportPhoto({ photo }: { photo: CitizenReportPhoto }) {
         >
           {showingAnnotated ? "Hasil deteksi YOLO" : "Foto asli"}
         </span>
-      </div>
-      {annotatedUrl && (
+        <span className="absolute right-2 bottom-2 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white">
+          <span className="material-symbols-outlined text-[14px]">open_in_full</span>
+        </span>
+      </button>
+      {annotatedUrl ? (
         <button
-          onClick={() => setShowRaw((v) => !v)}
+          onClick={onToggleRaw}
           className="mt-1 font-label-sm text-[11px] font-bold text-transport-blue underline"
         >
           {showRaw ? "Lihat hasil deteksi" : "Lihat foto asli"}
         </button>
+      ) : (
+        // Says why there is nothing to compare. Without this the dispatcher sees
+        // one photo and no way to tell "the detector found nothing here" from
+        // "the comparison is broken".
+        <p className="mt-1 text-label-sm text-[11px] text-on-surface-variant">
+          Tidak ada gambar hasil deteksi untuk foto ini.
+        </p>
       )}
+    </div>
+  );
+}
+
+/**
+ * One report photo at full size.
+ *
+ * The photo block in the card is a 160px crop, which is unreadable for judging
+ * either the photo or the detector's boxes on it, so this is where the actual
+ * looking happens. It carries the same original/YOLO switch as the card rather
+ * than duplicating the state: both read the card's per-photo flag, so switching
+ * in here and switching out there cannot disagree.
+ *
+ * Sits above the halte detail modal (z-[60] over its z-50), the same layering
+ * MediaCarousel's lightbox uses.
+ */
+function PhotoViewer({
+  photos,
+  index,
+  onIndexChange,
+  onClose,
+  showRaw,
+  onToggleRaw,
+}: {
+  photos: CitizenReportPhoto[];
+  index: number;
+  onIndexChange: (i: number) => void;
+  onClose: () => void;
+  showRaw: Record<string, boolean>;
+  onToggleRaw: (photo: CitizenReportPhoto) => void;
+}) {
+  const photo = photos[index];
+  if (!photo) return null;
+
+  const annotatedUrl = resolveUploadUrl(photo.annotated_url);
+  const rawUrl = resolveUploadUrl(photo.url);
+  const showingAnnotated = Boolean(annotatedUrl) && !showRaw[photo.url];
+  const shownUrl = showingAnnotated ? annotatedUrl : rawUrl;
+  const multiple = photos.length > 1;
+
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-black/90 p-4"
+      onClick={onClose}
+    >
+      <button
+        onClick={onClose}
+        aria-label="Tutup"
+        className="absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70"
+      >
+        <span className="material-symbols-outlined text-[22px]">close</span>
+      </button>
+
+      {shownUrl && (
+        /* eslint-disable-next-line @next/next/no-img-element */
+        <img
+          src={shownUrl}
+          alt=""
+          className="max-h-[75vh] max-w-full object-contain"
+          onClick={(e) => e.stopPropagation()}
+        />
+      )}
+
+      {multiple && (
+        <>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onIndexChange((index - 1 + photos.length) % photos.length);
+            }}
+            aria-label="Foto sebelumnya"
+            className="absolute top-1/2 left-4 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70"
+          >
+            <span className="material-symbols-outlined text-[24px]">chevron_left</span>
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onIndexChange((index + 1) % photos.length);
+            }}
+            aria-label="Foto berikutnya"
+            className="absolute top-1/2 right-4 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70"
+          >
+            <span className="material-symbols-outlined text-[24px]">chevron_right</span>
+          </button>
+          <span className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1 font-label-sm text-[12px] text-white">
+            {index + 1}/{photos.length}
+          </span>
+        </>
+      )}
+
+      <div
+        className="mt-3 flex flex-col items-center gap-1.5 text-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <span className="rounded-full bg-white/15 px-3 py-1 font-label-sm text-[11px] font-bold text-white">
+          {showingAnnotated ? "Hasil deteksi YOLO" : "Foto asli"}
+        </span>
+        {annotatedUrl ? (
+          <button
+            onClick={() => onToggleRaw(photo)}
+            className="font-label-sm text-[12px] font-bold text-white underline"
+          >
+            {showingAnnotated ? "Lihat foto asli" : "Lihat hasil deteksi YOLO"}
+          </button>
+        ) : (
+          <p className="max-w-sm font-label-sm text-[11px] text-white/80">
+            Detektor tidak menemukan objek pada foto ini, jadi tidak ada gambar hasil
+            deteksi yang bisa ditampilkan.
+          </p>
+        )}
+      </div>
     </div>
   );
 }
@@ -133,6 +274,14 @@ function ReportCard({ report, halteId, onDispatched }: ReportCardProps) {
   const [assignedTo, setAssignedTo] = useState("");
   const [status, setStatus] = useState<"idle" | "submitting" | "done" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
+  // Which photo is open at full size (null = none), and, per photo, whether the
+  // dispatcher asked for the original rather than the detector's render. Keyed
+  // by url rather than held per ReportPhoto so the card and the full-size view
+  // read one source and cannot disagree about what is being shown.
+  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
+  const [showRaw, setShowRaw] = useState<Record<string, boolean>>({});
+  const toggleRaw = (photo: CitizenReportPhoto) =>
+    setShowRaw((cur) => ({ ...cur, [photo.url]: !cur[photo.url] }));
 
   async function handleDispatch() {
     setStatus("submitting");
@@ -167,8 +316,14 @@ function ReportCard({ report, halteId, onDispatched }: ReportCardProps) {
 
       {report.photos.length > 0 && (
         <div className="mb-2 flex flex-col gap-2">
-          {report.photos.map((photo) => (
-            <ReportPhoto key={photo.url} photo={photo} />
+          {report.photos.map((photo, index) => (
+            <ReportPhoto
+              key={photo.url}
+              photo={photo}
+              showRaw={Boolean(showRaw[photo.url])}
+              onToggleRaw={() => toggleRaw(photo)}
+              onOpen={() => setViewerIndex(index)}
+            />
           ))}
         </div>
       )}
@@ -245,6 +400,17 @@ function ReportCard({ report, halteId, onDispatched }: ReportCardProps) {
             {status === "submitting" ? "Menyimpan..." : "Dispatch ke Tugas"}
           </button>
         </div>
+      )}
+
+      {viewerIndex !== null && (
+        <PhotoViewer
+          photos={report.photos}
+          index={viewerIndex}
+          onIndexChange={setViewerIndex}
+          onClose={() => setViewerIndex(null)}
+          showRaw={showRaw}
+          onToggleRaw={toggleRaw}
+        />
       )}
     </div>
   );
