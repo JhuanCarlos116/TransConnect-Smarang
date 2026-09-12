@@ -5,8 +5,9 @@ import * as maplibregl from "maplibre-gl";
 
 import { BUS_STOP_POINT_LAYER_ID } from "@/components/dashboard/BusStopLayer";
 import { koridorColorExpression, koridorTags, BRT_HALTE_COLOR } from "@/lib/brtCorridorStyle";
+import { rutePopupHtml } from "@/lib/brtRutePopup";
 import { fetchBrtNetwork } from "@/lib/fetchBrtNetwork";
-import type { BrtHalteFeature } from "@/types/brt";
+import type { BrtHalteFeature, BrtRuteProperties } from "@/types/brt";
 
 const RUTE_SOURCE_ID = "brt-network-rute";
 const HALTE_SOURCE_ID = "brt-network-halte";
@@ -61,6 +62,10 @@ export default function BrtLayer({ map, visible, onCorridors }: BrtLayerProps) {
       offset: 10,
     });
 
+    // Set once the hover handlers are attached, so the cleanup can detach the
+    // canvas listener even though it is bound inside the fetch callback below.
+    let detachHover: (() => void) | null = null;
+
     fetchBrtNetwork().then(({ halte, rute }) => {
       const initial = visibleRef.current ? "visible" : "none";
 
@@ -104,28 +109,70 @@ export default function BrtLayer({ map, visible, onCorridors }: BrtLayerProps) {
         map.moveLayer(BRT_HALTE_LAYER_ID, BUS_STOP_POINT_LAYER_ID);
       }
 
-      const showHaltePopup = (e: maplibregl.MapLayerMouseEvent) => {
-        const clicked = e.features?.[0];
-        if (!clicked || clicked.geometry.type !== "Point") return;
-        const p = clicked.properties as BrtHalteFeature["properties"] | undefined;
-        if (!p) return;
+      // One owner for every BRT hover popup on this map: the halte dots and the
+      // corridor lines. Two hover layers each carrying their own popup is how
+      // this app previously ended up with two maplibregl.Popups stacked on the
+      // same point (the bug MapInfoPopup was written to fix) -- and here it is
+      // guaranteed, because a halte sitting on a corridor is under the cursor
+      // as BOTH a circle feature and a line feature, and queryRenderedFeatures
+      // does not occlude: MapLibre would fire a mousemove for each layer.
+      //
+      // So one handler decides, with the priority stated: the dot is drawn on
+      // top of the lines and is the more specific object, so it wins, and a
+      // hover on a halte that happens to sit on a corridor still describes the
+      // halte rather than the corridor.
+      //
+      // Registered on the MAP rather than per layer on purpose: a layer-scoped
+      // mouseleave for one layer fires even when the cursor moved onto the
+      // other, which would tear the popup down a frame after it appeared. A
+      // map-scoped mousemove re-decides at the new point every time, so the
+      // popup can only ever be present or absent for the right reason.
+      const HOVER_LAYER_IDS = [BRT_HALTE_LAYER_ID, BRT_RUTE_LAYER_ID];
+
+      const showBrtHover = (e: maplibregl.MapMouseEvent) => {
+        const found = map.queryRenderedFeatures(e.point, { layers: HOVER_LAYER_IDS });
+        const onHalte = found.find((f) => f.layer.id === BRT_HALTE_LAYER_ID && f.geometry.type === "Point");
+        const onRute = found.find((f) => f.layer.id === BRT_RUTE_LAYER_ID);
+        const target = onHalte ?? onRute;
+        if (!target) {
+          map.getCanvas().style.cursor = "";
+          popup.remove();
+          return;
+        }
         map.getCanvas().style.cursor = "pointer";
-        const alias = p.alias && p.alias !== p.nama_halte ? `<br/><span style="opacity:.7">${p.alias}</span>` : "";
-        const jenis = p.jenis_shel ? `<br/><span style="opacity:.7">Shelter ${p.jenis_shel}</span>` : "";
-        popup
-          .setLngLat(e.lngLat)
-          .setHTML(
-            `<div style="font-size:12px;line-height:1.35"><strong>${p.nama_halte}</strong>${alias}${jenis}` +
-              `<br/><span style="opacity:.7">Halte BRT Trans Semarang</span></div>`,
-          )
-          .addTo(map);
+
+        let html: string;
+        if (target === onHalte) {
+          const p = target.properties as BrtHalteFeature["properties"];
+          const alias = p.alias && p.alias !== p.nama_halte ? `<br/><span style="opacity:.7">${p.alias}</span>` : "";
+          const jenis = p.jenis_shel ? `<br/><span style="opacity:.7">Shelter ${p.jenis_shel}</span>` : "";
+          html =
+            `<div style="font-size:12px;line-height:1.35"><strong>${p.nama_halte}</strong>${alias}${jenis}</div>` +
+            `<br/><span style="opacity:.7">Halte BRT Trans Semarang</span>`;
+        } else {
+          // Same builder the public /map uses, so a corridor reads identically
+          // on the page a citizen sees and the page DISHUB works in.
+          html = rutePopupHtml(target.properties as BrtRuteProperties);
+        }
+
+        popup.setLngLat(e.lngLat).setHTML(html).addTo(map);
       };
-      const hideHaltePopup = () => {
+      const hideBrtHover = () => {
         map.getCanvas().style.cursor = "";
         popup.remove();
       };
-      map.on("mousemove", BRT_HALTE_LAYER_ID, showHaltePopup);
-      map.on("mouseleave", BRT_HALTE_LAYER_ID, hideHaltePopup);
+      map.on("mousemove", showBrtHover);
+      // Cursor leaving the canvas entirely. This cannot be `map.on("mouseleave")`:
+      // MapLibre 6 dropped mouseenter/mouseleave from the MAP-level event types
+      // (only the layer-scoped forms keep them; the map has mouseout/mouseover
+      // instead) and the map-scoped call does not typecheck. A DOM listener on
+      // the canvas is also more precise here -- it fires only when the pointer
+      // really leaves the canvas, not when it moves onto the popup's own DOM.
+      const canvasEl = map.getCanvas();
+      canvasEl.addEventListener("mouseleave", hideBrtHover);
+      detachHover = () => {
+        canvasEl.removeEventListener("mouseleave", hideBrtHover);
+      };
 
       // Same desync guard as the survey layer: the fetch resolves after the
       // toggle may already have been flipped.
@@ -139,6 +186,7 @@ export default function BrtLayer({ map, visible, onCorridors }: BrtLayerProps) {
     });
 
     return () => {
+      detachHover?.();
       popup.remove();
     };
   }, [map]);
