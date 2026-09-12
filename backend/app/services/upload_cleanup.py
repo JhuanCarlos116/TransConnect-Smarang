@@ -211,7 +211,17 @@ async def quarantine_orphans(session: AsyncSession, dest: Path, *, apply: bool =
         "orphan_bytes": sum(r["bytes"] for r in moved),
         "files": moved,
     }
-    (dest / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    # Only a run that actually moved something writes the audit record. A dry
+    # run used to overwrite manifest.json too, which meant "check what would
+    # happen" quietly destroyed the record of what DID happen -- including the
+    # only provenance for files now sitting in quarantine with no rows pointing
+    # at them. Kept timestamped as well, so a later move does not erase the
+    # earlier one.
+    if apply and moved:
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        blob = json.dumps(manifest, indent=2)
+        (dest / f"manifest-{stamp}.json").write_text(blob, encoding="utf-8")
+        (dest / "manifest.json").write_text(blob, encoding="utf-8")
     return manifest
 
 
