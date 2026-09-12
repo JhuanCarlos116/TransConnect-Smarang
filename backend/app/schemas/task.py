@@ -45,6 +45,9 @@ class TaskOut(BaseModel):
     # block in HalteDetailModal has to tell them apart to stop showing a
     # decision that was already made as if it were still pending.
     technician_photo_rejected: bool
+    # The same decision for the repair video -- kept separate so the video can
+    # be turned down on its own (see models/task.py).
+    technician_video_rejected: bool
     facility_updates: dict[str, FacilityState] | None
     facility_updates_approved: bool
     facility_updates_rejected: bool

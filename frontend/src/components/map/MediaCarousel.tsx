@@ -17,6 +17,12 @@ function Lightbox({ media, index, onIndexChange, onClose, alt }: LightboxProps) 
   const item = media[index];
   const hasMultiple = media.length > 1;
 
+  // Same shrinking-list hazard as the carousel above, one layer down: the
+  // lightbox stays open across a revert or a rejection, and media[index] can
+  // stop existing underneath it. Render nothing rather than reach into
+  // undefined.
+  if (!item) return null;
+
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-4" onClick={onClose}>
       <button
@@ -86,7 +92,16 @@ export default function MediaCarousel({ media, alt }: MediaCarouselProps) {
     );
   }
 
-  const item = media[index];
+  // The list can shrink without this component remounting. The parent keys it
+  // by halte_id, which does not change when media changes, and media DOES
+  // change: approve_facility_update prepends the technician's video and photos,
+  // while reverting the batch -- or rejecting the video or a photo -- takes
+  // them back out. So page to those technician photos, press any of those, and
+  // media[index] is suddenly undefined. Reading item.type through that throws
+  // and takes the whole dashboard down, so clamp before reading.
+  const safeIndex = Math.min(index, media.length - 1);
+
+  const item = media[safeIndex];
   const hasMultiple = media.length > 1;
 
   return (
@@ -126,19 +141,19 @@ export default function MediaCarousel({ media, alt }: MediaCarouselProps) {
                 key={`${i}-${m.url}`}
                 onClick={() => setIndex(i)}
                 aria-label={`Media ${i + 1} dari ${media.length}`}
-                className={`h-1.5 rounded-full transition-all ${i === index ? "w-4 bg-white" : "w-1.5 bg-white/60"}`}
+                className={`h-1.5 rounded-full transition-all ${i === safeIndex ? "w-4 bg-white" : "w-1.5 bg-white/60"}`}
               />
             ))}
           </div>
 
           <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 font-label-sm text-[11px] text-white">
             {item.type === "video" && <span className="material-symbols-outlined text-[13px]">videocam</span>}
-            {index + 1}/{media.length}
+            {safeIndex + 1}/{media.length}
           </span>
         </>
       )}
 
-      {lightboxOpen && <Lightbox media={media} index={index} onIndexChange={setIndex} onClose={() => setLightboxOpen(false)} alt={alt} />}
+      {lightboxOpen && <Lightbox media={media} index={safeIndex} onIndexChange={setIndex} onClose={() => setLightboxOpen(false)} alt={alt} />}
     </>
   );
 }

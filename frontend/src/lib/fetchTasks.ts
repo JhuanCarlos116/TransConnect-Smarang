@@ -118,6 +118,20 @@ export async function rejectFacilityUpdate(taskId: string): Promise<Task> {
   return parseOrThrow<Task>(res);
 }
 
+export async function rejectTechnicianVideo(taskId: string): Promise<Task> {
+  const res = await fetch(`${requireApiBase()}/api/v1/tasks/${taskId}/reject-video`, {
+    method: "PATCH",
+  });
+  return parseOrThrow<Task>(res);
+}
+
+export async function approveTechnicianVideo(taskId: string): Promise<Task> {
+  const res = await fetch(`${requireApiBase()}/api/v1/tasks/${taskId}/approve-video`, {
+    method: "PATCH",
+  });
+  return parseOrThrow<Task>(res);
+}
+
 export async function revertFacilityUpdate(taskId: string): Promise<Task> {
   const res = await fetch(`${requireApiBase()}/api/v1/tasks/${taskId}/revert-facility-update`, {
     method: "PATCH",

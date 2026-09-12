@@ -53,6 +53,48 @@ def _task_photo_urls(task: MaintenanceTask) -> list[str]:
     return urls
 
 
+def _withdraw_from_halte_media(task: MaintenanceTask, halte: HalteSurvey, urls: set[str]) -> int:
+    """Take the given upload paths back out of halte_survey.media.
+
+    Needed because the technician's video and photos reach the public by two
+    separate routes: the approval flags on the task, and this gallery, where
+    approve_facility_update copies them. Turning one down has to close both, or
+    the item stays visible on the halte page after being rejected.
+
+    The catch is the revert snapshot. approve_facility_update records how many
+    items it PREPENDED and revert_facility_update later drops that many from the
+    front of the list -- so removing an item here without touching that count
+    would make a later revert eat one of the halte's own survey photos, silently
+    and permanently. The count is reduced by however many of the removed items
+    were part of that prepended block.
+    """
+    media = list(halte.media or [])
+    snapshot = task.facility_updates_snapshot
+    prepended = snapshot.get("media_prepended_count", 0) if isinstance(snapshot, dict) else 0
+
+    kept: list[dict] = []
+    removed_from_prefix = 0
+    for index, item in enumerate(media):
+        if isinstance(item, dict) and item.get("url") in urls:
+            if index < prepended:
+                removed_from_prefix += 1
+            continue
+        kept.append(item)
+
+    if len(kept) == len(media):
+        return 0
+
+    # Reassign rather than mutate: SQLAlchemy does not track in-place changes
+    # inside a JSONB value (same reasoning as the other writes in this file).
+    halte.media = kept
+    if removed_from_prefix and isinstance(snapshot, dict):
+        task.facility_updates_snapshot = {
+            **snapshot,
+            "media_prepended_count": max(0, prepended - removed_from_prefix),
+        }
+    return len(media) - len(kept)
+
+
 def _to_out(task: MaintenanceTask, halte: HalteSurvey) -> TaskOut:
     return TaskOut(
         task_id=task.task_id,
@@ -70,6 +112,7 @@ def _to_out(task: MaintenanceTask, halte: HalteSurvey) -> TaskOut:
         technician_video_url=task.technician_video_url,
         approved_for_public=task.approved_for_public,
         technician_photo_rejected=task.technician_photo_rejected,
+        technician_video_rejected=task.technician_video_rejected,
         facility_updates=task.facility_updates,
         facility_updates_approved=task.facility_updates_approved,
         facility_updates_rejected=task.facility_updates_rejected,
@@ -268,6 +311,11 @@ async def submit_technician_report(
         "Ukuran video maksimal 25 MB.",
     )
     task.facility_updates = parsed_facility_updates
+    # A freshly submitted video is a new decision, same reasoning as the photo
+    # flags below: the old verdict was about the previous video. Without this,
+    # a technician resubmitting after a rejection could never get the new video
+    # published.
+    task.technician_video_rejected = False
     # A freshly submitted batch always needs a fresh look from DISHUB, even
     # if an earlier batch on this same task was already approved -- or
     # already turned down, since this is a different set of values.
@@ -371,7 +419,14 @@ async def reject_technician_photo(task_id: str, session: AsyncSession = Depends(
     why it was turned down), and it was never on the public page anyway
     unless something had approved it first -- if it had, this takes it back
     off (list_approved_repair_photos reads approved_for_public, which this
-    clears). Nothing here touches halte_survey.
+    clears).
+
+    Withdrawing is also why this works on an ALREADY approved photo, not just a
+    pending one: "setuju" is not a one-way door, and a reviewer who changes
+    their mind needs a way back. The photo is copied into halte_survey.media by
+    approve_facility_update, so that copy is withdrawn too -- otherwise the
+    photo would disappear from the public repair strip while staying on the
+    halte page, which is not what "tolak" means to anyone reading it.
 
     Reversible: /approve clears this flag, so a change of mind costs one
     click and no data.
@@ -382,8 +437,70 @@ async def reject_technician_photo(task_id: str, session: AsyncSession = Depends(
     if not task.technician_photo_url:
         raise HTTPException(status_code=400, detail="Tugas ini belum punya foto laporan petugas.")
 
+    halte = await session.get(HalteSurvey, task.halte_id)
+    if halte is None:
+        raise HTTPException(status_code=404, detail="Halte tidak ditemukan.")
+
     task.approved_for_public = False
     task.technician_photo_rejected = True
+    _withdraw_from_halte_media(task, halte, set(_task_photo_urls(task)))
+
+    await session.commit()
+    await session.refresh(task)
+
+    return _to_out(task, halte)
+
+
+@router.patch("/tasks/{task_id}/reject-video", response_model=TaskOut)
+async def reject_technician_video(task_id: str, session: AsyncSession = Depends(get_session)) -> TaskOut:
+    """DISHUB turns down the repair video on its own, keeping the photos.
+
+    The video has no approval flag of its own the way the photos do
+    (approved_for_public governs the public repair strip, which is photos
+    only) -- it reaches the public purely through halte_survey.media, where
+    approve_facility_update copies it. So "tolak" here has to do two things:
+    record the decision, and take the video back out of that gallery. Doing
+    only the first would leave the rejected video playing on the halte page.
+
+    Reversible via /approve-video below.
+    """
+    task = await session.get(MaintenanceTask, task_id)
+    if task is None:
+        raise HTTPException(status_code=404, detail="Tugas tidak ditemukan.")
+    if not task.technician_video_url:
+        raise HTTPException(status_code=400, detail="Tugas ini belum punya video laporan petugas.")
+
+    halte = await session.get(HalteSurvey, task.halte_id)
+    if halte is None:
+        raise HTTPException(status_code=404, detail="Halte tidak ditemukan.")
+
+    task.technician_video_rejected = True
+    _withdraw_from_halte_media(task, halte, {task.technician_video_url})
+
+    await session.commit()
+    await session.refresh(task)
+
+    return _to_out(task, halte)
+
+
+@router.patch("/tasks/{task_id}/approve-video", response_model=TaskOut)
+async def approve_technician_video(task_id: str, session: AsyncSession = Depends(get_session)) -> TaskOut:
+    """Undo reject_technician_video.
+
+    Clears the rejection so the video is eligible again, but does NOT push it
+    straight back into halte_survey.media: that gallery is written by the
+    facility-approval step, and re-adding items to it here would put the
+    revert snapshot's count out of step with the list. Approving the facility
+    batch again (or a fresh one) is what puts the video back on the halte page,
+    and the review block says so.
+    """
+    task = await session.get(MaintenanceTask, task_id)
+    if task is None:
+        raise HTTPException(status_code=404, detail="Tugas tidak ditemukan.")
+    if not task.technician_video_url:
+        raise HTTPException(status_code=400, detail="Tugas ini belum punya video laporan petugas.")
+
+    task.technician_video_rejected = False
     await session.commit()
     await session.refresh(task)
 
@@ -436,7 +553,14 @@ async def approve_facility_update(task_id: str, session: AsyncSession = Depends(
 
     existing_urls = {m.get("url") for m in (halte.media or [])}
     new_media: list[dict] = []
-    if task.technician_video_url and task.technician_video_url not in existing_urls:
+    # A rejected video or photo must not ride into the public gallery on the
+    # back of a facility approval -- the rejection is a decision about what the
+    # public may see, and publishing it here would quietly reverse that.
+    if (
+        task.technician_video_url
+        and not task.technician_video_rejected
+        and task.technician_video_url not in existing_urls
+    ):
         new_media.append({"url": task.technician_video_url, "type": "video"})
     # ALL the repair photos, not just the first. Approving the batch is
     # approving the evidence that came with it, and the halte's own gallery is
@@ -444,9 +568,10 @@ async def approve_facility_update(task_id: str, session: AsyncSession = Depends(
     # and dropping the rest would misrepresent what the technician submitted.
     # existing_urls is re-checked per photo so re-approving after a revert
     # does not stack duplicates.
-    for url in _task_photo_urls(task):
-        if url not in existing_urls:
-            new_media.append({"url": url, "type": "photo"})
+    if not task.technician_photo_rejected:
+        for url in _task_photo_urls(task):
+            if url not in existing_urls:
+                new_media.append({"url": url, "type": "photo"})
     if new_media:
         halte.media = [*new_media, *(halte.media or [])]
 
