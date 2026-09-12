@@ -36,6 +36,9 @@ export interface Task {
   // Whether an approved batch can still be undone (see revertFacilityUpdate)
   // -- false once reverted, or if nothing has been approved yet.
   facility_updates_revertible: boolean;
+  // The same decision as technician_photo_rejected, for the repair video --
+  // its own flag so the video can be turned down while the photos stay.
+  technician_video_rejected: boolean;
   created_at: string;
   updated_at: string;
 }

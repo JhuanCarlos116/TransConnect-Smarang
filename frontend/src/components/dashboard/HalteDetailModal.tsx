@@ -5,8 +5,9 @@ import Link from "next/link";
 
 import { conditionColor, conditionLabelText } from "@/lib/conditionScore";
 import { fetchHalteData } from "@/lib/fetchHalteData";
-import { approveFacilityUpdate, approveTechnicianPhoto, createTask, fetchTasksByHalte,
-         rejectFacilityUpdate, rejectTechnicianPhoto, revertFacilityUpdate } from "@/lib/fetchTasks";
+import { approveFacilityUpdate, approveTechnicianPhoto, approveTechnicianVideo, createTask,
+         fetchTasksByHalte, rejectFacilityUpdate, rejectTechnicianPhoto, rejectTechnicianVideo,
+         revertFacilityUpdate } from "@/lib/fetchTasks";
 import { resolveUploadUrl } from "@/lib/resolveUploadUrl";
 import MediaCarousel from "@/components/map/MediaCarousel";
 import CitizenReportSection from "@/components/dashboard/CitizenReportSection";
@@ -93,9 +94,11 @@ function FieldNoteSection({ halteId, note, refreshSignal, onTasksChanged, onHalt
   const [revertibleTask, setRevertibleTask] = useState<Task | null>(null);
   const [facilityBusy, setFacilityBusy] = useState(false);
   const [photoBusy, setPhotoBusy] = useState(false);
+  const [videoBusy, setVideoBusy] = useState(false);
   const [reverting, setReverting] = useState(false);
   const [facilityError, setFacilityError] = useState<string | null>(null);
   const [photoError, setPhotoError] = useState<string | null>(null);
+  const [videoError, setVideoError] = useState<string | null>(null);
   const [revertError, setRevertError] = useState<string | null>(null);
 
   // "Reviewed" means approved OR explicitly turned down. Both flags are
@@ -214,6 +217,38 @@ function FieldNoteSection({ halteId, note, refreshSignal, onTasksChanged, onHalt
     }
   }
 
+  async function handleRejectVideo() {
+    if (!reviewTask) return;
+    if (!window.confirm("Tolak video laporan tim ini? Video akan ditarik dari halaman halte.")) return;
+    setVideoBusy(true);
+    setVideoError(null);
+    try {
+      await rejectTechnicianVideo(reviewTask.task_id);
+      onTasksChanged?.();
+      await refreshHalte();
+      await load();
+    } catch (err) {
+      setVideoError(err instanceof Error ? err.message : "Gagal menolak video perbaikan.");
+    } finally {
+      setVideoBusy(false);
+    }
+  }
+
+  async function handleApproveVideo() {
+    if (!reviewTask) return;
+    setVideoBusy(true);
+    setVideoError(null);
+    try {
+      await approveTechnicianVideo(reviewTask.task_id);
+      onTasksChanged?.();
+      await load();
+    } catch (err) {
+      setVideoError(err instanceof Error ? err.message : "Gagal membatalkan penolakan video.");
+    } finally {
+      setVideoBusy(false);
+    }
+  }
+
   async function handleRevertFacility() {
     if (!revertibleTask) return;
     if (!window.confirm("Kembalikan fasilitas & foto/video halte ini ke kondisi sebelum persetujuan terakhir?")) return;
@@ -302,15 +337,53 @@ function FieldNoteSection({ halteId, note, refreshSignal, onTasksChanged, onHalt
               )}
 
               {reviewTask.technician_video_url && (
-                <a
-                  href={resolveUploadUrl(reviewTask.technician_video_url) ?? "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 rounded-lg border border-border-low bg-surface-container-low p-2.5 font-label-sm text-[12px] font-bold text-transport-blue hover:underline"
-                >
-                  <span className="material-symbols-outlined text-[18px]">play_circle</span>
-                  Buka video perbaikan dari tim
-                </a>
+                <div className="flex flex-col gap-2 rounded-lg border border-border-low bg-surface p-2.5">
+                  <a
+                    href={resolveUploadUrl(reviewTask.technician_video_url) ?? "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 rounded-lg border border-border-low bg-surface-container-low p-2.5 font-label-sm text-[12px] font-bold text-transport-blue hover:underline"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">play_circle</span>
+                    Buka video perbaikan dari tim
+                  </a>
+
+                  {/* The video has its own decision, separate from the photos:
+                      it shows the work happening and is often the more
+                      sensitive of the two, so turning it down must not also
+                      throw away the photos. Unlike the photos it has no
+                      public strip of its own -- it reaches the public through
+                      the halte's own gallery, so rejecting it withdraws it
+                      from there. */}
+                  {reviewTask.technician_video_rejected ? (
+                    <div className="flex flex-col gap-2 rounded-lg border border-alert-red/30 bg-red-50 p-2.5 text-label-sm text-on-surface">
+                      <span className="flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[18px] text-alert-red">cancel</span>
+                        Video ditolak -- tidak tampil di halaman halte.
+                      </span>
+                      <button
+                        onClick={handleApproveVideo}
+                        disabled={videoBusy}
+                        className="flex w-full items-center justify-center gap-2 rounded-lg border border-safety-green px-3 py-2 font-label-sm text-[12px] font-bold text-safety-green transition-colors hover:bg-safety-green hover:text-on-primary disabled:cursor-not-allowed disabled:opacity-70"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">undo</span>
+                        {videoBusy ? "Memproses..." : "Batalkan penolakan video"}
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      {videoError && <p className="text-label-sm text-[11px] text-alert-red">{videoError}</p>}
+                      <button
+                        onClick={handleRejectVideo}
+                        disabled={videoBusy}
+                        className="flex items-center justify-center gap-1.5 rounded-lg border border-alert-red px-3 py-2 font-label-sm text-[12px] font-bold text-alert-red transition-colors hover:bg-alert-red hover:text-on-error disabled:cursor-not-allowed disabled:opacity-70"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">block</span>
+                        {videoBusy ? "Memproses..." : "Tolak Video"}
+                      </button>
+                    </>
+                  )}
+                </div>
               )}
 
               {reviewTask.technician_photo_url && (
@@ -338,9 +411,25 @@ function FieldNoteSection({ halteId, note, refreshSignal, onTasksChanged, onHalt
                     ))}
                   </div>
                   {reviewTask.approved_for_public ? (
-                    <div className="flex items-center gap-2 rounded-lg border border-safety-green/30 bg-green-50 p-2.5 text-label-sm text-on-surface">
-                      <span className="material-symbols-outlined text-[18px] text-safety-green">check_circle</span>
-                      Disetujui -- tampil di halaman publik.
+                    <div className="flex flex-col gap-2 rounded-lg border border-safety-green/30 bg-green-50 p-2.5 text-label-sm text-on-surface">
+                      <span className="flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[18px] text-safety-green">check_circle</span>
+                        Disetujui -- tampil di halaman publik.
+                      </span>
+                      {/* Approving is not a one-way door. Without this the only
+                          way back was the facility revert, which also undoes
+                          the facility values and the video -- far more than a
+                          reviewer who simply changed their mind about a photo
+                          meant to do. */}
+                      {photoError && <p className="text-label-sm text-[11px] text-alert-red">{photoError}</p>}
+                      <button
+                        onClick={handleRejectPhoto}
+                        disabled={photoBusy}
+                        className="flex w-full items-center justify-center gap-2 rounded-lg border border-alert-red px-3 py-2 font-label-sm text-[12px] font-bold text-alert-red transition-colors hover:bg-alert-red hover:text-on-error disabled:cursor-not-allowed disabled:opacity-70"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">undo</span>
+                        {photoBusy ? "Memproses..." : "Tarik kembali dari publik"}
+                      </button>
                     </div>
                   ) : reviewTask.technician_photo_rejected ? (
                     <div className="flex flex-col gap-2 rounded-lg border border-alert-red/30 bg-red-50 p-2.5 text-label-sm text-on-surface">

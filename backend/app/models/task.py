@@ -56,6 +56,16 @@ class MaintenanceTask(Base):
     # PATCH /tasks/{task_id}/reject; it only ever controls the public strip
     # (see list_approved_repair_photos), never the task's own data.
     technician_photo_rejected: Mapped[bool] = mapped_column(Boolean, default=False)
+    # Same decision as technician_photo_rejected, for the repair VIDEO. Its own
+    # flag because it is its own decision: the video is what shows the work
+    # happening and is often the more sensitive of the two, so DISHUB has to be
+    # able to turn it down while keeping the photos.
+    #
+    # Note the video reaches the public by TWO routes, not one: this flag, and
+    # halte_survey.media, where approve_facility_update copies it. Turning it
+    # down clears this flag's route and withdraws it from media too -- a
+    # rejection that left it on the halte gallery would not be a rejection.
+    technician_video_rejected: Mapped[bool] = mapped_column(Boolean, default=False)
 
     # Facility ada/tidak values the technician is proposing (e.g.
     # {"cctv": "ada", "lighting": "tidak"}), submitted alongside the report --
