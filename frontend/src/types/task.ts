@@ -1,6 +1,11 @@
-import type { ConditionLabel } from "@/types/halte";
+import type { ConditionLabel, FacilityVariable } from "@/types/halte";
 
 export type TaskStatus = "belum_dikerjakan" | "proses" | "selesai";
+
+// Only "ada"/"tidak" -- a technician reports what they observed directly,
+// there's no "-" (unknown) case for a facility they're actively filing a
+// report about.
+export type TaskFacilityState = "ada" | "tidak";
 
 export interface Task {
   task_id: string;
@@ -14,7 +19,10 @@ export interface Task {
   status: TaskStatus;
   technician_report: string | null;
   technician_photo_url: string | null;
+  technician_video_url: string | null;
   approved_for_public: boolean;
+  facility_updates: Partial<Record<FacilityVariable, TaskFacilityState>> | null;
+  facility_updates_approved: boolean;
   created_at: string;
   updated_at: string;
 }

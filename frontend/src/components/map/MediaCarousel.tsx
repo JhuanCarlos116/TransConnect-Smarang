@@ -123,7 +123,7 @@ export default function MediaCarousel({ media, alt }: MediaCarouselProps) {
           <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
             {media.map((m, i) => (
               <button
-                key={m.url}
+                key={`${i}-${m.url}`}
                 onClick={() => setIndex(i)}
                 aria-label={`Media ${i + 1} dari ${media.length}`}
                 className={`h-1.5 rounded-full transition-all ${i === index ? "w-4 bg-white" : "w-1.5 bg-white/60"}`}

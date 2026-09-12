@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, String, func
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -35,10 +36,23 @@ class MaintenanceTask(Base):
     # actually reports back (what was done, with proof).
     technician_report: Mapped[str | None] = mapped_column(String, nullable=True)
     technician_photo_url: Mapped[str | None] = mapped_column(String, nullable=True)
+    technician_video_url: Mapped[str | None] = mapped_column(String, nullable=True)
     # True only after DISHUB explicitly approves showing the technician's
     # photo on the public map (HaltePublicModal) -- set via a separate
     # approval action, not automatically when status becomes "selesai".
     approved_for_public: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    # Facility ada/tidak values the technician is proposing (e.g.
+    # {"cctv": "ada", "lighting": "tidak"}), submitted alongside the report --
+    # see PATCH /tasks/{task_id}/report. Held here rather than applied to
+    # halte_survey immediately: DISHUB reviews and approves the whole batch
+    # via PATCH /tasks/{task_id}/approve-facility-update, which is what
+    # actually writes these onto halte_survey (facility values, condition
+    # score, and the technician's photo/video into halte.media) -- a
+    # separate gate from approved_for_public above, since that one only
+    # governs whether the photo shows on the public repair-history strip.
+    facility_updates: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    facility_updates_approved: Mapped[bool] = mapped_column(Boolean, default=False)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(

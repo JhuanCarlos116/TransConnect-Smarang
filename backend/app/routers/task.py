@@ -10,6 +10,7 @@ profile menu it removed for exactly this reason), so a real relation here
 would just be a differently-shaped version of the same fabrication.
 """
 
+import json
 import uuid
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
@@ -20,12 +21,14 @@ from app.db import get_session
 from app.models.citizen_report import CitizenReport
 from app.models.halte import HalteSurvey
 from app.models.task import MaintenanceTask
-from app.routers.citizen_report import PHOTO_CONTENT_TYPE_TO_EXT, _save_upload
-from app.schemas.task import ApprovedRepairPhoto, TaskCreate, TaskOut, TaskStatusUpdate
+from app.routers.citizen_report import PHOTO_CONTENT_TYPE_TO_EXT, VIDEO_CONTENT_TYPE_TO_EXT, _save_upload
+from app.schemas.task import ApprovedRepairPhoto, FacilityState, TaskCreate, TaskOut, TaskStatusUpdate
+from app.services.condition_score import FACILITY_VARIABLES, compute_condition_score
 
 router = APIRouter()
 
 MAX_TECHNICIAN_PHOTO_BYTES = 5 * 1024 * 1024  # 5 MB, same cap as citizen_report's photo
+MAX_TECHNICIAN_VIDEO_BYTES = 25 * 1024 * 1024  # 25 MB, same cap as citizen_report's video
 
 
 def _to_out(task: MaintenanceTask, halte: HalteSurvey) -> TaskOut:
@@ -41,7 +44,10 @@ def _to_out(task: MaintenanceTask, halte: HalteSurvey) -> TaskOut:
         status=task.status,
         technician_report=task.technician_report,
         technician_photo_url=task.technician_photo_url,
+        technician_video_url=task.technician_video_url,
         approved_for_public=task.approved_for_public,
+        facility_updates=task.facility_updates,
+        facility_updates_approved=task.facility_updates_approved,
         created_at=task.created_at,
         updated_at=task.updated_at,
     )
@@ -146,24 +152,70 @@ async def update_task_status(
     return _to_out(task, halte)
 
 
+def _parse_facility_updates(raw: str) -> dict[str, FacilityState]:
+    try:
+        parsed = json.loads(raw)
+    except (json.JSONDecodeError, TypeError) as exc:
+        raise HTTPException(status_code=400, detail="Format data fasilitas tidak valid.") from exc
+
+    if not isinstance(parsed, dict) or not parsed:
+        raise HTTPException(
+            status_code=400, detail="Pilih minimal satu fasilitas yang statusnya dilaporkan berubah."
+        )
+
+    for key, value in parsed.items():
+        if key not in FACILITY_VARIABLES:
+            raise HTTPException(status_code=400, detail=f"Fasilitas '{key}' tidak dikenali.")
+        if value not in ("ada", "tidak"):
+            raise HTTPException(
+                status_code=400, detail=f"Status fasilitas '{key}' harus 'ada' atau 'tidak'."
+            )
+
+    return parsed
+
+
 @router.patch("/tasks/{task_id}/report", response_model=TaskOut)
 async def submit_technician_report(
     task_id: str,
     report: str = Form(...),
+    facility_updates: str = Form(...),
+    video: UploadFile = File(...),
     photo: UploadFile | None = File(None),
     session: AsyncSession = Depends(get_session),
 ) -> TaskOut:
     """Technician's own report on a task in progress/done -- separate from
-    the dispatcher's original description (what needs fixing). Submitting a
-    new photo here does NOT make it public on its own; see /approve below.
+    the dispatcher's original description (what needs fixing). A report is
+    only considered complete with proof: video is required (photo stays
+    optional, as before). facility_updates is the technician's own read of
+    which of the 5 survey facilities changed and to what -- neither this nor
+    the video/photo take effect on halte_survey immediately; DISHUB reviews
+    and applies them via PATCH /tasks/{task_id}/approve-facility-update.
+    Submitting a new photo here does NOT make it public on its own either;
+    see /approve below (a separate, narrower gate that predates this one).
     """
     task = await session.get(MaintenanceTask, task_id)
     if task is None:
         raise HTTPException(status_code=404, detail="Tugas tidak ditemukan.")
     if not report.strip():
         raise HTTPException(status_code=400, detail="Laporan petugas tidak boleh kosong.")
+    if not video.filename:
+        raise HTTPException(status_code=400, detail="Video laporan wajib dilampirkan.")
+
+    parsed_facility_updates = _parse_facility_updates(facility_updates)
 
     task.technician_report = report.strip()
+    task.technician_video_url = await _save_upload(
+        video,
+        VIDEO_CONTENT_TYPE_TO_EXT,
+        MAX_TECHNICIAN_VIDEO_BYTES,
+        "Format video harus MP4, WebM, atau MOV.",
+        "Ukuran video maksimal 25 MB.",
+    )
+    task.facility_updates = parsed_facility_updates
+    # A freshly submitted batch always needs a fresh look from DISHUB, even
+    # if an earlier batch on this same task was already approved.
+    task.facility_updates_approved = False
+
     if photo is not None and photo.filename:
         task.technician_photo_url = await _save_upload(
             photo,
@@ -216,4 +268,57 @@ async def approve_technician_photo(task_id: str, session: AsyncSession = Depends
     await session.refresh(task)
 
     halte = await session.get(HalteSurvey, task.halte_id)
+    return _to_out(task, halte)
+
+
+@router.patch("/tasks/{task_id}/approve-facility-update", response_model=TaskOut)
+async def approve_facility_update(task_id: str, session: AsyncSession = Depends(get_session)) -> TaskOut:
+    """DISHUB's approval for the technician's proposed facility ada/tidak
+    values (see submit_technician_report) -- a separate, broader gate from
+    /approve above, which only ever governs the public repair-photo strip.
+    Approving here is what actually writes the technician's findings onto
+    halte_survey: the facility values themselves, the recomputed condition
+    score, and the technician's photo/video prepended to halte.media so the
+    halte's own display reflects the latest known state rather than the
+    original survey photos alone.
+    """
+    task = await session.get(MaintenanceTask, task_id)
+    if task is None:
+        raise HTTPException(status_code=404, detail="Tugas tidak ditemukan.")
+    if not task.facility_updates:
+        raise HTTPException(status_code=400, detail="Tugas ini belum punya usulan perubahan fasilitas.")
+
+    halte = await session.get(HalteSurvey, task.halte_id)
+    if halte is None:
+        raise HTTPException(status_code=404, detail="Halte tidak ditemukan.")
+
+    for facility, value in task.facility_updates.items():
+        setattr(halte, facility, value)
+
+    halte.condition_score, halte.condition_label = compute_condition_score(
+        {facility: getattr(halte, facility) for facility in FACILITY_VARIABLES}
+    )
+    # Reassign the whole dicts/lists: SQLAlchemy does not track changes made
+    # in-place inside a JSONB value, so mutating them directly would not
+    # persist (same reasoning as _apply_to_survey in citizen_report.py).
+    halte.facility_sources = {
+        **(halte.facility_sources or {}),
+        **{f: "manual" for f in task.facility_updates},
+    }
+
+    existing_urls = {m.get("url") for m in (halte.media or [])}
+    new_media: list[dict] = []
+    if task.technician_video_url and task.technician_video_url not in existing_urls:
+        new_media.append({"url": task.technician_video_url, "type": "video"})
+    if task.technician_photo_url and task.technician_photo_url not in existing_urls:
+        new_media.append({"url": task.technician_photo_url, "type": "photo"})
+    if new_media:
+        halte.media = [*new_media, *(halte.media or [])]
+
+    task.facility_updates_approved = True
+
+    await session.commit()
+    await session.refresh(task)
+    await session.refresh(halte)
+
     return _to_out(task, halte)

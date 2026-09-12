@@ -62,23 +62,33 @@ export default function DashboardPage() {
     setHalteRefreshSignal((n) => n + 1);
   }, []);
 
-  // Which halte need a report marker on the map, and what color: red for a
-  // citizen report that's either brand new or dispatched but not yet
-  // started (task "belum_dikerjakan"), orange once a technician has actually
-  // started work (task "proses"). A task reaching "selesai" deletes its
-  // citizen_report row server-side, so it naturally drops out of `reports`
-  // here and the ring disappears -- no separate "done" case needed.
+  // Which halte need a report marker on the map, and what color: red for
+  // "not started yet" (a citizen report with no task, or a task still
+  // "belum_dikerjakan"), orange once a technician has actually started work
+  // (task "proses"). A task reaching "selesai" deletes its citizen_report
+  // row server-side, so it naturally drops out of `reports` here; a
+  // "selesai" task itself is excluded below too, since the halte is
+  // considered handled either way.
+  // Sourced from tasks first (keyed by halte_id directly, not
+  // citizen_report_id) so a manually dispatched task -- one with no citizen
+  // report behind it, created via TaskCreateSection rather than dispatched
+  // from a report -- gets the same ring a citizen-report-linked task does;
+  // it used to be invisible here because this only ever iterated `reports`.
+  // Raw, undispatched reports are folded in afterwards for any halte a task
+  // doesn't already cover.
   // Refetched after dispatch/create-task actions (see handleTasksChanged)
   // and once more each time this page mounts, so a task marked "selesai"
   // from the separate /dashboard/tasks page is reflected next visit here.
   const refreshReportedHalteIds = useCallback(() => {
     Promise.all([fetchAllCitizenReports(), fetchTasks()])
       .then(([reports, tasks]) => {
-        const taskByReportId = new Map(tasks.filter((t) => t.citizen_report_id).map((t) => [t.citizen_report_id!, t]));
         const next = new Map<string, ReportMarkerStatus>();
         for (const report of reports) {
-          const task = taskByReportId.get(report.report_id);
-          next.set(report.halte_id, task?.status === "proses" ? "proses" : "baru");
+          next.set(report.halte_id, "baru");
+        }
+        for (const task of tasks) {
+          if (task.status === "selesai") continue;
+          next.set(task.halte_id, task.status === "proses" ? "proses" : "baru");
         }
         setReportedHalteStatus(next);
       })

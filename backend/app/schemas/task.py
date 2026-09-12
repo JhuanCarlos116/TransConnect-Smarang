@@ -4,6 +4,7 @@ from typing import Literal
 from pydantic import BaseModel
 
 TaskStatus = Literal["belum_dikerjakan", "proses", "selesai"]
+FacilityState = Literal["ada", "tidak"]
 
 
 class TaskCreate(BaseModel):
@@ -32,7 +33,10 @@ class TaskOut(BaseModel):
     status: TaskStatus
     technician_report: str | None
     technician_photo_url: str | None
+    technician_video_url: str | None
     approved_for_public: bool
+    facility_updates: dict[str, FacilityState] | None
+    facility_updates_approved: bool
     created_at: datetime
     updated_at: datetime
 

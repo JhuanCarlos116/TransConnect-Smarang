@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 
-import { approveTechnicianPhoto, submitTechnicianReport } from "@/lib/fetchTasks";
+import FacilityUpdatePicker, { type FacilityUpdates } from "@/components/dashboard/FacilityUpdatePicker";
+import { approveFacilityUpdate, approveTechnicianPhoto, submitTechnicianReport } from "@/lib/fetchTasks";
 import { resolveUploadUrl } from "@/lib/resolveUploadUrl";
 import type { Task } from "@/types/task";
 
@@ -13,6 +14,15 @@ interface TaskDetailModalProps {
 }
 
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
+const MAX_VIDEO_BYTES = 25 * 1024 * 1024;
+
+const FACILITY_LABELS: Record<string, string> = {
+  cctv: "CCTV Pengawas",
+  lighting: "Penerangan Jalan",
+  sidewalk_condition: "Kondisi Trotoar",
+  route_info_signage: "Papan Informasi Rute",
+  canopy: "Kanopi / Peneduh",
+};
 
 /**
  * Opened from a task card in the "proses"/"selesai" columns (see
@@ -25,8 +35,11 @@ const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 export default function TaskDetailModal({ task, onClose, onUpdated }: TaskDetailModalProps) {
   const [report, setReport] = useState(task?.technician_report ?? "");
   const [photo, setPhoto] = useState<File | null>(null);
+  const [video, setVideo] = useState<File | null>(null);
+  const [facilityUpdates, setFacilityUpdates] = useState<FacilityUpdates>({});
   const [submitting, setSubmitting] = useState(false);
-  const [approving, setApproving] = useState(false);
+  const [approvingPhoto, setApprovingPhoto] = useState(false);
+  const [approvingFacility, setApprovingFacility] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   if (!task) return null;
@@ -43,15 +56,29 @@ export default function TaskDetailModal({ task, onClose, onUpdated }: TaskDetail
     setPhoto(file);
   }
 
+  function handleVideoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > MAX_VIDEO_BYTES) {
+      setError("Ukuran video maksimal 25 MB.");
+      e.target.value = "";
+      return;
+    }
+    setError(null);
+    setVideo(file);
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!task || !report.trim()) return;
+    if (!task || !report.trim() || !video) return;
     setSubmitting(true);
     setError(null);
     try {
-      const updated = await submitTechnicianReport(task.task_id, report.trim(), photo ?? undefined);
+      const updated = await submitTechnicianReport(task.task_id, report.trim(), video, facilityUpdates, photo ?? undefined);
       onUpdated(updated);
       setPhoto(null);
+      setVideo(null);
+      setFacilityUpdates({});
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal mengirim laporan petugas.");
     } finally {
@@ -59,9 +86,9 @@ export default function TaskDetailModal({ task, onClose, onUpdated }: TaskDetail
     }
   }
 
-  async function handleApprove() {
+  async function handleApprovePhoto() {
     if (!task) return;
-    setApproving(true);
+    setApprovingPhoto(true);
     setError(null);
     try {
       const updated = await approveTechnicianPhoto(task.task_id);
@@ -69,7 +96,21 @@ export default function TaskDetailModal({ task, onClose, onUpdated }: TaskDetail
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal menyetujui foto.");
     } finally {
-      setApproving(false);
+      setApprovingPhoto(false);
+    }
+  }
+
+  async function handleApproveFacility() {
+    if (!task) return;
+    setApprovingFacility(true);
+    setError(null);
+    try {
+      const updated = await approveFacilityUpdate(task.task_id);
+      onUpdated(updated);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Gagal menyetujui perubahan fasilitas.");
+    } finally {
+      setApprovingFacility(false);
     }
   }
 
@@ -108,14 +149,22 @@ export default function TaskDetailModal({ task, onClose, onUpdated }: TaskDetail
                 className="w-full rounded-lg border border-border-low bg-surface-container-low p-2.5 font-body-md text-[13px] text-on-surface focus:border-transport-blue focus:outline-none focus:ring-1 focus:ring-transport-blue"
               />
               <label className="flex items-center gap-2 rounded-lg border border-border-low bg-surface-container-low p-2.5 text-label-sm text-on-surface-variant">
+                <span className="material-symbols-outlined text-[18px]">videocam</span>
+                {video ? video.name : "Tambah video perbaikan (wajib, MP4/WebM/MOV, maks 25 MB)"}
+                <input type="file" accept="video/mp4,video/webm,video/quicktime" onChange={handleVideoChange} className="hidden" />
+              </label>
+              <label className="flex items-center gap-2 rounded-lg border border-border-low bg-surface-container-low p-2.5 text-label-sm text-on-surface-variant">
                 <span className="material-symbols-outlined text-[18px]">photo_camera</span>
                 {photo ? photo.name : "Tambah foto perbaikan (opsional)"}
                 <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePhotoChange} className="hidden" />
               </label>
+
+              <FacilityUpdatePicker value={facilityUpdates} onChange={setFacilityUpdates} />
+
               {error && <p className="text-label-sm text-alert-red">{error}</p>}
               <button
                 type="submit"
-                disabled={submitting || !report.trim()}
+                disabled={submitting || !report.trim() || !video}
                 className="self-start rounded-lg bg-transport-blue px-4 py-2 font-label-sm text-label-sm font-bold text-on-primary transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {submitting ? "Menyimpan..." : "Simpan Laporan"}
@@ -136,12 +185,44 @@ export default function TaskDetailModal({ task, onClose, onUpdated }: TaskDetail
                 </div>
               ) : (
                 <button
-                  onClick={handleApprove}
-                  disabled={approving}
+                  onClick={handleApprovePhoto}
+                  disabled={approvingPhoto}
                   className="flex w-full items-center justify-center gap-2 rounded-lg bg-safety-green px-4 py-2.5 font-label-md text-label-md font-bold text-on-primary transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   <span className="material-symbols-outlined text-[18px]">verified</span>
-                  {approving ? "Menyetujui..." : "Setujui & Tampilkan ke Publik"}
+                  {approvingPhoto ? "Menyetujui..." : "Setujui & Tampilkan ke Publik"}
+                </button>
+              )}
+            </div>
+          )}
+
+          {task.facility_updates && Object.keys(task.facility_updates).length > 0 && (
+            <div className="rounded-lg border border-border-low bg-surface p-3">
+              <h4 className="mb-2 font-label-md text-[13px] font-bold text-on-surface">Usulan Perubahan Fasilitas</h4>
+              <ul className="mb-3 flex flex-col gap-1">
+                {Object.entries(task.facility_updates).map(([facility, val]) => (
+                  <li key={facility} className="flex items-center gap-2 font-label-sm text-[12px] text-on-surface">
+                    <span
+                      className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${val === "ada" ? "bg-safety-green" : "bg-alert-red"}`}
+                    />
+                    {FACILITY_LABELS[facility] ?? facility}: {val === "ada" ? "Tersedia" : "Tidak Tersedia"}
+                  </li>
+                ))}
+              </ul>
+
+              {task.facility_updates_approved ? (
+                <div className="flex items-center gap-2 rounded-lg border border-safety-green/30 bg-green-50 p-2.5 text-label-sm text-on-surface">
+                  <span className="material-symbols-outlined text-[18px] text-safety-green">check_circle</span>
+                  Disetujui -- fasilitas & foto/video halte sudah diperbarui.
+                </div>
+              ) : (
+                <button
+                  onClick={handleApproveFacility}
+                  disabled={approvingFacility}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-safety-green px-4 py-2.5 font-label-md text-label-md font-bold text-on-primary transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  <span className="material-symbols-outlined text-[18px]">verified</span>
+                  {approvingFacility ? "Menyetujui..." : "Setujui Perubahan Fasilitas"}
                 </button>
               )}
             </div>
