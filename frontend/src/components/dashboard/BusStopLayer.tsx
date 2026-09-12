@@ -11,11 +11,15 @@ export type HalteConditionFilter = ConditionLabel | "all";
 /** "baru" = a citizen report with no task yet, or a task that hasn't been
  * started ("belum_dikerjakan") -- still needs attention, drawn red.
  * "proses" = the dispatched task is actively being worked on -- drawn
- * orange. There is no "selesai" status: a task reaching "selesai" deletes
- * its citizen_report row server-side (see update_task_status in
- * routers/task.py), so that halte simply stops appearing in the map passed
- * in here and its ring disappears on its own. */
-export type ReportMarkerStatus = "baru" | "proses";
+ * orange. "menunggu_approval" = the technician has finished and the task is
+ * "selesai", but they proposed facility changes DISHUB hasn't reviewed yet
+ * (see approve-facility-update in routers/task.py) -- drawn purple, so a
+ * halte doesn't silently drop off the map the moment a task is marked done
+ * while its facility data is still unconfirmed. A task reaching "selesai"
+ * with no pending facility_updates (or one dispatched from a citizen report,
+ * which gets its report row deleted at that point) has nothing left to flag
+ * and drops out of the map passed in here as before. */
+export type ReportMarkerStatus = "baru" | "proses" | "menunggu_approval";
 
 const SOURCE_ID = "bus-stops";
 export const BUS_STOP_POINT_LAYER_ID = "bus-stops-points";
@@ -180,7 +184,15 @@ export default function BusStopLayer({
           "circle-radius": 12,
           "circle-color": "transparent",
           "circle-stroke-width": 3,
-          "circle-stroke-color": ["match", ["get", REPORT_STATUS_PROPERTY], "proses", "#f97316", "#dc2626"],
+          "circle-stroke-color": [
+            "match",
+            ["get", REPORT_STATUS_PROPERTY],
+            "proses",
+            "#f97316",
+            "menunggu_approval",
+            "#9333ea",
+            "#dc2626",
+          ],
         },
       });
 

@@ -4,13 +4,22 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 import { conditionColor, conditionLabelText } from "@/lib/conditionScore";
-import { createTask, fetchTasksByHalte } from "@/lib/fetchTasks";
+import { fetchHalteData } from "@/lib/fetchHalteData";
+import { approveFacilityUpdate, createTask, fetchTasksByHalte, revertFacilityUpdate } from "@/lib/fetchTasks";
 import MediaCarousel from "@/components/map/MediaCarousel";
 import CitizenReportSection from "@/components/dashboard/CitizenReportSection";
 import FacilityEditor from "@/components/dashboard/FacilityEditor";
 import AssigneePicker from "@/components/dashboard/AssigneePicker";
 import type { HalteFeature } from "@/types/halte";
 import type { Task } from "@/types/task";
+
+const FACILITY_LABELS: Record<string, string> = {
+  cctv: "CCTV Pengawas",
+  lighting: "Penerangan Jalan",
+  sidewalk_condition: "Kondisi Trotoar",
+  route_info_signage: "Papan Informasi Rute",
+  canopy: "Kanopi / Peneduh",
+};
 
 interface HalteDetailModalProps {
   feature: HalteFeature | null;
@@ -33,6 +42,17 @@ interface FieldNoteSectionProps {
    * report submitted) so this section's "currently active" report reflects
    * the latest state without requiring the modal to be reopened. */
   refreshSignal?: number;
+  /** Called after DISHUB approves a technician's proposed facility changes,
+   * so the map ring (which shows purple for a "selesai" task with an
+   * unapproved facility update) updates without needing to reopen this
+   * modal. */
+  onTasksChanged?: () => void;
+  /** The facility approval writes onto halte_survey itself (values, score,
+   * media) -- refetches and hands the server's fresh copy back up the same
+   * way FacilityEditor's manual correction does, so the score banner and
+   * map marker move together with the approval instead of showing stale
+   * data until the modal is reopened. */
+  onHalteUpdated?: (feature: HalteFeature) => void;
 }
 
 /**
@@ -44,11 +64,28 @@ interface FieldNoteSectionProps {
  * server-side (catatan_lapangan is untouched) -- it just moves into a
  * collapsed "Catatan Awal (Riwayat)" block underneath once a technician
  * report exists to take its place as the headline.
+ *
+ * Also where the dispatcher reviews and approves a technician's proposed
+ * facility changes (see approve-facility-update in routers/task.py) -- this
+ * lives here rather than in TaskDetailModal because that modal is about one
+ * task's own record-keeping (what was reported, whether its photo is public),
+ * while this section is what the dispatcher actually reads to decide the
+ * halte's current state, so the approval belongs next to it. Looked up by
+ * status "proses" OR "selesai": a dispatcher can move a task to "selesai"
+ * from TaskBoard before its facility data has been reviewed, and that
+ * pending approval shouldn't become unreachable just because the task
+ * changed columns.
  */
-function FieldNoteSection({ halteId, note, refreshSignal }: FieldNoteSectionProps) {
+function FieldNoteSection({ halteId, note, refreshSignal, onTasksChanged, onHalteUpdated }: FieldNoteSectionProps) {
   const [open, setOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const [pendingFacilityTask, setPendingFacilityTask] = useState<Task | null>(null);
+  const [revertibleTask, setRevertibleTask] = useState<Task | null>(null);
+  const [approving, setApproving] = useState(false);
+  const [reverting, setReverting] = useState(false);
+  const [approveError, setApproveError] = useState<string | null>(null);
+  const [revertError, setRevertError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -57,6 +94,22 @@ function FieldNoteSection({ halteId, note, refreshSignal }: FieldNoteSectionProp
         if (cancelled) return;
         const inProgress = tasks.find((t) => t.status === "proses" && t.technician_report);
         setActiveTask(inProgress ?? null);
+
+        const pending = tasks.find(
+          (t) =>
+            (t.status === "proses" || t.status === "selesai") &&
+            t.facility_updates &&
+            Object.keys(t.facility_updates).length > 0 &&
+            !t.facility_updates_approved,
+        );
+        setPendingFacilityTask(pending ?? null);
+
+        // Most recently updated task with an approval still standing, so
+        // "Kembalikan" always targets whichever change actually last
+        // touched this halte's facility data -- fetchTasksByHalte already
+        // orders newest first.
+        const revertible = tasks.find((t) => t.facility_updates_approved && t.facility_updates_revertible);
+        setRevertibleTask(revertible ?? null);
       })
       .catch(() => {
         // Non-critical -- falls back to showing just the original survey note.
@@ -65,6 +118,58 @@ function FieldNoteSection({ halteId, note, refreshSignal }: FieldNoteSectionProp
       cancelled = true;
     };
   }, [halteId, refreshSignal]);
+
+  async function refreshHalte() {
+    // Approving/reverting rewrite halte_survey itself (facility values,
+    // score, media) -- there's no single-halte endpoint, so refetch the
+    // full survey set (same as every other halte-data load in this app)
+    // and pick this one out, so FacilityEditor/the score banner/map marker
+    // pick up the new values instead of showing what was current when this
+    // modal opened.
+    const data = await fetchHalteData();
+    const fresh = data.features.find((f) => f.properties.halte_id === halteId);
+    if (fresh) onHalteUpdated?.(fresh);
+  }
+
+  async function handleApproveFacility() {
+    if (!pendingFacilityTask) return;
+    setApproving(true);
+    setApproveError(null);
+    try {
+      const updatedTask = await approveFacilityUpdate(pendingFacilityTask.task_id);
+      setPendingFacilityTask(updatedTask.facility_updates_approved ? null : updatedTask);
+      if (updatedTask.facility_updates_approved) setRevertibleTask(updatedTask);
+      onTasksChanged?.();
+      await refreshHalte();
+    } catch (err) {
+      setApproveError(err instanceof Error ? err.message : "Gagal menyetujui perubahan fasilitas.");
+    } finally {
+      setApproving(false);
+    }
+  }
+
+  async function handleRevertFacility() {
+    if (!revertibleTask) return;
+    if (!window.confirm("Kembalikan fasilitas & foto/video halte ini ke kondisi sebelum persetujuan terakhir?")) return;
+    setReverting(true);
+    setRevertError(null);
+    try {
+      const updatedTask = await revertFacilityUpdate(revertibleTask.task_id);
+      setRevertibleTask(null);
+      // The task's own proposed values are unchanged and now unapproved
+      // again -- surface them once more so DISHUB can re-review instead of
+      // the proposal silently disappearing.
+      if (updatedTask.facility_updates && Object.keys(updatedTask.facility_updates).length > 0) {
+        setPendingFacilityTask(updatedTask);
+      }
+      onTasksChanged?.();
+      await refreshHalte();
+    } catch (err) {
+      setRevertError(err instanceof Error ? err.message : "Gagal mengembalikan perubahan fasilitas.");
+    } finally {
+      setReverting(false);
+    }
+  }
 
   return (
     <div className="rounded-lg border border-border-low bg-surface p-3">
@@ -116,6 +221,51 @@ function FieldNoteSection({ halteId, note, refreshSignal }: FieldNoteSectionProp
             <p className="font-body-md text-[13px] text-on-surface-variant leading-relaxed italic bg-surface-container-low p-2.5 rounded">
               &ldquo;{note}&rdquo;
             </p>
+          )}
+
+          {pendingFacilityTask && (
+            <div className="border-t border-border-low pt-2.5">
+              <h5 className="mb-2 flex items-center gap-1.5 font-label-sm text-[12px] font-bold text-on-surface">
+                <span className="material-symbols-outlined text-[16px] text-purple-600">fact_check</span>
+                Usulan Perubahan Fasilitas dari Tim Lapangan
+              </h5>
+              <ul className="mb-2.5 flex flex-col gap-1">
+                {Object.entries(pendingFacilityTask.facility_updates ?? {}).map(([facility, val]) => (
+                  <li key={facility} className="flex items-center gap-2 font-label-sm text-[12px] text-on-surface">
+                    <span
+                      className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${val === "ada" ? "bg-safety-green" : "bg-alert-red"}`}
+                    />
+                    {FACILITY_LABELS[facility] ?? facility}: {val === "ada" ? "Tersedia" : "Tidak Tersedia"}
+                  </li>
+                ))}
+              </ul>
+              {approveError && <p className="mb-2 text-label-sm text-[11px] text-alert-red">{approveError}</p>}
+              <button
+                onClick={handleApproveFacility}
+                disabled={approving}
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-safety-green px-3 py-2 font-label-sm text-[12px] font-bold text-on-primary transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                <span className="material-symbols-outlined text-[16px]">verified</span>
+                {approving ? "Menyetujui..." : "Setujui Perubahan Fasilitas"}
+              </button>
+            </div>
+          )}
+
+          {revertibleTask && (
+            <div className="border-t border-border-low pt-2.5">
+              <p className="mb-2 font-label-sm text-[11px] text-on-surface-variant">
+                Perubahan fasilitas terakhir sudah disetujui. Salah pencet, atau ingin membatalkannya?
+              </p>
+              {revertError && <p className="mb-2 text-label-sm text-[11px] text-alert-red">{revertError}</p>}
+              <button
+                onClick={handleRevertFacility}
+                disabled={reverting}
+                className="flex w-full items-center justify-center gap-2 rounded-lg border border-alert-red px-3 py-2 font-label-sm text-[12px] font-bold text-alert-red transition-colors hover:bg-alert-red hover:text-on-error disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                <span className="material-symbols-outlined text-[16px]">undo</span>
+                {reverting ? "Mengembalikan..." : "Kembalikan Perubahan Sebelumnya"}
+              </button>
+            </div>
           )}
         </div>
       )}
@@ -298,7 +448,13 @@ export default function HalteDetailModal({ feature, onClose, onTasksChanged, onH
           <CitizenReportSection halteId={p.halte_id} onDispatched={handleTasksChanged} />
 
           {p.catatan_lapangan && (
-            <FieldNoteSection halteId={p.halte_id} note={p.catatan_lapangan} refreshSignal={refreshSignal} />
+            <FieldNoteSection
+              halteId={p.halte_id}
+              note={p.catatan_lapangan}
+              refreshSignal={refreshSignal}
+              onTasksChanged={handleTasksChanged}
+              onHalteUpdated={handleHalteUpdated}
+            />
           )}
 
           <TaskCreateSection halteId={p.halte_id} onCreated={handleTasksChanged} />

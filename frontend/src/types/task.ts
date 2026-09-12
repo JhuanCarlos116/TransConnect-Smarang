@@ -23,6 +23,9 @@ export interface Task {
   approved_for_public: boolean;
   facility_updates: Partial<Record<FacilityVariable, TaskFacilityState>> | null;
   facility_updates_approved: boolean;
+  // Whether an approved batch can still be undone (see revertFacilityUpdate)
+  // -- false once reverted, or if nothing has been approved yet.
+  facility_updates_revertible: boolean;
   created_at: string;
   updated_at: string;
 }

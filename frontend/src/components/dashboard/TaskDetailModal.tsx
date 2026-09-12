@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import FacilityUpdatePicker, { type FacilityUpdates } from "@/components/dashboard/FacilityUpdatePicker";
-import { approveFacilityUpdate, approveTechnicianPhoto, submitTechnicianReport } from "@/lib/fetchTasks";
+import { approveTechnicianPhoto, submitTechnicianReport } from "@/lib/fetchTasks";
 import { resolveUploadUrl } from "@/lib/resolveUploadUrl";
 import type { Task } from "@/types/task";
 
@@ -16,14 +16,6 @@ interface TaskDetailModalProps {
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 const MAX_VIDEO_BYTES = 25 * 1024 * 1024;
 
-const FACILITY_LABELS: Record<string, string> = {
-  cctv: "CCTV Pengawas",
-  lighting: "Penerangan Jalan",
-  sidewalk_condition: "Kondisi Trotoar",
-  route_info_signage: "Papan Informasi Rute",
-  canopy: "Kanopi / Peneduh",
-};
-
 /**
  * Opened from a task card in the "proses"/"selesai" columns (see
  * TaskBoard.tsx) -- lets whoever's doing the repair submit their own report
@@ -31,6 +23,12 @@ const FACILITY_LABELS: Record<string, string> = {
  * what needs fixing), and lets DISHUB approve that photo for the public map.
  * Approval is a distinct action from "selesai" status: submitting a photo
  * here does not make it public on its own (see backend/app/routers/task.py).
+ *
+ * Reviewing/approving the technician's proposed FACILITY changes happens
+ * elsewhere -- in HalteDetailModal's FieldNoteSection, next to the halte's
+ * own field notes, since that's what a dispatcher reads to judge the
+ * halte's current state. This modal is scoped to one task's own record
+ * (what was reported, whether its photo is public), not the halte's data.
  */
 export default function TaskDetailModal({ task, onClose, onUpdated }: TaskDetailModalProps) {
   const [report, setReport] = useState(task?.technician_report ?? "");
@@ -39,7 +37,6 @@ export default function TaskDetailModal({ task, onClose, onUpdated }: TaskDetail
   const [facilityUpdates, setFacilityUpdates] = useState<FacilityUpdates>({});
   const [submitting, setSubmitting] = useState(false);
   const [approvingPhoto, setApprovingPhoto] = useState(false);
-  const [approvingFacility, setApprovingFacility] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   if (!task) return null;
@@ -97,20 +94,6 @@ export default function TaskDetailModal({ task, onClose, onUpdated }: TaskDetail
       setError(err instanceof Error ? err.message : "Gagal menyetujui foto.");
     } finally {
       setApprovingPhoto(false);
-    }
-  }
-
-  async function handleApproveFacility() {
-    if (!task) return;
-    setApprovingFacility(true);
-    setError(null);
-    try {
-      const updated = await approveFacilityUpdate(task.task_id);
-      onUpdated(updated);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal menyetujui perubahan fasilitas.");
-    } finally {
-      setApprovingFacility(false);
     }
   }
 
@@ -199,31 +182,14 @@ export default function TaskDetailModal({ task, onClose, onUpdated }: TaskDetail
           {task.facility_updates && Object.keys(task.facility_updates).length > 0 && (
             <div className="rounded-lg border border-border-low bg-surface p-3">
               <h4 className="mb-2 font-label-md text-[13px] font-bold text-on-surface">Usulan Perubahan Fasilitas</h4>
-              <ul className="mb-3 flex flex-col gap-1">
-                {Object.entries(task.facility_updates).map(([facility, val]) => (
-                  <li key={facility} className="flex items-center gap-2 font-label-sm text-[12px] text-on-surface">
-                    <span
-                      className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${val === "ada" ? "bg-safety-green" : "bg-alert-red"}`}
-                    />
-                    {FACILITY_LABELS[facility] ?? facility}: {val === "ada" ? "Tersedia" : "Tidak Tersedia"}
-                  </li>
-                ))}
-              </ul>
-
-              {task.facility_updates_approved ? (
+              <p className="mb-2 font-label-sm text-[12px] text-on-surface-variant">
+                Ditinjau dan disetujui dari halaman detail halte, di bagian Catatan Survei Lapangan.
+              </p>
+              {task.facility_updates_approved && (
                 <div className="flex items-center gap-2 rounded-lg border border-safety-green/30 bg-green-50 p-2.5 text-label-sm text-on-surface">
                   <span className="material-symbols-outlined text-[18px] text-safety-green">check_circle</span>
                   Disetujui -- fasilitas & foto/video halte sudah diperbarui.
                 </div>
-              ) : (
-                <button
-                  onClick={handleApproveFacility}
-                  disabled={approvingFacility}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-safety-green px-4 py-2.5 font-label-md text-label-md font-bold text-on-primary transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
-                >
-                  <span className="material-symbols-outlined text-[18px]">verified</span>
-                  {approvingFacility ? "Menyetujui..." : "Setujui Perubahan Fasilitas"}
-                </button>
               )}
             </div>
           )}

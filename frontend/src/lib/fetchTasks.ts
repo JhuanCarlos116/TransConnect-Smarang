@@ -93,6 +93,13 @@ export async function approveFacilityUpdate(taskId: string): Promise<Task> {
   return parseOrThrow<Task>(res);
 }
 
+export async function revertFacilityUpdate(taskId: string): Promise<Task> {
+  const res = await fetch(`${requireApiBase()}/api/v1/tasks/${taskId}/revert-facility-update`, {
+    method: "PATCH",
+  });
+  return parseOrThrow<Task>(res);
+}
+
 export async function fetchApprovedRepairPhotos(halteId: string): Promise<ApprovedRepairPhoto[]> {
   const res = await fetch(`${requireApiBase()}/api/v1/halte/${halteId}/repair-photos`);
   return parseOrThrow<ApprovedRepairPhoto[]>(res);
