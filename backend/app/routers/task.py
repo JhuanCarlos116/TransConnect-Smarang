@@ -46,8 +46,10 @@ def _to_out(task: MaintenanceTask, halte: HalteSurvey) -> TaskOut:
         technician_photo_url=task.technician_photo_url,
         technician_video_url=task.technician_video_url,
         approved_for_public=task.approved_for_public,
+        technician_photo_rejected=task.technician_photo_rejected,
         facility_updates=task.facility_updates,
         facility_updates_approved=task.facility_updates_approved,
+        facility_updates_rejected=task.facility_updates_rejected,
         facility_updates_revertible=task.facility_updates_approved and task.facility_updates_snapshot is not None,
         created_at=task.created_at,
         updated_at=task.updated_at,
@@ -214,8 +216,10 @@ async def submit_technician_report(
     )
     task.facility_updates = parsed_facility_updates
     # A freshly submitted batch always needs a fresh look from DISHUB, even
-    # if an earlier batch on this same task was already approved.
+    # if an earlier batch on this same task was already approved -- or
+    # already turned down, since this is a different set of values.
     task.facility_updates_approved = False
+    task.facility_updates_rejected = False
 
     if photo is not None and photo.filename:
         task.technician_photo_url = await _save_upload(
@@ -227,8 +231,10 @@ async def submit_technician_report(
         )
         # A newly submitted photo needs re-approval before it goes public --
         # otherwise a technician could quietly swap the photo an admin
-        # already approved.
+        # already approved. Same for a rejection: that verdict was about the
+        # previous image, so it doesn't carry over to this one.
         task.approved_for_public = False
+        task.technician_photo_rejected = False
 
     await session.commit()
     await session.refresh(task)
@@ -265,6 +271,42 @@ async def approve_technician_photo(task_id: str, session: AsyncSession = Depends
         raise HTTPException(status_code=400, detail="Tugas ini belum punya foto laporan petugas.")
 
     task.approved_for_public = True
+    # A later approval overrides an earlier rejection -- the two flags are
+    # mutually exclusive states of one decision, and leaving the rejection
+    # set would make the review block show "ditolak" for a photo the public
+    # page is currently displaying.
+    task.technician_photo_rejected = False
+    await session.commit()
+    await session.refresh(task)
+
+    halte = await session.get(HalteSurvey, task.halte_id)
+    return _to_out(task, halte)
+
+
+@router.patch("/tasks/{task_id}/reject", response_model=TaskOut)
+async def reject_technician_photo(task_id: str, session: AsyncSession = Depends(get_session)) -> TaskOut:
+    """DISHUB's explicit NO for the technician's photo -- the counterpart to
+    /approve above, so a reviewer has a way to close the question instead of
+    leaving it open forever.
+
+    Only the public-strip decision changes: the photo stays on the task
+    (deleting the file would destroy the record of what was submitted and
+    why it was turned down), and it was never on the public page anyway
+    unless something had approved it first -- if it had, this takes it back
+    off (list_approved_repair_photos reads approved_for_public, which this
+    clears). Nothing here touches halte_survey.
+
+    Reversible: /approve clears this flag, so a change of mind costs one
+    click and no data.
+    """
+    task = await session.get(MaintenanceTask, task_id)
+    if task is None:
+        raise HTTPException(status_code=404, detail="Tugas tidak ditemukan.")
+    if not task.technician_photo_url:
+        raise HTTPException(status_code=400, detail="Tugas ini belum punya foto laporan petugas.")
+
+    task.approved_for_public = False
+    task.technician_photo_rejected = True
     await session.commit()
     await session.refresh(task)
 
@@ -325,6 +367,11 @@ async def approve_facility_update(task_id: str, session: AsyncSession = Depends(
         halte.media = [*new_media, *(halte.media or [])]
 
     task.facility_updates_approved = True
+    # Approving overrides an earlier rejection of the same batch (rejecting
+    # then approving is a legitimate change of mind; leaving both flags set
+    # would make the review block claim the batch was turned down while
+    # halte_survey carries its values).
+    task.facility_updates_rejected = False
     task.facility_updates_snapshot = {
         "facility_values": facility_snapshot,
         "facility_sources": source_snapshot,
@@ -384,9 +431,56 @@ async def revert_facility_update(task_id: str, session: AsyncSession = Depends(g
 
     task.facility_updates_approved = False
     task.facility_updates_snapshot = None
+    # The reverted batch is surfaced for review again, so any earlier "no"
+    # must not stick to it -- otherwise it would reappear already marked
+    # rejected and DISHUB could not approve it a second time.
+    task.facility_updates_rejected = False
 
     await session.commit()
     await session.refresh(task)
     await session.refresh(halte)
 
+    return _to_out(task, halte)
+
+
+@router.patch("/tasks/{task_id}/reject-facility-update", response_model=TaskOut)
+async def reject_facility_update(task_id: str, session: AsyncSession = Depends(get_session)) -> TaskOut:
+    """DISHUB reviewed the technician's proposed facility values and turned
+    them down -- the counterpart to approve-facility-update, so a proposal
+    can be closed out instead of sitting in the review block as pending
+    forever.
+
+    Writes NOTHING to halte_survey. That asymmetry with the approve path is
+    the point: rejecting is the safe direction, so the surveyed values, the
+    condition score and the halte's media stay exactly as the team recorded
+    them, and only the task's own review state changes. The proposal itself
+    is kept on the task (facility_updates is untouched) so the decision
+    remains auditable and DISHUB can change its mind via
+    approve-facility-update, which clears this flag.
+
+    Refused once the batch has already been approved (400): in that state
+    halte_survey already carries the technician's values, so "rejecting"
+    would really mean undoing an applied change -- which is precisely what
+    revert-facility-update does, snapshot and all. Choosing between the two
+    here would silently leave the halte's data disagreeing with the task.
+    """
+    task = await session.get(MaintenanceTask, task_id)
+    if task is None:
+        raise HTTPException(status_code=404, detail="Tugas tidak ditemukan.")
+    if not task.facility_updates:
+        raise HTTPException(status_code=400, detail="Tugas ini belum punya usulan perubahan fasilitas.")
+    if task.facility_updates_approved:
+        raise HTTPException(
+            status_code=400,
+            detail="Usulan ini sudah disetujui dan sudah tertulis di data halte. "
+            "Pakai \"Kembalikan Perubahan Sebelumnya\" dulu, baru tolak.",
+        )
+
+    task.facility_updates_rejected = True
+    task.facility_updates_approved = False
+
+    await session.commit()
+    await session.refresh(task)
+
+    halte = await session.get(HalteSurvey, task.halte_id)
     return _to_out(task, halte)

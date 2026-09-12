@@ -35,8 +35,14 @@ class TaskOut(BaseModel):
     technician_photo_url: str | None
     technician_video_url: str | None
     approved_for_public: bool
+    # Explicit "no" from DISHUB, as opposed to "not reviewed yet" -- the two
+    # are indistinguishable from approved_for_public alone, and the review
+    # block in HalteDetailModal has to tell them apart to stop showing a
+    # decision that was already made as if it were still pending.
+    technician_photo_rejected: bool
     facility_updates: dict[str, FacilityState] | None
     facility_updates_approved: bool
+    facility_updates_rejected: bool
     # Whether an approved facility_updates batch can still be undone (see
     # revert-facility-update) -- exposed as a plain flag rather than the
     # snapshot itself, since the frontend only needs to know whether to show

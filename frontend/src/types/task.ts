@@ -21,8 +21,14 @@ export interface Task {
   technician_photo_url: string | null;
   technician_video_url: string | null;
   approved_for_public: boolean;
+  // An explicit "no" from DISHUB on the repair photo, as opposed to "not
+  // reviewed yet" -- both look like approved_for_public: false otherwise.
+  technician_photo_rejected: boolean;
   facility_updates: Partial<Record<FacilityVariable, TaskFacilityState>> | null;
   facility_updates_approved: boolean;
+  // Same idea for the facility batch: reviewed and turned down, versus still
+  // waiting for a decision.
+  facility_updates_rejected: boolean;
   // Whether an approved batch can still be undone (see revertFacilityUpdate)
   // -- false once reverted, or if nothing has been approved yet.
   facility_updates_revertible: boolean;

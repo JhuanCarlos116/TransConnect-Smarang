@@ -3,8 +3,7 @@
 import { useState } from "react";
 
 import FacilityUpdatePicker, { type FacilityUpdates } from "@/components/dashboard/FacilityUpdatePicker";
-import { approveTechnicianPhoto, submitTechnicianReport } from "@/lib/fetchTasks";
-import { resolveUploadUrl } from "@/lib/resolveUploadUrl";
+import { submitTechnicianReport } from "@/lib/fetchTasks";
 import type { Task } from "@/types/task";
 
 interface TaskDetailModalProps {
@@ -20,15 +19,15 @@ const MAX_VIDEO_BYTES = 25 * 1024 * 1024;
  * Opened from a task card in the "proses"/"selesai" columns (see
  * TaskBoard.tsx) -- lets whoever's doing the repair submit their own report
  * text + a photo (separate from the dispatcher's original description of
- * what needs fixing), and lets DISHUB approve that photo for the public map.
- * Approval is a distinct action from "selesai" status: submitting a photo
- * here does not make it public on its own (see backend/app/routers/task.py).
+ * what needs fixing), plus the video proof and any proposed facility values.
  *
- * Reviewing/approving the technician's proposed FACILITY changes happens
- * elsewhere -- in HalteDetailModal's FieldNoteSection, next to the halte's
- * own field notes, since that's what a dispatcher reads to judge the
- * halte's current state. This modal is scoped to one task's own record
- * (what was reported, whether its photo is public), not the halte's data.
+ * Reviewing any of that belongs to DISHUB and happens elsewhere: both the
+ * photo's public-approval gate and the facility batch are approved/turned
+ * down in HalteDetailModal's FieldNoteSection, next to the halte's own field
+ * notes. That's deliberate -- those are decisions about the HAlTE's data and
+ * what the public sees, not part of one task's record-keeping, and a
+ * dispatcher judging a halte shouldn't have to open a second modal and find
+ * the matching task first. The blocks here only report the current verdict.
  */
 export default function TaskDetailModal({ task, onClose, onUpdated }: TaskDetailModalProps) {
   const [report, setReport] = useState(task?.technician_report ?? "");
@@ -36,7 +35,6 @@ export default function TaskDetailModal({ task, onClose, onUpdated }: TaskDetail
   const [video, setVideo] = useState<File | null>(null);
   const [facilityUpdates, setFacilityUpdates] = useState<FacilityUpdates>({});
   const [submitting, setSubmitting] = useState(false);
-  const [approvingPhoto, setApprovingPhoto] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   if (!task) return null;
@@ -80,20 +78,6 @@ export default function TaskDetailModal({ task, onClose, onUpdated }: TaskDetail
       setError(err instanceof Error ? err.message : "Gagal mengirim laporan petugas.");
     } finally {
       setSubmitting(false);
-    }
-  }
-
-  async function handleApprovePhoto() {
-    if (!task) return;
-    setApprovingPhoto(true);
-    setError(null);
-    try {
-      const updated = await approveTechnicianPhoto(task.task_id);
-      onUpdated(updated);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal menyetujui foto.");
-    } finally {
-      setApprovingPhoto(false);
     }
   }
 
@@ -158,23 +142,22 @@ export default function TaskDetailModal({ task, onClose, onUpdated }: TaskDetail
           {task.technician_photo_url && (
             <div className="rounded-lg border border-border-low bg-surface p-3">
               <h4 className="mb-2 font-label-md text-[13px] font-bold text-on-surface">Foto Perbaikan</h4>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={resolveUploadUrl(task.technician_photo_url) ?? undefined} alt="" className="mb-3 h-48 w-full rounded-md object-cover" />
-
-              {task.approved_for_public ? (
+              <p className="mb-2 font-label-sm text-[12px] text-on-surface-variant">
+                Disetujui atau ditolak dari halaman detail halte, di bagian Catatan Survei Lapangan --
+                bersama catatan laporan tim, video, dan usulan fasilitasnya, supaya semua keputusan
+                untuk satu halte ada di satu tempat.
+              </p>
+              {task.approved_for_public && (
                 <div className="flex items-center gap-2 rounded-lg border border-safety-green/30 bg-green-50 p-2.5 text-label-sm text-on-surface">
                   <span className="material-symbols-outlined text-[18px] text-safety-green">check_circle</span>
                   Disetujui -- tampil di halaman publik.
                 </div>
-              ) : (
-                <button
-                  onClick={handleApprovePhoto}
-                  disabled={approvingPhoto}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-safety-green px-4 py-2.5 font-label-md text-label-md font-bold text-on-primary transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
-                >
-                  <span className="material-symbols-outlined text-[18px]">verified</span>
-                  {approvingPhoto ? "Menyetujui..." : "Setujui & Tampilkan ke Publik"}
-                </button>
+              )}
+              {task.technician_photo_rejected && !task.approved_for_public && (
+                <div className="flex items-center gap-2 rounded-lg border border-alert-red/30 bg-red-50 p-2.5 text-label-sm text-on-surface">
+                  <span className="material-symbols-outlined text-[18px] text-alert-red">cancel</span>
+                  Ditolak -- tidak tampil di halaman publik.
+                </div>
               )}
             </div>
           )}

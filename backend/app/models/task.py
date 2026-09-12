@@ -41,6 +41,15 @@ class MaintenanceTask(Base):
     # photo on the public map (HaltePublicModal) -- set via a separate
     # approval action, not automatically when status becomes "selesai".
     approved_for_public: Mapped[bool] = mapped_column(Boolean, default=False)
+    # DISHUB explicitly decided NOT to publish this photo. Recorded rather
+    # than just leaving approved_for_public False, because "False" cannot be
+    # told apart from "nobody has looked yet" -- without this, a rejected
+    # photo sits in HalteDetailModal's review block forever reading as
+    # "menunggu keputusan". Approving later clears it, so this is a decision,
+    # not a delete: the photo itself stays on the task's own record. Set via
+    # PATCH /tasks/{task_id}/reject; it only ever controls the public strip
+    # (see list_approved_repair_photos), never the task's own data.
+    technician_photo_rejected: Mapped[bool] = mapped_column(Boolean, default=False)
 
     # Facility ada/tidak values the technician is proposing (e.g.
     # {"cctv": "ada", "lighting": "tidak"}), submitted alongside the report --
@@ -63,6 +72,14 @@ class MaintenanceTask(Base):
     # a revert (rather than kept for repeated undo) since a fresh approval is
     # needed before there's anything meaningful to revert again.
     facility_updates_snapshot: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    # DISHUB reviewed the batch and turned it down. Like
+    # technician_photo_rejected above, this exists so a decision can be told
+    # apart from "not reviewed yet" -- otherwise a rejected proposal keeps
+    # showing up as awaiting approval. Set via PATCH
+    # /tasks/{task_id}/reject-facility-update, which writes NOTHING to
+    # halte_survey: the surveyed values stay exactly as they were, and the
+    # task keeps the proposal on record so the decision is auditable.
+    facility_updates_rejected: Mapped[bool] = mapped_column(Boolean, default=False)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(

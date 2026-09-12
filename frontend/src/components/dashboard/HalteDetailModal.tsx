@@ -5,7 +5,9 @@ import Link from "next/link";
 
 import { conditionColor, conditionLabelText } from "@/lib/conditionScore";
 import { fetchHalteData } from "@/lib/fetchHalteData";
-import { approveFacilityUpdate, createTask, fetchTasksByHalte, revertFacilityUpdate } from "@/lib/fetchTasks";
+import { approveFacilityUpdate, approveTechnicianPhoto, createTask, fetchTasksByHalte,
+         rejectFacilityUpdate, rejectTechnicianPhoto, revertFacilityUpdate } from "@/lib/fetchTasks";
+import { resolveUploadUrl } from "@/lib/resolveUploadUrl";
 import MediaCarousel from "@/components/map/MediaCarousel";
 import CitizenReportSection from "@/components/dashboard/CitizenReportSection";
 import FacilityEditor from "@/components/dashboard/FacilityEditor";
@@ -65,58 +67,71 @@ interface FieldNoteSectionProps {
  * collapsed "Catatan Awal (Riwayat)" block underneath once a technician
  * report exists to take its place as the headline.
  *
- * Also where the dispatcher reviews and approves a technician's proposed
- * facility changes (see approve-facility-update in routers/task.py) -- this
- * lives here rather than in TaskDetailModal because that modal is about one
- * task's own record-keeping (what was reported, whether its photo is public),
- * while this section is what the dispatcher actually reads to decide the
- * halte's current state, so the approval belongs next to it. Looked up by
- * status "proses" OR "selesai": a dispatcher can move a task to "selesai"
- * from TaskBoard before its facility data has been reviewed, and that
- * pending approval shouldn't become unreachable just because the task
+ * Also where the dispatcher reviews the field team's repair submission --
+ * the report note, the video, the repair photo (approve/turn down publishing
+ * it publicly), and the proposed facility changes. All of that used to be
+ * split: the photo's public-approval gate lived in TaskDetailModal, which is
+ * about one task's own record-keeping. DISHUB asked for it here instead,
+ * next to the note it belongs to -- a dispatcher reading "what did the team
+ * do at this halte" should be able to act on it without opening a second
+ * modal and hunting for the matching task. TaskDetailModal now points here.
+ *
+ * Looked up by status "proses" OR "selesai": a dispatcher can move a task to
+ * "selesai" from TaskBoard before any of this has been reviewed, and a
+ * pending decision shouldn't become unreachable just because the task
  * changed columns.
  */
 function FieldNoteSection({ halteId, note, refreshSignal, onTasksChanged, onHalteUpdated }: FieldNoteSectionProps) {
   const [open, setOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
-  const [pendingFacilityTask, setPendingFacilityTask] = useState<Task | null>(null);
+  /** Newest task with something DISHUB still has to decide on, else the
+   * newest one that submitted anything at all -- so the decisions come first
+   * and, failing that, the latest submission is still described rather than
+   * the box going blank. */
+  const [reviewTask, setReviewTask] = useState<Task | null>(null);
   const [revertibleTask, setRevertibleTask] = useState<Task | null>(null);
-  const [approving, setApproving] = useState(false);
+  const [facilityBusy, setFacilityBusy] = useState(false);
+  const [photoBusy, setPhotoBusy] = useState(false);
   const [reverting, setReverting] = useState(false);
-  const [approveError, setApproveError] = useState<string | null>(null);
+  const [facilityError, setFacilityError] = useState<string | null>(null);
+  const [photoError, setPhotoError] = useState<string | null>(null);
   const [revertError, setRevertError] = useState<string | null>(null);
 
+  // "Reviewed" means approved OR explicitly turned down. Both flags are
+  // needed: approved_for_public === false alone cannot be told apart from
+  // nobody having looked yet.
+  const photoPending = (t: Task) =>
+    Boolean(t.technician_photo_url) && !t.approved_for_public && !t.technician_photo_rejected;
+  const facilityPending = (t: Task) =>
+    Boolean(t.facility_updates && Object.keys(t.facility_updates).length > 0) &&
+    !t.facility_updates_approved && !t.facility_updates_rejected;
+
+  async function load() {
+    const tasks = await fetchTasksByHalte(halteId);
+    const inProgress = tasks.find((t) => t.status === "proses" && t.technician_report);
+    setActiveTask(inProgress ?? null);
+
+    // fetchTasksByHalte orders newest first, so find() is "most recent".
+    const submitted = (t: Task) => t.status === "proses" || t.status === "selesai";
+    const needsDecision = tasks.find((t) => submitted(t) && (photoPending(t) || facilityPending(t)));
+    const anySubmission = tasks.find(
+      (t) => submitted(t) && (t.technician_photo_url || (t.facility_updates && Object.keys(t.facility_updates).length > 0)),
+    );
+    setReviewTask(needsDecision ?? anySubmission ?? null);
+
+    // Most recently updated task with an approval still standing, so
+    // "Kembalikan" always targets whichever change actually last touched
+    // this halte's facility data.
+    const revertible = tasks.find((t) => t.facility_updates_approved && t.facility_updates_revertible);
+    setRevertibleTask(revertible ?? null);
+  }
+
   useEffect(() => {
-    let cancelled = false;
-    fetchTasksByHalte(halteId)
-      .then((tasks) => {
-        if (cancelled) return;
-        const inProgress = tasks.find((t) => t.status === "proses" && t.technician_report);
-        setActiveTask(inProgress ?? null);
-
-        const pending = tasks.find(
-          (t) =>
-            (t.status === "proses" || t.status === "selesai") &&
-            t.facility_updates &&
-            Object.keys(t.facility_updates).length > 0 &&
-            !t.facility_updates_approved,
-        );
-        setPendingFacilityTask(pending ?? null);
-
-        // Most recently updated task with an approval still standing, so
-        // "Kembalikan" always targets whichever change actually last
-        // touched this halte's facility data -- fetchTasksByHalte already
-        // orders newest first.
-        const revertible = tasks.find((t) => t.facility_updates_approved && t.facility_updates_revertible);
-        setRevertibleTask(revertible ?? null);
-      })
-      .catch(() => {
-        // Non-critical -- falls back to showing just the original survey note.
-      });
-    return () => {
-      cancelled = true;
-    };
+    load().catch(() => {
+      // Non-critical -- falls back to showing just the original survey note.
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [halteId, refreshSignal]);
 
   async function refreshHalte() {
@@ -131,20 +146,71 @@ function FieldNoteSection({ halteId, note, refreshSignal, onTasksChanged, onHalt
     if (fresh) onHalteUpdated?.(fresh);
   }
 
+  // Every review action reloads the task list rather than patching one task
+  // in local state: a decision can change WHICH task is the one under review
+  // (approving the newest leaves an older proposal still pending), and
+  // computing that by hand is how the block ends up showing a decision that
+  // no longer applies.
   async function handleApproveFacility() {
-    if (!pendingFacilityTask) return;
-    setApproving(true);
-    setApproveError(null);
+    if (!reviewTask) return;
+    setFacilityBusy(true);
+    setFacilityError(null);
     try {
-      const updatedTask = await approveFacilityUpdate(pendingFacilityTask.task_id);
-      setPendingFacilityTask(updatedTask.facility_updates_approved ? null : updatedTask);
-      if (updatedTask.facility_updates_approved) setRevertibleTask(updatedTask);
+      await approveFacilityUpdate(reviewTask.task_id);
       onTasksChanged?.();
       await refreshHalte();
+      await load();
     } catch (err) {
-      setApproveError(err instanceof Error ? err.message : "Gagal menyetujui perubahan fasilitas.");
+      setFacilityError(err instanceof Error ? err.message : "Gagal menyetujui perubahan fasilitas.");
     } finally {
-      setApproving(false);
+      setFacilityBusy(false);
+    }
+  }
+
+  async function handleRejectFacility() {
+    if (!reviewTask) return;
+    if (!window.confirm("Tolak usulan perubahan fasilitas ini? Data halte tidak akan diubah.")) return;
+    setFacilityBusy(true);
+    setFacilityError(null);
+    try {
+      await rejectFacilityUpdate(reviewTask.task_id);
+      onTasksChanged?.();
+      await load();
+    } catch (err) {
+      setFacilityError(err instanceof Error ? err.message : "Gagal menolak perubahan fasilitas.");
+    } finally {
+      setFacilityBusy(false);
+    }
+  }
+
+  async function handleApprovePhoto() {
+    if (!reviewTask) return;
+    setPhotoBusy(true);
+    setPhotoError(null);
+    try {
+      await approveTechnicianPhoto(reviewTask.task_id);
+      onTasksChanged?.();
+      await load();
+    } catch (err) {
+      setPhotoError(err instanceof Error ? err.message : "Gagal menyetujui foto perbaikan.");
+    } finally {
+      setPhotoBusy(false);
+    }
+  }
+
+  async function handleRejectPhoto() {
+    if (!reviewTask) return;
+    if (!window.confirm("Tolak foto perbaikan ini? Foto tidak akan tampil di halaman publik.")) return;
+    setPhotoBusy(true);
+    setPhotoError(null);
+    try {
+      await rejectTechnicianPhoto(reviewTask.task_id);
+      onTasksChanged?.();
+      await load();
+    } catch (err) {
+      setPhotoError(err instanceof Error ? err.message : "Gagal menolak foto perbaikan.");
+    } finally {
+      setPhotoBusy(false);
     }
   }
 
@@ -154,16 +220,13 @@ function FieldNoteSection({ halteId, note, refreshSignal, onTasksChanged, onHalt
     setReverting(true);
     setRevertError(null);
     try {
-      const updatedTask = await revertFacilityUpdate(revertibleTask.task_id);
-      setRevertibleTask(null);
-      // The task's own proposed values are unchanged and now unapproved
-      // again -- surface them once more so DISHUB can re-review instead of
-      // the proposal silently disappearing.
-      if (updatedTask.facility_updates && Object.keys(updatedTask.facility_updates).length > 0) {
-        setPendingFacilityTask(updatedTask);
-      }
+      await revertFacilityUpdate(revertibleTask.task_id);
       onTasksChanged?.();
       await refreshHalte();
+      // The task's own proposed values are unchanged and unapproved again --
+      // load() surfaces them once more so DISHUB can re-review, instead of
+      // the proposal silently disappearing.
+      await load();
     } catch (err) {
       setRevertError(err instanceof Error ? err.message : "Gagal mengembalikan perubahan fasilitas.");
     } finally {
@@ -223,31 +286,138 @@ function FieldNoteSection({ halteId, note, refreshSignal, onTasksChanged, onHalt
             </p>
           )}
 
-          {pendingFacilityTask && (
-            <div className="border-t border-border-low pt-2.5">
-              <h5 className="mb-2 flex items-center gap-1.5 font-label-sm text-[12px] font-bold text-on-surface">
+          {reviewTask && (
+            <div className="flex flex-col gap-2.5 border-t border-border-low pt-2.5">
+              <h5 className="flex items-center gap-1.5 font-label-sm text-[12px] font-bold text-on-surface">
                 <span className="material-symbols-outlined text-[16px] text-purple-600">fact_check</span>
-                Usulan Perubahan Fasilitas dari Tim Lapangan
+                Laporan Perbaikan dari Tim Lapangan
               </h5>
-              <ul className="mb-2.5 flex flex-col gap-1">
-                {Object.entries(pendingFacilityTask.facility_updates ?? {}).map(([facility, val]) => (
-                  <li key={facility} className="flex items-center gap-2 font-label-sm text-[12px] text-on-surface">
-                    <span
-                      className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${val === "ada" ? "bg-safety-green" : "bg-alert-red"}`}
-                    />
-                    {FACILITY_LABELS[facility] ?? facility}: {val === "ada" ? "Tersedia" : "Tidak Tersedia"}
-                  </li>
-                ))}
-              </ul>
-              {approveError && <p className="mb-2 text-label-sm text-[11px] text-alert-red">{approveError}</p>}
-              <button
-                onClick={handleApproveFacility}
-                disabled={approving}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-safety-green px-3 py-2 font-label-sm text-[12px] font-bold text-on-primary transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                <span className="material-symbols-outlined text-[16px]">verified</span>
-                {approving ? "Menyetujui..." : "Setujui Perubahan Fasilitas"}
-              </button>
+
+              {/* The report text is already the headline above when this is
+                  the task in progress -- don't print the same words twice. */}
+              {reviewTask.task_id !== activeTask?.task_id && reviewTask.technician_report && (
+                <p className="font-body-md text-[13px] text-on-surface-variant leading-relaxed italic bg-surface-container-low p-2.5 rounded">
+                  &ldquo;{reviewTask.technician_report}&rdquo;
+                </p>
+              )}
+
+              {reviewTask.technician_video_url && (
+                <a
+                  href={resolveUploadUrl(reviewTask.technician_video_url) ?? "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 rounded-lg border border-border-low bg-surface-container-low p-2.5 font-label-sm text-[12px] font-bold text-transport-blue hover:underline"
+                >
+                  <span className="material-symbols-outlined text-[18px]">play_circle</span>
+                  Buka video perbaikan dari tim
+                </a>
+              )}
+
+              {reviewTask.technician_photo_url && (
+                <div className="rounded-lg border border-border-low bg-surface p-2.5">
+                  <h6 className="mb-2 font-label-md text-[12px] font-bold text-on-surface">Foto Perbaikan</h6>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={resolveUploadUrl(reviewTask.technician_photo_url) ?? undefined}
+                    alt=""
+                    className="mb-2.5 h-40 w-full rounded-md object-cover"
+                  />
+                  {reviewTask.approved_for_public ? (
+                    <div className="flex items-center gap-2 rounded-lg border border-safety-green/30 bg-green-50 p-2.5 text-label-sm text-on-surface">
+                      <span className="material-symbols-outlined text-[18px] text-safety-green">check_circle</span>
+                      Disetujui -- tampil di halaman publik.
+                    </div>
+                  ) : reviewTask.technician_photo_rejected ? (
+                    <div className="flex flex-col gap-2 rounded-lg border border-alert-red/30 bg-red-50 p-2.5 text-label-sm text-on-surface">
+                      <span className="flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[18px] text-alert-red">cancel</span>
+                        Ditolak -- tidak tampil di halaman publik.
+                      </span>
+                      <button
+                        onClick={handleApprovePhoto}
+                        disabled={photoBusy}
+                        className="flex w-full items-center justify-center gap-2 rounded-lg border border-safety-green px-3 py-2 font-label-sm text-[12px] font-bold text-safety-green transition-colors hover:bg-safety-green hover:text-on-primary disabled:cursor-not-allowed disabled:opacity-70"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">verified</span>
+                        Batalkan penolakan -- tampilkan ke publik
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      {photoError && <p className="mb-2 text-label-sm text-[11px] text-alert-red">{photoError}</p>}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleApprovePhoto}
+                          disabled={photoBusy}
+                          className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-safety-green px-3 py-2 font-label-sm text-[12px] font-bold text-on-primary transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">verified</span>
+                          {photoBusy ? "Memproses..." : "Setujui & Tampilkan ke Publik"}
+                        </button>
+                        <button
+                          onClick={handleRejectPhoto}
+                          disabled={photoBusy}
+                          className="flex items-center justify-center gap-1.5 rounded-lg border border-alert-red px-3 py-2 font-label-sm text-[12px] font-bold text-alert-red transition-colors hover:bg-alert-red hover:text-on-error disabled:cursor-not-allowed disabled:opacity-70"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">block</span>
+                          Tolak Foto
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {reviewTask.facility_updates && Object.keys(reviewTask.facility_updates).length > 0 && (
+                <div className="rounded-lg border border-border-low bg-surface p-2.5">
+                  <h6 className="mb-2 font-label-md text-[12px] font-bold text-on-surface">
+                    Usulan Perubahan Fasilitas dari Tim Lapangan
+                  </h6>
+                  <ul className="mb-2.5 flex flex-col gap-1">
+                    {Object.entries(reviewTask.facility_updates).map(([facility, val]) => (
+                      <li key={facility} className="flex items-center gap-2 font-label-sm text-[12px] text-on-surface">
+                        <span
+                          className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${val === "ada" ? "bg-safety-green" : "bg-alert-red"}`}
+                        />
+                        {FACILITY_LABELS[facility] ?? facility}: {val === "ada" ? "Tersedia" : "Tidak Tersedia"}
+                      </li>
+                    ))}
+                  </ul>
+                  {reviewTask.facility_updates_approved ? (
+                    <div className="flex items-center gap-2 rounded-lg border border-safety-green/30 bg-green-50 p-2.5 text-label-sm text-on-surface">
+                      <span className="material-symbols-outlined text-[18px] text-safety-green">check_circle</span>
+                      Disetujui -- fasilitas & foto/video halte sudah diperbarui.
+                    </div>
+                  ) : reviewTask.facility_updates_rejected ? (
+                    <div className="flex items-center gap-2 rounded-lg border border-alert-red/30 bg-red-50 p-2.5 text-label-sm text-on-surface">
+                      <span className="material-symbols-outlined text-[18px] text-alert-red">cancel</span>
+                      Ditolak -- data halte tidak diubah.
+                    </div>
+                  ) : (
+                    <>
+                      {facilityError && <p className="mb-2 text-label-sm text-[11px] text-alert-red">{facilityError}</p>}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleApproveFacility}
+                          disabled={facilityBusy}
+                          className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-safety-green px-3 py-2 font-label-sm text-[12px] font-bold text-on-primary transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">verified</span>
+                          {facilityBusy ? "Memproses..." : "Setujui Perubahan Fasilitas"}
+                        </button>
+                        <button
+                          onClick={handleRejectFacility}
+                          disabled={facilityBusy}
+                          className="flex items-center justify-center gap-1.5 rounded-lg border border-alert-red px-3 py-2 font-label-sm text-[12px] font-bold text-alert-red transition-colors hover:bg-alert-red hover:text-on-error disabled:cursor-not-allowed disabled:opacity-70"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">block</span>
+                          Tolak Usulan
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
