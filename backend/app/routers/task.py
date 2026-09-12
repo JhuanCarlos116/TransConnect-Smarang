@@ -24,6 +24,7 @@ from app.models.task import MaintenanceTask
 from app.routers.citizen_report import PHOTO_CONTENT_TYPE_TO_EXT, VIDEO_CONTENT_TYPE_TO_EXT, _save_upload
 from app.schemas.task import ApprovedRepairPhoto, FacilityState, TaskCreate, TaskOut, TaskStatusUpdate
 from app.services.condition_score import FACILITY_VARIABLES, compute_condition_score
+from app.services.upload_cleanup import remove_if_unreferenced
 
 router = APIRouter()
 
@@ -142,14 +143,29 @@ async def update_task_status(
     # into citizen_report, so deleting the row it still points to violates
     # that constraint otherwise. TaskOut keeps the field on the response as
     # None here rather than the id that's no longer resolvable to anything.
+    # Uploaded files outlive their rows unless something removes them: this
+    # app had no os.remove anywhere, so a deleted report left its photo (and
+    # the detector's annotated copy) sitting in the publicly-served uploads
+    # directory, still downloadable by anyone holding the URL. Collected
+    # BEFORE the delete so the values are still readable, removed AFTER the
+    # commit so the row being deleted doesn't count as a live reference to
+    # itself.
+    report_uploads: list[str | None] = []
     if body.status == "selesai" and task.citizen_report_id is not None:
         citizen_report = await session.get(CitizenReport, task.citizen_report_id)
         task.citizen_report_id = None
         if citizen_report is not None:
+            report_uploads = [citizen_report.photo_url, citizen_report.photo_annotated_url]
             await session.delete(citizen_report)
 
     await session.commit()
     await session.refresh(task)
+
+    # Each is only removed if nothing else refers to it -- a photo already
+    # approved into halte_survey.media is referenced from there too, and that
+    # reference must win.
+    for upload in report_uploads:
+        await remove_if_unreferenced(session, upload)
 
     halte = await session.get(HalteSurvey, task.halte_id)
     return _to_out(task, halte)
@@ -254,8 +270,18 @@ async def delete_task(task_id: str, session: AsyncSession = Depends(get_session)
     if task is None:
         raise HTTPException(status_code=404, detail="Tugas tidak ditemukan.")
 
+    # Read the paths before the row goes, remove the files only after the
+    # commit. remove_if_unreferenced re-checks the whole database, which is
+    # what keeps an approval from being undone by a delete: once a facility
+    # batch is approved, this task's photo and video were also copied into
+    # halte_survey.media, so those files have a second owner and must survive.
+    task_uploads = [task.technician_photo_url, task.technician_video_url]
+
     await session.delete(task)
     await session.commit()
+
+    for upload in task_uploads:
+        await remove_if_unreferenced(session, upload)
 
 
 @router.patch("/tasks/{task_id}/approve", response_model=TaskOut)
