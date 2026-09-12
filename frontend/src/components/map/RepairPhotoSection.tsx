@@ -47,8 +47,26 @@ export default function RepairPhotoSection({ halteId }: RepairPhotoSectionProps)
       <div className="flex flex-col gap-2.5">
         {photos.map((p) => (
           <div key={p.updated_at} className="overflow-hidden rounded-lg border border-border-low bg-surface">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={resolveUploadUrl(p.technician_photo_url) ?? undefined} alt="" className="h-40 w-full object-cover" />
+            {/* Every approved photo, not just the first -- what DISHUB approved
+                is the whole submission, so that is what the public sees. */}
+            <div className="flex flex-wrap gap-1 p-1">
+              {p.technician_photo_urls.map((url) => (
+                <a
+                  key={url}
+                  href={resolveUploadUrl(url) ?? "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="min-w-[45%] flex-1 overflow-hidden rounded"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={resolveUploadUrl(url) ?? undefined}
+                    alt=""
+                    className="h-32 w-full object-cover"
+                  />
+                </a>
+              ))}
+            </div>
             <p className="p-2.5 text-[13px] leading-relaxed text-on-surface-variant">{p.technician_report}</p>
           </div>
         ))}

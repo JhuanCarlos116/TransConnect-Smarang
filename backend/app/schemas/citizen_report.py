@@ -3,6 +3,14 @@ from datetime import datetime
 from pydantic import BaseModel
 
 
+class CitizenReportPhoto(BaseModel):
+    """One photo of a report -- the original plus, when the detector drew
+    anything, its annotated twin. See app/services/photo_detection.py."""
+
+    url: str
+    annotated_url: str | None = None
+
+
 class CitizenReportOut(BaseModel):
     report_id: str
     halte_id: str
@@ -12,6 +20,12 @@ class CitizenReportOut(BaseModel):
     description: str
     photo_url: str | None
     photo_annotated_url: str | None = None
+    # Every photo on the report, in submission order, with photo_url /
+    # photo_annotated_url above being the first entry. Reports submitted before
+    # multi-photo uploads existed are served as a one-entry list built from
+    # those scalars (see _photo_list), so a reader only ever deals with the
+    # list and older rows still appear.
+    photos: list[CitizenReportPhoto] = []
     video_url: str | None
     status: str
     created_at: datetime

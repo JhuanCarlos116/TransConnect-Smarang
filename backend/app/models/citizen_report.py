@@ -30,6 +30,18 @@ class CitizenReport(Base):
     # system in this project (see task.py's assigned_to for the same reasoning).
     reporter_name: Mapped[str] = mapped_column(String)
     description: Mapped[str] = mapped_column(String)
+    # Every photo the reporter attached, in the order they were picked:
+    # [{"url": "/uploads/<uuid>.jpg", "annotated_url": "/uploads/<uuid>.annotated.jpg"|None}, ...].
+    # THIS list is the authoritative record of what was submitted. The two
+    # scalar columns below hold the FIRST entry and are kept only because a
+    # number of readers were written against a single-photo report (the
+    # dashboard's report card, the cleanup hook that reclaims orphaned files,
+    # the approved-photo strip). Every write path sets the list and the
+    # scalars together from the same save result, so the two cannot disagree;
+    # any new reader should use `photos` and treat the scalars as "primary
+    # photo" shorthand.
+    photos: Mapped[list | None] = mapped_column(JSONB, nullable=True)
+
     # Relative paths under /uploads, e.g. "/uploads/<uuid>.jpg" -- None if the
     # reporter didn't attach that media type.
     photo_url: Mapped[str | None] = mapped_column(String, nullable=True)

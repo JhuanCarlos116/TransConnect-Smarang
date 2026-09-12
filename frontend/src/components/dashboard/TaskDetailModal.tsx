@@ -3,7 +3,10 @@
 import { useState } from "react";
 
 import FacilityUpdatePicker, { type FacilityUpdates } from "@/components/dashboard/FacilityUpdatePicker";
+import PhotoPicker from "@/components/ui/PhotoPicker";
 import { submitTechnicianReport } from "@/lib/fetchTasks";
+import { resolveUploadUrl } from "@/lib/resolveUploadUrl";
+import { MAX_VIDEO_BYTES, mb } from "@/lib/uploadLimits";
 import type { Task } from "@/types/task";
 
 interface TaskDetailModalProps {
@@ -11,9 +14,6 @@ interface TaskDetailModalProps {
   onClose: () => void;
   onUpdated: (task: Task) => void;
 }
-
-const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
-const MAX_VIDEO_BYTES = 25 * 1024 * 1024;
 
 /**
  * Opened from a task card in the "proses"/"selesai" columns (see
@@ -31,7 +31,7 @@ const MAX_VIDEO_BYTES = 25 * 1024 * 1024;
  */
 export default function TaskDetailModal({ task, onClose, onUpdated }: TaskDetailModalProps) {
   const [report, setReport] = useState(task?.technician_report ?? "");
-  const [photo, setPhoto] = useState<File | null>(null);
+  const [photos, setPhotos] = useState<File[]>([]);
   const [video, setVideo] = useState<File | null>(null);
   const [facilityUpdates, setFacilityUpdates] = useState<FacilityUpdates>({});
   const [submitting, setSubmitting] = useState(false);
@@ -39,23 +39,13 @@ export default function TaskDetailModal({ task, onClose, onUpdated }: TaskDetail
 
   if (!task) return null;
 
-  function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > MAX_PHOTO_BYTES) {
-      setError("Ukuran foto maksimal 5 MB.");
-      e.target.value = "";
-      return;
-    }
-    setError(null);
-    setPhoto(file);
-  }
-
+  // Photo size/count limits are enforced by PhotoPicker, which owns that
+  // field's state now that there can be several files.
   function handleVideoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > MAX_VIDEO_BYTES) {
-      setError("Ukuran video maksimal 25 MB.");
+      setError(`Ukuran video maksimal ${mb(MAX_VIDEO_BYTES)}.`);
       e.target.value = "";
       return;
     }
@@ -69,9 +59,15 @@ export default function TaskDetailModal({ task, onClose, onUpdated }: TaskDetail
     setSubmitting(true);
     setError(null);
     try {
-      const updated = await submitTechnicianReport(task.task_id, report.trim(), video, facilityUpdates, photo ?? undefined);
+      const updated = await submitTechnicianReport(
+        task.task_id,
+        report.trim(),
+        video,
+        facilityUpdates,
+        photos.length > 0 ? photos : undefined,
+      );
       onUpdated(updated);
-      setPhoto(null);
+      setPhotos([]);
       setVideo(null);
       setFacilityUpdates({});
     } catch (err) {
@@ -117,14 +113,15 @@ export default function TaskDetailModal({ task, onClose, onUpdated }: TaskDetail
               />
               <label className="flex items-center gap-2 rounded-lg border border-border-low bg-surface-container-low p-2.5 text-label-sm text-on-surface-variant">
                 <span className="material-symbols-outlined text-[18px]">videocam</span>
-                {video ? video.name : "Tambah video perbaikan (wajib, MP4/WebM/MOV, maks 25 MB)"}
+                {video ? video.name : `Tambah video perbaikan (wajib, MP4/WebM/MOV, maks ${mb(MAX_VIDEO_BYTES)})`}
                 <input type="file" accept="video/mp4,video/webm,video/quicktime" onChange={handleVideoChange} className="hidden" />
               </label>
-              <label className="flex items-center gap-2 rounded-lg border border-border-low bg-surface-container-low p-2.5 text-label-sm text-on-surface-variant">
-                <span className="material-symbols-outlined text-[18px]">photo_camera</span>
-                {photo ? photo.name : "Tambah foto perbaikan (opsional)"}
-                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePhotoChange} className="hidden" />
-              </label>
+              <PhotoPicker
+                photos={photos}
+                onChange={setPhotos}
+                onError={setError}
+                idleLabel="Tambah foto perbaikan (opsional, bisa beberapa)"
+              />
 
               <FacilityUpdatePicker value={facilityUpdates} onChange={setFacilityUpdates} />
 
@@ -147,6 +144,26 @@ export default function TaskDetailModal({ task, onClose, onUpdated }: TaskDetail
                 bersama catatan laporan tim, video, dan usulan fasilitasnya, supaya semua keputusan
                 untuk satu halte ada di satu tempat.
               </p>
+              {/* Every photo on the task, not just the first, so the technician
+                  can see exactly what is on record before it is reviewed. */}
+              <div className="mb-2 flex flex-wrap gap-2">
+                {task.technician_photo_urls.map((url) => (
+                  <a
+                    key={url}
+                    href={resolveUploadUrl(url) ?? undefined}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="h-16 w-16 overflow-hidden rounded-md border border-border-low"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={resolveUploadUrl(url) ?? undefined}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  </a>
+                ))}
+              </div>
               {task.approved_for_public && (
                 <div className="flex items-center gap-2 rounded-lg border border-safety-green/30 bg-green-50 p-2.5 text-label-sm text-on-surface">
                   <span className="material-symbols-outlined text-[18px] text-safety-green">check_circle</span>

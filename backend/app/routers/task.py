@@ -21,15 +21,36 @@ from app.db import get_session
 from app.models.citizen_report import CitizenReport
 from app.models.halte import HalteSurvey
 from app.models.task import MaintenanceTask
-from app.routers.citizen_report import PHOTO_CONTENT_TYPE_TO_EXT, VIDEO_CONTENT_TYPE_TO_EXT, _save_upload
+from app.routers.citizen_report import (
+    PHOTO_CONTENT_TYPE_TO_EXT,
+    VIDEO_CONTENT_TYPE_TO_EXT,
+    _collect_photo_uploads,
+    _photo_list,
+    _save_upload,
+)
 from app.schemas.task import ApprovedRepairPhoto, FacilityState, TaskCreate, TaskOut, TaskStatusUpdate
 from app.services.condition_score import FACILITY_VARIABLES, compute_condition_score
 from app.services.upload_cleanup import remove_if_unreferenced
 
 router = APIRouter()
 
-MAX_TECHNICIAN_PHOTO_BYTES = 5 * 1024 * 1024  # 5 MB, same cap as citizen_report's photo
+MAX_TECHNICIAN_PHOTO_BYTES = 15 * 1024 * 1024  # 15 MB, same cap as citizen_report's photo
 MAX_TECHNICIAN_VIDEO_BYTES = 25 * 1024 * 1024  # 25 MB, same cap as citizen_report's video
+
+
+def _task_photo_urls(task: MaintenanceTask) -> list[str]:
+    """Every repair-photo path on this task, in submission order.
+
+    `technician_photo_urls` is authoritative. The scalar `technician_photo_url`
+    is folded in as well so a task reported before multi-photo uploads existed
+    still has its single photo published, approved and cleaned up exactly as
+    before -- for rows written since, the scalar is just the first entry and
+    the membership check keeps it from being counted twice.
+    """
+    urls = [u for u in (task.technician_photo_urls or []) if u]
+    if task.technician_photo_url and task.technician_photo_url not in urls:
+        urls.append(task.technician_photo_url)
+    return urls
 
 
 def _to_out(task: MaintenanceTask, halte: HalteSurvey) -> TaskOut:
@@ -45,6 +66,7 @@ def _to_out(task: MaintenanceTask, halte: HalteSurvey) -> TaskOut:
         status=task.status,
         technician_report=task.technician_report,
         technician_photo_url=task.technician_photo_url,
+        technician_photo_urls=_task_photo_urls(task),
         technician_video_url=task.technician_video_url,
         approved_for_public=task.approved_for_public,
         technician_photo_rejected=task.technician_photo_rejected,
@@ -85,6 +107,7 @@ async def list_approved_repair_photos(
         ApprovedRepairPhoto(
             technician_report=task.technician_report or "",
             technician_photo_url=task.technician_photo_url,
+            technician_photo_urls=_task_photo_urls(task),
             updated_at=task.updated_at,
         )
         for task in result.scalars().all()
@@ -155,7 +178,15 @@ async def update_task_status(
         citizen_report = await session.get(CitizenReport, task.citizen_report_id)
         task.citizen_report_id = None
         if citizen_report is not None:
-            report_uploads = [citizen_report.photo_url, citizen_report.photo_annotated_url]
+            # Every photo with its annotated twin, not just the scalar pair: a
+            # report can carry several photos now, and collecting only the
+            # first would strand the rest in the publicly-served directory
+            # forever -- which is the exact leak this cleanup exists to close.
+            report_uploads = [
+                path
+                for photo in _photo_list(citizen_report)
+                for path in (photo.url, photo.annotated_url)
+            ]
             await session.delete(citizen_report)
 
     await session.commit()
@@ -199,17 +230,23 @@ async def submit_technician_report(
     report: str = Form(...),
     facility_updates: str = Form(...),
     video: UploadFile = File(...),
+    # Repeated multipart parts named "photos". `photo` (singular) is the
+    # pre-existing single-photo field, kept so a cached dashboard bundle can
+    # still submit; _collect_photo_uploads folds the two together, with the
+    # same 15 MB-per-file and 5-photo caps either way.
+    photos: list[UploadFile] | None = File(None),
     photo: UploadFile | None = File(None),
     session: AsyncSession = Depends(get_session),
 ) -> TaskOut:
     """Technician's own report on a task in progress/done -- separate from
     the dispatcher's original description (what needs fixing). A report is
-    only considered complete with proof: video is required (photo stays
-    optional, as before). facility_updates is the technician's own read of
+    only considered complete with proof: video is required (photos stay
+    optional, as before, but there can now be several of them, each up to
+    15 MB). facility_updates is the technician's own read of
     which of the 5 survey facilities changed and to what -- neither this nor
-    the video/photo take effect on halte_survey immediately; DISHUB reviews
+    the video/photos take effect on halte_survey immediately; DISHUB reviews
     and applies them via PATCH /tasks/{task_id}/approve-facility-update.
-    Submitting a new photo here does NOT make it public on its own either;
+    Submitting new photos here does NOT make them public on their own either;
     see /approve below (a separate, narrower gate that predates this one).
     """
     task = await session.get(MaintenanceTask, task_id)
@@ -237,14 +274,26 @@ async def submit_technician_report(
     task.facility_updates_approved = False
     task.facility_updates_rejected = False
 
-    if photo is not None and photo.filename:
-        task.technician_photo_url = await _save_upload(
-            photo,
-            PHOTO_CONTENT_TYPE_TO_EXT,
-            MAX_TECHNICIAN_PHOTO_BYTES,
-            "Format foto harus JPEG, PNG, atau WebP.",
-            "Ukuran foto maksimal 5 MB.",
-        )
+    photo_uploads = _collect_photo_uploads(photos, photo)
+    if photo_uploads:
+        saved: list[str] = []
+        for upload in photo_uploads:
+            saved.append(
+                await _save_upload(
+                    upload,
+                    PHOTO_CONTENT_TYPE_TO_EXT,
+                    MAX_TECHNICIAN_PHOTO_BYTES,
+                    "Format foto harus JPEG, PNG, atau WebP.",
+                    "Ukuran foto maksimal 15 MB.",
+                )
+            )
+        # REPLACES the previous set rather than adding to it: this is one
+        # report's evidence and a resubmission is a new report. Appending
+        # would quietly grow the task's gallery with superseded shots that
+        # DISHUB would then have to approve all over again -- and that the
+        # public strip would show next to the current ones.
+        task.technician_photo_urls = saved
+        task.technician_photo_url = saved[0]
         # A newly submitted photo needs re-approval before it goes public --
         # otherwise a technician could quietly swap the photo an admin
         # already approved. Same for a rejection: that verdict was about the
@@ -273,9 +322,11 @@ async def delete_task(task_id: str, session: AsyncSession = Depends(get_session)
     # Read the paths before the row goes, remove the files only after the
     # commit. remove_if_unreferenced re-checks the whole database, which is
     # what keeps an approval from being undone by a delete: once a facility
-    # batch is approved, this task's photo and video were also copied into
+    # batch is approved, this task's photos and video were also copied into
     # halte_survey.media, so those files have a second owner and must survive.
-    task_uploads = [task.technician_photo_url, task.technician_video_url]
+    # Every photo, not just the primary one -- the rest have no other row
+    # pointing at them and would otherwise be stranded in a public directory.
+    task_uploads = [*_task_photo_urls(task), task.technician_video_url]
 
     await session.delete(task)
     await session.commit()
@@ -387,8 +438,15 @@ async def approve_facility_update(task_id: str, session: AsyncSession = Depends(
     new_media: list[dict] = []
     if task.technician_video_url and task.technician_video_url not in existing_urls:
         new_media.append({"url": task.technician_video_url, "type": "video"})
-    if task.technician_photo_url and task.technician_photo_url not in existing_urls:
-        new_media.append({"url": task.technician_photo_url, "type": "photo"})
+    # ALL the repair photos, not just the first. Approving the batch is
+    # approving the evidence that came with it, and the halte's own gallery is
+    # the only place that evidence reaches the public -- publishing one shot
+    # and dropping the rest would misrepresent what the technician submitted.
+    # existing_urls is re-checked per photo so re-approving after a revert
+    # does not stack duplicates.
+    for url in _task_photo_urls(task):
+        if url not in existing_urls:
+            new_media.append({"url": url, "type": "photo"})
     if new_media:
         halte.media = [*new_media, *(halte.media or [])]
 

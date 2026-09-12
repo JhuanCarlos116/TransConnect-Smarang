@@ -23,7 +23,11 @@ export async function createCitizenReport(input: CitizenReportCreateInput): Prom
   formData.append("halte_id", input.halteId);
   formData.append("reporter_name", input.reporterName);
   formData.append("description", input.description);
-  if (input.photo) formData.append("photo", input.photo);
+  if (input.photos?.length) {
+    // One repeated part per file, all named "photos" -- the backend reads them
+    // as a list (see the `photos` parameter in routers/citizen_report.py).
+    input.photos.forEach((file) => formData.append("photos", file));
+  }
   if (input.video) formData.append("video", input.video);
 
   const res = await fetch(`${requireApiBase()}/api/v1/citizen-reports`, {

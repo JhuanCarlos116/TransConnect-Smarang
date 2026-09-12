@@ -35,6 +35,12 @@ class MaintenanceTask(Base):
     # own description above (what needs fixing) vs. what the technician
     # actually reports back (what was done, with proof).
     technician_report: Mapped[str | None] = mapped_column(String, nullable=True)
+    # Every repair photo submitted for this task, in submission order, as
+    # "/uploads/<uuid>.jpg" paths. Authoritative; the scalar below is its first
+    # entry and exists for the readers written against a single-photo task
+    # (the public strip, the approve/reject gates, the cleanup hook) -- both
+    # are always written together from one save result.
+    technician_photo_urls: Mapped[list | None] = mapped_column(JSONB, nullable=True)
     technician_photo_url: Mapped[str | None] = mapped_column(String, nullable=True)
     technician_video_url: Mapped[str | None] = mapped_column(String, nullable=True)
     # True only after DISHUB explicitly approves showing the technician's

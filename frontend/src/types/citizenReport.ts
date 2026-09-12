@@ -1,3 +1,11 @@
+export interface CitizenReportPhoto {
+  url: string;
+  // The detector's own render of `url` with its boxes drawn on it -- what
+  // "Laporan Warga" shows DISHUB. Null when that photo produced no detection
+  // or the render failed; `url` is always the fallback.
+  annotated_url: string | null;
+}
+
 export interface CitizenReport {
   report_id: string;
   halte_id: string;
@@ -6,10 +14,15 @@ export interface CitizenReport {
   lon: number;
   description: string;
   photo_url: string | null;
-  // The detector's own render of photo_url with its boxes drawn on it --
-  // what "Laporan Warga" shows DISHUB. Null when the photo produced no
-  // detection (or the render failed); photo_url is always the fallback.
+  // The detector's own render of photo_url with its boxes drawn on it -- what
+  // "Laporan Warga" shows DISHUB. Null when the photo produced no detection
+  // (or the render failed); photo_url is always the fallback.
   photo_annotated_url: string | null;
+  // Every photo on the report, in submission order; photo_url and
+  // photo_annotated_url are the first entry. Use this list to render a
+  // gallery -- reports submitted before multi-photo uploads existed come back
+  // as a one-entry list, so there is no need to handle a missing list.
+  photos: CitizenReportPhoto[];
   video_url: string | null;
   status: string;
   created_at: string;
@@ -27,6 +40,6 @@ export interface CitizenReportCreateInput {
   halteId: string;
   reporterName: string;
   description: string;
-  photo?: File;
+  photos?: File[];
   video?: File;
 }

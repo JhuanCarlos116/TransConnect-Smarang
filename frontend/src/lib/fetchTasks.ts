@@ -66,13 +66,15 @@ export async function submitTechnicianReport(
   report: string,
   video: File,
   facilityUpdates: Partial<Record<FacilityVariable, TaskFacilityState>>,
-  photo?: File,
+  photos?: File[],
 ): Promise<Task> {
   const formData = new FormData();
   formData.append("report", report);
   formData.append("video", video);
   formData.append("facility_updates", JSON.stringify(facilityUpdates));
-  if (photo) formData.append("photo", photo);
+  // One repeated part per file, all named "photos" -- the backend reads them
+  // as a list (see the `photos` parameter in routers/task.py).
+  photos?.forEach((file) => formData.append("photos", file));
 
   const res = await fetch(`${requireApiBase()}/api/v1/tasks/${taskId}/report`, {
     method: "PATCH",

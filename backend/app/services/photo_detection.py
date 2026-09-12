@@ -124,6 +124,60 @@ def analyze_photo(image_path: Path, confidence_threshold: float = CONFIDENCE_THR
     return analysis
 
 
+def merge_analyses(analyses: list[PhotoAnalysis], entries: list[dict]) -> dict:
+    """Fold several photos' readings into the one ai_detections blob stored on
+    the report.
+
+    A report can now carry more than one photo and the detector runs on each
+    separately, so those separate readings have to become a single dict here.
+
+    The top-level keys are deliberately left in the shape as_jsonb produced
+    for a single photo (detections / observed / model / error), so the
+    dashboard's "Hasil baca YOLO" panel -- which counts detections and lists
+    their confidence chips -- keeps working on a multi-photo report without
+    being touched. `photos` is the new, additive part: one entry per photo, in
+    submission order, so a dispatcher can tell which picture produced which
+    reading instead of seeing one undifferentiated list.
+
+    `observed` is the UNION across photos, which is the honest combination
+    for the presence-only rule in this module's header: a facility any single
+    photo proved present is present, and since no photo can ever prove
+    absence there is nothing to intersect. `detections` is the concatenation,
+    each tagged with the index of the photo it came from.
+
+    `error` is set only when EVERY photo failed. One unreadable frame next to
+    a good one is not a detector failure, and the per-photo `error` inside
+    `photos` still records it.
+    """
+    merged_detections: list[dict] = []
+    observed: dict[str, str] = {}
+    per_photo: list[dict] = []
+    for index, analysis in enumerate(analyses):
+        for detection in analysis.detections:
+            merged_detections.append({**detection, "photo_index": index})
+        observed.update(analysis.observed)
+        entry = entries[index] if index < len(entries) else {}
+        per_photo.append(
+            {
+                "url": entry.get("url"),
+                "annotated_url": entry.get("annotated_url"),
+                "detections": len(analysis.detections),
+                "observed": analysis.observed,
+                "error": analysis.error,
+            }
+        )
+
+    failures = [a.error for a in analyses if a.error]
+    return {
+        "detections": merged_detections,
+        "observed": observed,
+        "confidence_threshold": CONFIDENCE_THRESHOLD,
+        "model": "transconnect-infra-9class",
+        "error": failures[0] if analyses and len(failures) == len(analyses) else None,
+        "photos": per_photo,
+    }
+
+
 def render_annotated(image_path: Path) -> bytes | None:
     """Ask the detector for the same photo with its boxes drawn on it.
 

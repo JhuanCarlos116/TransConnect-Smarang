@@ -19,6 +19,10 @@ export interface Task {
   status: TaskStatus;
   technician_report: string | null;
   technician_photo_url: string | null;
+  // Every repair photo on the task, in submission order; technician_photo_url
+  // is the first entry. Render this list rather than the single URL -- tasks
+  // reported before multi-photo uploads existed come back as a one-entry list.
+  technician_photo_urls: string[];
   technician_video_url: string | null;
   approved_for_public: boolean;
   // An explicit "no" from DISHUB on the repair photo, as opposed to "not
@@ -46,5 +50,8 @@ export interface TaskCreateInput {
 export interface ApprovedRepairPhoto {
   technician_report: string;
   technician_photo_url: string;
+  // All of the task's approved repair photos, in submission order;
+  // technician_photo_url is the first one. The public strip shows every entry.
+  technician_photo_urls: string[];
   updated_at: string;
 }
