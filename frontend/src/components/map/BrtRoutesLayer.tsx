@@ -6,6 +6,7 @@ import * as maplibregl from "maplibre-gl";
 import { HALTE_POINT_LAYER_ID } from "@/components/map/HalteLayer";
 import CorridorLegendRows from "@/components/ui/CorridorLegendRows";
 import { koridorColorExpression, koridorTags } from "@/lib/brtCorridorStyle";
+import { rutePopupHtml } from "@/lib/brtRutePopup";
 import { fetchBrtNetwork } from "@/lib/fetchBrtNetwork";
 import type { BrtRuteFeature } from "@/types/brt";
 
@@ -135,15 +136,9 @@ export default function BrtRoutesLayer({
         const p = clicked.properties as BrtRuteFeature["properties"] | undefined;
         if (!p) return;
         map.getCanvas().style.cursor = "pointer";
-        const koridor = p.koridor ? `Koridor ${p.koridor} · ` : "";
-        const km = typeof p.length_km === "number" ? `<br/><span style="opacity:.7">${p.length_km.toFixed(1)} km</span>` : "";
-        popup
-          .setLngLat(e.lngLat)
-          .setHTML(
-            `<div style="font-size:12px;line-height:1.35"><strong>${p.rute}</strong><br/>` +
-              `<span style="opacity:.7">${koridor}Jaringan BRT Trans Semarang</span>${km}</div>`,
-          )
-          .addTo(map);
+        // Body comes from lib/brtRutePopup.ts, shared with the DISHUB dashboard
+        // layer, so the two pages cannot describe the same corridor differently.
+        popup.setLngLat(e.lngLat).setHTML(rutePopupHtml(p)).addTo(map);
       };
       const hidePopup = () => {
         map.getCanvas().style.cursor = "";
