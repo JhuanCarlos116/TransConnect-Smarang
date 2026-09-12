@@ -4,10 +4,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import AppHeader from "@/components/ui/AppHeader";
-import PhotoPicker from "@/components/ui/PhotoPicker";
+import PhotoPicker, { findUnreadablePhoto } from "@/components/ui/PhotoPicker";
 import ReportHaltePicker from "@/components/map/ReportHaltePicker";
 import { createCitizenReport } from "@/lib/fetchCitizenReports";
-import { MAX_VIDEO_BYTES, mb } from "@/lib/uploadLimits";
+import { uploadErrorMessage } from "@/lib/uploadError";
+import { MAX_VIDEO_BYTES, UPLOAD_TIMEOUT_MS, mb } from "@/lib/uploadLimits";
 import { useLocalProfile } from "@/lib/useLocalProfile";
 import type { HalteFeature } from "@/types/halte";
 
@@ -51,20 +52,41 @@ export default function LaporPage() {
 
     setStatus("submitting");
     setError(null);
+
+    // Prove every chosen photo can still be read before anything is sent.
+    // Without this, a File the browser has lost access to produces a request
+    // whose body never arrives: no error here, nothing on the server, and
+    // "Mengirim..." forever. See findUnreadablePhoto.
+    const unreadable = await findUnreadablePhoto(photos);
+    if (unreadable) {
+      setStatus("error");
+      setError(
+        `Foto "${unreadable.name}" tidak bisa dibaca lagi oleh browser. Hapus foto itu dari daftar lalu pilih ulang, atau kirim laporan tanpa foto.`,
+      );
+      return;
+    }
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), UPLOAD_TIMEOUT_MS);
     try {
-      await createCitizenReport({
-        lat: halte.geometry.coordinates[1],
-        lon: halte.geometry.coordinates[0],
-        halteId: halte.properties.halte_id,
-        reporterName: name.trim(),
-        description: description.trim(),
-        photos: photos.length > 0 ? photos : undefined,
-        video: video ?? undefined,
-      });
+      await createCitizenReport(
+        {
+          lat: halte.geometry.coordinates[1],
+          lon: halte.geometry.coordinates[0],
+          halteId: halte.properties.halte_id,
+          reporterName: name.trim(),
+          description: description.trim(),
+          photos: photos.length > 0 ? photos : undefined,
+          video: video ?? undefined,
+        },
+        { signal: controller.signal },
+      );
       setStatus("done");
     } catch (err) {
       setStatus("error");
-      setError(err instanceof Error ? err.message : "Gagal mengirim laporan.");
+      setError(uploadErrorMessage(err));
+    } finally {
+      clearTimeout(timer);
     }
   }
 

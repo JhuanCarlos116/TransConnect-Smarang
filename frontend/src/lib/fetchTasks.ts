@@ -1,5 +1,6 @@
 import type { FacilityVariable } from "@/types/halte";
 import type { ApprovedRepairPhoto, Task, TaskCreateInput, TaskFacilityState, TaskStatus } from "@/types/task";
+import { uploadStatusMessage } from "@/lib/uploadError";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -67,6 +68,7 @@ export async function submitTechnicianReport(
   video: File,
   facilityUpdates: Partial<Record<FacilityVariable, TaskFacilityState>>,
   photos?: File[],
+  opts: { signal?: AbortSignal } = {},
 ): Promise<Task> {
   const formData = new FormData();
   formData.append("report", report);
@@ -79,8 +81,15 @@ export async function submitTechnicianReport(
   const res = await fetch(`${requireApiBase()}/api/v1/tasks/${taskId}/report`, {
     method: "PATCH",
     body: formData,
+    signal: opts.signal,
   });
-  return parseOrThrow<Task>(res);
+  if (!res.ok) {
+    const body = (await res.json().catch(() => null)) as { detail?: string } | null;
+    throw new Error(
+      body?.detail ?? uploadStatusMessage(res.status) ?? `Backend merespons status ${res.status}`,
+    );
+  }
+  return (await res.json()) as Task;
 }
 
 export async function approveTechnicianPhoto(taskId: string): Promise<Task> {

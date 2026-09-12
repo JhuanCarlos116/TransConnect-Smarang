@@ -1,4 +1,5 @@
 import type { CitizenReport, CitizenReportCreateInput } from "@/types/citizenReport";
+import { uploadStatusMessage } from "@/lib/uploadError";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -16,7 +17,15 @@ function requireApiBase(): string {
   return API_BASE_URL;
 }
 
-export async function createCitizenReport(input: CitizenReportCreateInput): Promise<CitizenReport> {
+/**
+ * @param opts.signal lets the caller bound how long the upload may take -- see
+ *   UPLOAD_TIMEOUT_MS. Without it a request that will never finish leaves the
+ *   form spinning forever with nothing to show the person.
+ */
+export async function createCitizenReport(
+  input: CitizenReportCreateInput,
+  opts: { signal?: AbortSignal } = {},
+): Promise<CitizenReport> {
   const formData = new FormData();
   formData.append("lat", String(input.lat));
   formData.append("lon", String(input.lon));
@@ -33,11 +42,14 @@ export async function createCitizenReport(input: CitizenReportCreateInput): Prom
   const res = await fetch(`${requireApiBase()}/api/v1/citizen-reports`, {
     method: "POST",
     body: formData,
+    signal: opts.signal,
   });
 
   if (!res.ok) {
     const body = (await res.json().catch(() => null)) as { detail?: string } | null;
-    throw new Error(body?.detail ?? `Backend merespons status ${res.status}`);
+    throw new Error(
+      body?.detail ?? uploadStatusMessage(res.status) ?? `Backend merespons status ${res.status}`,
+    );
   }
 
   return (await res.json()) as CitizenReport;
