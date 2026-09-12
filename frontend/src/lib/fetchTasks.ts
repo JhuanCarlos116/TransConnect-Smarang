@@ -1,4 +1,5 @@
-import type { ApprovedRepairPhoto, Task, TaskCreateInput, TaskStatus } from "@/types/task";
+import type { FacilityVariable } from "@/types/halte";
+import type { ApprovedRepairPhoto, Task, TaskCreateInput, TaskFacilityState, TaskStatus } from "@/types/task";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -60,9 +61,17 @@ export async function deleteTask(taskId: string): Promise<void> {
   }
 }
 
-export async function submitTechnicianReport(taskId: string, report: string, photo?: File): Promise<Task> {
+export async function submitTechnicianReport(
+  taskId: string,
+  report: string,
+  video: File,
+  facilityUpdates: Partial<Record<FacilityVariable, TaskFacilityState>>,
+  photo?: File,
+): Promise<Task> {
   const formData = new FormData();
   formData.append("report", report);
+  formData.append("video", video);
+  formData.append("facility_updates", JSON.stringify(facilityUpdates));
   if (photo) formData.append("photo", photo);
 
   const res = await fetch(`${requireApiBase()}/api/v1/tasks/${taskId}/report`, {
@@ -74,6 +83,13 @@ export async function submitTechnicianReport(taskId: string, report: string, pho
 
 export async function approveTechnicianPhoto(taskId: string): Promise<Task> {
   const res = await fetch(`${requireApiBase()}/api/v1/tasks/${taskId}/approve`, { method: "PATCH" });
+  return parseOrThrow<Task>(res);
+}
+
+export async function approveFacilityUpdate(taskId: string): Promise<Task> {
+  const res = await fetch(`${requireApiBase()}/api/v1/tasks/${taskId}/approve-facility-update`, {
+    method: "PATCH",
+  });
   return parseOrThrow<Task>(res);
 }
 

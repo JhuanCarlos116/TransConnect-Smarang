@@ -19,10 +19,14 @@ const STATE_OPTIONS: Array<{ value: FacilityState; label: string }> = [
   { value: "-", label: "Tidak disebutkan" },
 ];
 
-function stateBadge(value: FacilityState): { text: string; colorClass: string } {
-  if (value === "ada") return { text: "Tersedia & Baik", colorClass: "text-safety-green bg-green-50" };
-  if (value === "tidak") return { text: "Tidak Ada / Rusak", colorClass: "text-alert-red bg-red-50" };
-  return { text: "Tidak Disebutkan", colorClass: "text-on-surface-variant bg-surface-container" };
+// Same solid-color-box treatment as HaltePublicModal's facility chips
+// (see stateChipClasses there) -- the team asked for the dashboard's view
+// to match what a passenger sees exactly, dropping the "baik/rusak" wording
+// since a photo/survey only ever proves presence or absence, not quality.
+function stateBoxClasses(value: FacilityState): string {
+  if (value === "ada") return "bg-safety-green text-on-primary";
+  if (value === "tidak") return "bg-alert-red text-on-primary";
+  return "bg-outline-variant text-on-surface";
 }
 
 /**
@@ -30,13 +34,18 @@ function stateBadge(value: FacilityState): { text: string; colorClass: string } 
  * surveyed one. This is the whole reason the detector is allowed to write to
  * the survey at all: it only ever fills variables nobody recorded, and every
  * value it touches stays marked as such until a human overrules it.
+ *
+ * Kept outside the color box (absolute, top-right corner) rather than
+ * dropped entirely once the box itself switched to the passenger-style
+ * solid-color look -- staff still need to see which values are
+ * machine-written or hand-corrected, a passenger has no reason to.
  */
 function sourceBadge(source: FacilitySource | undefined) {
   if (source === "ai") {
     return (
       <span
         title="Diisi otomatis dari foto laporan warga"
-        className="rounded bg-blue-50 px-1.5 py-0.5 font-label-sm text-[10px] font-bold text-transport-blue"
+        className="rounded bg-surface/90 px-1.5 py-0.5 font-label-sm text-[9px] font-bold text-transport-blue backdrop-blur-sm"
       >
         dari foto
       </span>
@@ -46,20 +55,13 @@ function sourceBadge(source: FacilitySource | undefined) {
     return (
       <span
         title="Dikoreksi manual oleh admin DISHUB"
-        className="rounded bg-surface-container px-1.5 py-0.5 font-label-sm text-[10px] font-bold text-on-surface-variant"
+        className="rounded bg-surface/90 px-1.5 py-0.5 font-label-sm text-[9px] font-bold text-on-surface-variant backdrop-blur-sm"
       >
         dikoreksi
       </span>
     );
   }
-  return (
-    <span
-      title="Hasil pengamatan tim survei di lapangan"
-      className="rounded bg-surface-container px-1.5 py-0.5 font-label-sm text-[10px] font-bold text-on-surface-variant"
-    >
-      survei
-    </span>
-  );
+  return null;
 }
 
 interface FacilityEditorProps {
@@ -131,20 +133,19 @@ export default function FacilityEditor({ feature, onUpdated }: FacilityEditorPro
         )}
       </div>
 
-      {/* One column, not two: at this modal's width a half-width cell cannot
-          hold the facility label plus BOTH the provenance badge and the state
-          badge, and the state text was being clipped ("Tersedia & Ba..."). */}
-      <div className="grid grid-cols-1 gap-2">
-        {ROWS.map(({ key, label, icon }) => {
-          const value = p[key];
-          const badge = stateBadge(value);
-          return (
-            <div key={key} className="flex items-center justify-between gap-2 p-2.5 rounded-lg border border-border-low bg-surface">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-outline text-[18px]">{icon}</span>
-                <span className="font-label-sm text-[12px] text-on-surface font-medium">{label}</span>
-              </div>
-              {editing ? (
+      {editing ? (
+        <div className="grid grid-cols-1 gap-2">
+          {ROWS.map(({ key, label, icon }) => {
+            const value = p[key];
+            return (
+              <div
+                key={key}
+                className="flex items-center justify-between gap-2 rounded-lg border border-border-low bg-surface p-2.5"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[18px] text-outline">{icon}</span>
+                  <span className="font-label-sm text-[12px] font-medium text-on-surface">{label}</span>
+                </div>
                 <select
                   aria-label={`${label} — status fasilitas`}
                   value={draft[key] ?? value}
@@ -157,16 +158,27 @@ export default function FacilityEditor({ feature, onUpdated }: FacilityEditorPro
                     </option>
                   ))}
                 </select>
-              ) : (
-                <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-                  {sourceBadge(p.facility_sources?.[key])}
-                  <span className={`font-label-sm text-[11px] font-bold px-2 py-0.5 rounded ${badge.colorClass}`}>{badge.text}</span>
-                </span>
-              )}
-            </div>
-          );
-        })}
-      </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        // Same 2-column solid-color box grid as HaltePublicModal's public
+        // facility display -- see ATTRIBUTE_ROWS/stateChipClasses there.
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+          {ROWS.map(({ key, label, icon }) => {
+            const value = p[key];
+            const badge = sourceBadge(p.facility_sources?.[key]);
+            return (
+              <div key={key} className={`relative flex items-center gap-2 rounded-lg p-2.5 ${stateBoxClasses(value)}`}>
+                <span className="material-symbols-outlined text-[18px]">{icon}</span>
+                <span className="font-label-sm text-[12px] font-medium">{label}</span>
+                {badge && <span className="absolute right-2 top-2">{badge}</span>}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {editing && (
         <div className="mt-2 flex flex-col gap-2">
