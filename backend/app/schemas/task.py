@@ -37,6 +37,11 @@ class TaskOut(BaseModel):
     approved_for_public: bool
     facility_updates: dict[str, FacilityState] | None
     facility_updates_approved: bool
+    # Whether an approved facility_updates batch can still be undone (see
+    # revert-facility-update) -- exposed as a plain flag rather than the
+    # snapshot itself, since the frontend only needs to know whether to show
+    # the "Kembalikan" button.
+    facility_updates_revertible: bool
     created_at: datetime
     updated_at: datetime
 

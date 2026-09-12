@@ -53,6 +53,16 @@ class MaintenanceTask(Base):
     # governs whether the photo shows on the public repair-history strip.
     facility_updates: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     facility_updates_approved: Mapped[bool] = mapped_column(Boolean, default=False)
+    # halte_survey's own state immediately before an approval overwrote it --
+    # {"facility_values": {...}, "facility_sources": {...}, "condition_score":
+    # int, "condition_label": str, "media_prepended_count": int}. Written by
+    # approve_facility_update, consumed (and cleared) by
+    # revert_facility_update -- lets DISHUB undo a mis-click without leaving
+    # halte_survey's prior values unrecoverable, since applying one task's
+    # facility_updates otherwise overwrites them with no trace. Cleared after
+    # a revert (rather than kept for repeated undo) since a fresh approval is
+    # needed before there's anything meaningful to revert again.
+    facility_updates_snapshot: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(

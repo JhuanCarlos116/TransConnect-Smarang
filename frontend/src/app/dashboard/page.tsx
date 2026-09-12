@@ -65,10 +65,14 @@ export default function DashboardPage() {
   // Which halte need a report marker on the map, and what color: red for
   // "not started yet" (a citizen report with no task, or a task still
   // "belum_dikerjakan"), orange once a technician has actually started work
-  // (task "proses"). A task reaching "selesai" deletes its citizen_report
-  // row server-side, so it naturally drops out of `reports` here; a
-  // "selesai" task itself is excluded below too, since the halte is
-  // considered handled either way.
+  // (task "proses"), purple if the task is "selesai" but the technician's
+  // proposed facility changes haven't been reviewed yet (see
+  // approve-facility-update in routers/task.py) -- the halte shouldn't
+  // silently vanish from the map just because a dispatcher moved the task's
+  // column while its facility data is still unconfirmed. A "selesai" task
+  // with nothing pending (or one dispatched from a citizen report, whose
+  // report row is deleted at that point) drops out of `reports`/here as
+  // before, since there's genuinely nothing left to flag.
   // Sourced from tasks first (keyed by halte_id directly, not
   // citizen_report_id) so a manually dispatched task -- one with no citizen
   // report behind it, created via TaskCreateSection rather than dispatched
@@ -87,7 +91,14 @@ export default function DashboardPage() {
           next.set(report.halte_id, "baru");
         }
         for (const task of tasks) {
-          if (task.status === "selesai") continue;
+          if (task.status === "selesai") {
+            const hasPendingFacilityUpdate =
+              task.facility_updates &&
+              Object.keys(task.facility_updates).length > 0 &&
+              !task.facility_updates_approved;
+            if (hasPendingFacilityUpdate) next.set(task.halte_id, "menunggu_approval");
+            continue;
+          }
           next.set(task.halte_id, task.status === "proses" ? "proses" : "baru");
         }
         setReportedHalteStatus(next);

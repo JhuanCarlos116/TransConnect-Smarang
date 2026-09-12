@@ -48,6 +48,7 @@ def _to_out(task: MaintenanceTask, halte: HalteSurvey) -> TaskOut:
         approved_for_public=task.approved_for_public,
         facility_updates=task.facility_updates,
         facility_updates_approved=task.facility_updates_approved,
+        facility_updates_revertible=task.facility_updates_approved and task.facility_updates_snapshot is not None,
         created_at=task.created_at,
         updated_at=task.updated_at,
     )
@@ -292,6 +293,14 @@ async def approve_facility_update(task_id: str, session: AsyncSession = Depends(
     if halte is None:
         raise HTTPException(status_code=404, detail="Halte tidak ditemukan.")
 
+    # Snapshot halte's exact state right before this approval overwrites it,
+    # so a mis-click (or a DISHUB reviewer changing their mind) can be undone
+    # via revert_facility_update below -- otherwise the prior facility
+    # values/score/media are gone with no trace the moment this commits.
+    facility_snapshot = {facility: getattr(halte, facility) for facility in task.facility_updates}
+    source_snapshot = {f: (halte.facility_sources or {}).get(f) for f in task.facility_updates}
+    prev_score, prev_label = halte.condition_score, halte.condition_label
+
     for facility, value in task.facility_updates.items():
         setattr(halte, facility, value)
 
@@ -316,6 +325,65 @@ async def approve_facility_update(task_id: str, session: AsyncSession = Depends(
         halte.media = [*new_media, *(halte.media or [])]
 
     task.facility_updates_approved = True
+    task.facility_updates_snapshot = {
+        "facility_values": facility_snapshot,
+        "facility_sources": source_snapshot,
+        "condition_score": prev_score,
+        "condition_label": prev_label,
+        "media_prepended_count": len(new_media),
+    }
+
+    await session.commit()
+    await session.refresh(task)
+    await session.refresh(halte)
+
+    return _to_out(task, halte)
+
+
+@router.patch("/tasks/{task_id}/revert-facility-update", response_model=TaskOut)
+async def revert_facility_update(task_id: str, session: AsyncSession = Depends(get_session)) -> TaskOut:
+    """Undoes one approve_facility_update -- for a dispatcher mis-click, or
+    a reviewer who changes their mind after approving. Restores halte_survey's
+    exact facility values, provenance, condition score, and media list from
+    the snapshot approve_facility_update took right before it overwrote them.
+
+    The snapshot is cleared afterwards rather than kept for a second revert:
+    once undone, the task's facility_updates themselves are still sitting
+    there unapproved (facility_updates_approved goes back to False), so
+    DISHUB can review and approve them again from scratch if this was
+    reverted by mistake -- that fresh approval takes a new, current snapshot.
+    """
+    task = await session.get(MaintenanceTask, task_id)
+    if task is None:
+        raise HTTPException(status_code=404, detail="Tugas tidak ditemukan.")
+    if not task.facility_updates_approved or not task.facility_updates_snapshot:
+        raise HTTPException(status_code=400, detail="Tidak ada perubahan fasilitas yang bisa dikembalikan.")
+
+    halte = await session.get(HalteSurvey, task.halte_id)
+    if halte is None:
+        raise HTTPException(status_code=404, detail="Halte tidak ditemukan.")
+
+    snapshot = task.facility_updates_snapshot
+    for facility, value in snapshot["facility_values"].items():
+        setattr(halte, facility, value)
+
+    halte.condition_score = snapshot["condition_score"]
+    halte.condition_label = snapshot["condition_label"]
+
+    restored_sources = dict(halte.facility_sources or {})
+    for facility, prev_source in snapshot["facility_sources"].items():
+        if prev_source is None:
+            restored_sources.pop(facility, None)
+        else:
+            restored_sources[facility] = prev_source
+    halte.facility_sources = restored_sources
+
+    media_prepended_count = snapshot.get("media_prepended_count", 0)
+    if media_prepended_count and halte.media:
+        halte.media = halte.media[media_prepended_count:]
+
+    task.facility_updates_approved = False
+    task.facility_updates_snapshot = None
 
     await session.commit()
     await session.refresh(task)
