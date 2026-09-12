@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { MAX_PHOTOS, MAX_PHOTO_BYTES, PHOTO_ACCEPT, mb } from "@/lib/uploadLimits";
 
@@ -28,6 +28,10 @@ interface PhotoPickerProps {
  * now, another after walking around the halte.
  */
 export default function PhotoPicker({ photos, onChange, onError, idleLabel, hint }: PhotoPickerProps) {
+  // Remounts the input so a file can be picked again after being removed, but
+  // ONLY while nothing is selected -- see the note on the input below.
+  const [inputKey, setInputKey] = useState(0);
+
   // Preview URLs for the chosen files. Rebuilt whenever the selection changes
   // and revoked on the way out: a blob URL pins its whole image in memory for
   // the life of the tab, and a set of phone photos is not small.
@@ -36,9 +40,6 @@ export default function PhotoPicker({ photos, onChange, onError, idleLabel, hint
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const picked = Array.from(e.target.files ?? []);
-    // Cleared straight away so re-picking the same file still fires `change` --
-    // otherwise removing a photo and re-adding it silently does nothing.
-    e.target.value = "";
     if (picked.length === 0) return;
 
     const oversized = picked.filter((file) => file.size > MAX_PHOTO_BYTES);
@@ -62,8 +63,12 @@ export default function PhotoPicker({ photos, onChange, onError, idleLabel, hint
   }
 
   function removeAt(index: number) {
+    const next = photos.filter((_, i) => i !== index);
+    // Remount only once the selection is empty, which is the one moment there
+    // is no held File whose permission the remount could take away.
+    if (next.length === 0) setInputKey((k) => k + 1);
     onError(null);
-    onChange(photos.filter((_, i) => i !== index));
+    onChange(next);
   }
 
   return (
@@ -76,7 +81,31 @@ export default function PhotoPicker({ photos, onChange, onError, idleLabel, hint
         <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-transport-blue text-on-primary">
           <span className="material-symbols-outlined text-[16px]">add</span>
         </span>
-        <input type="file" multiple accept={PHOTO_ACCEPT} onChange={handleChange} className="hidden" />
+        {/*
+          The input's value is deliberately NOT cleared after a pick.
+
+          Clearing it is the standard trick for letting someone re-pick the same
+          file, because a file input only fires `change` when its value actually
+          changes -- the first version of this component did exactly that. It
+          had to go: on Android a picked photo comes back as a content:// URI
+          whose read permission belongs to the input's current selection, and
+          resetting the input can revoke it. The browser then cannot produce the
+          upload body at all, and the failure is silent: the POST goes out, the
+          body never arrives, and the server eventually gives up while the
+          citizen watches "Mengirim..." -- reproduced from production logs,
+          where nginx logged a 408 and FastAPI never saw the request.
+
+          Re-pickability is kept the safe way instead: `key` changes only when
+          the selection is empty.
+        */}
+        <input
+          key={inputKey}
+          type="file"
+          multiple
+          accept={PHOTO_ACCEPT}
+          onChange={handleChange}
+          className="hidden"
+        />
       </label>
 
       {photos.length > 0 && (
@@ -106,4 +135,39 @@ export default function PhotoPicker({ photos, onChange, onError, idleLabel, hint
       </p>
     </div>
   );
+}
+
+/** How long one photo gets to prove it is still readable. */
+const READ_PROBE_TIMEOUT_MS = 8_000;
+
+/**
+ * The first selected photo the browser can no longer read, or null if all are
+ * fine.
+ *
+ * Worth the one byte per photo it costs, because the alternative failure is
+ * the worst one this feature has: a File that cannot be read still lets the
+ * POST start, its body simply never completes, and nothing anywhere says so.
+ * The person sees "Mengirim..." until they give up, nginx times out its body
+ * read, and FastAPI never receives the request -- so there is no server-side
+ * error to look at afterwards either. Checking readability first turns that
+ * silence into a message naming the photo.
+ *
+ * Bounded by a timeout rather than left to reject on its own: a file backed by
+ * a cloud photo library blocks while it downloads instead of failing, which is
+ * the same indefinite hang one step earlier.
+ */
+export async function findUnreadablePhoto(files: File[]): Promise<File | null> {
+  for (const file of files) {
+    try {
+      await Promise.race([
+        file.slice(0, 1).arrayBuffer(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("waktu baca berkas habis")), READ_PROBE_TIMEOUT_MS),
+        ),
+      ]);
+    } catch {
+      return file;
+    }
+  }
+  return null;
 }

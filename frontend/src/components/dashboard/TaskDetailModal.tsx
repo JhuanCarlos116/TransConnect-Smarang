@@ -3,10 +3,11 @@
 import { useState } from "react";
 
 import FacilityUpdatePicker, { type FacilityUpdates } from "@/components/dashboard/FacilityUpdatePicker";
-import PhotoPicker from "@/components/ui/PhotoPicker";
+import PhotoPicker, { findUnreadablePhoto } from "@/components/ui/PhotoPicker";
 import { submitTechnicianReport } from "@/lib/fetchTasks";
 import { resolveUploadUrl } from "@/lib/resolveUploadUrl";
-import { MAX_VIDEO_BYTES, mb } from "@/lib/uploadLimits";
+import { uploadErrorMessage } from "@/lib/uploadError";
+import { MAX_VIDEO_BYTES, UPLOAD_TIMEOUT_MS, mb } from "@/lib/uploadLimits";
 import type { Task } from "@/types/task";
 
 interface TaskDetailModalProps {
@@ -58,6 +59,21 @@ export default function TaskDetailModal({ task, onClose, onUpdated }: TaskDetail
     if (!task || !report.trim() || !video) return;
     setSubmitting(true);
     setError(null);
+
+    // Same guard as the citizen page: an unreadable photo would otherwise
+    // produce a request whose body never arrives -- no error here, none on the
+    // server, and the button stuck on "Menyimpan...". See findUnreadablePhoto.
+    const unreadable = await findUnreadablePhoto(photos);
+    if (unreadable) {
+      setError(
+        `Foto "${unreadable.name}" tidak bisa dibaca lagi oleh browser. Hapus foto itu lalu pilih ulang.`,
+      );
+      setSubmitting(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), UPLOAD_TIMEOUT_MS);
     try {
       const updated = await submitTechnicianReport(
         task.task_id,
@@ -65,14 +81,16 @@ export default function TaskDetailModal({ task, onClose, onUpdated }: TaskDetail
         video,
         facilityUpdates,
         photos.length > 0 ? photos : undefined,
+        { signal: controller.signal },
       );
       onUpdated(updated);
       setPhotos([]);
       setVideo(null);
       setFacilityUpdates({});
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal mengirim laporan petugas.");
+      setError(uploadErrorMessage(err, "laporan petugas"));
     } finally {
+      clearTimeout(timer);
       setSubmitting(false);
     }
   }

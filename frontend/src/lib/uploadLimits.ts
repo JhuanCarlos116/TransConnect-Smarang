@@ -19,6 +19,19 @@ export const MAX_PHOTO_BYTES = 15 * 1024 * 1024;
 export const MAX_PHOTOS = 5;
 export const MAX_VIDEO_BYTES = 25 * 1024 * 1024;
 
+/**
+ * How long to wait for an upload before giving up and saying so.
+ *
+ * A 15 MB photo over a weak mobile uplink is legitimately slow, and nginx is
+ * configured to allow a slow upload (verified: 12.9 MB at 200 KB/s, 66 seconds,
+ * succeeds). So this is not a size limit in disguise -- it exists so that a
+ * request which is never going to finish ends with a message instead of an
+ * indefinitely spinning "Mengirim...". That spin is worse than an error: it
+ * looks like the app is working, so the person waits instead of retrying, and
+ * nothing is recorded on the server to explain it afterwards.
+ */
+export const UPLOAD_TIMEOUT_MS = 90_000;
+
 export const PHOTO_ACCEPT = "image/jpeg,image/png,image/webp";
 export const VIDEO_ACCEPT = "video/mp4,video/webm,video/quicktime";
 
